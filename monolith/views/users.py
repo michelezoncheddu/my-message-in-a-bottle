@@ -11,6 +11,16 @@ def _users():
     _users = db.session.query(User)
     return render_template("users.html", users=_users)
 
+@users.route('/profile')
+def profile():
+    firstname   = current_user.get_firstname()
+    surname     = current_user.get_surname()
+    email       = current_user.get_email()
+    return render_template('profile.html', 
+                            firstname= firstname,
+                            surname= surname,
+                            email= email) 
+
 
 @users.route('/create_user', methods=['POST', 'GET'])
 def create_user():
