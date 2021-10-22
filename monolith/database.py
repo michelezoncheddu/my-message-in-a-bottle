@@ -36,4 +36,16 @@ class User(db.Model):
 
     def get_id(self):
         return self.id
+    
+    # get firstname
+    def get_firstname(self):
+        return self.firstname
+
+    # get surname
+    def get_surname(self):
+        return self.lastname
+    
+    # get email
+    def get_email(self):
+        return self.email
 
