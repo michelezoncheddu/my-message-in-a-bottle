@@ -3,6 +3,8 @@ from flask import Blueprint, redirect, render_template, request
 from monolith.database import User, db
 from monolith.forms import UserForm,UserDelForm
 
+from flask_login import current_user
+
 users = Blueprint('users', __name__)
 
 
