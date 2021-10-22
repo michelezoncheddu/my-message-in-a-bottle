@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request
 
 from monolith.database import User, db
-from monolith.forms import UserForm
+from monolith.forms import UserForm,UserDelForm
 
 users = Blueprint('users', __name__)
 
@@ -31,5 +31,22 @@ def create_user():
             return redirect('/users')
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
+    else:
+        raise RuntimeError('This should not happen!')
+
+@users.route('/delete_user', methods=['POST','GET'])
+def delete_user():
+    form = UserDelForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            del_user = User.query.filter_by(firstname=form.firstname.data).first()
+            db.session.delete(del_user)
+            db.session.commit()
+            db.session.commit()
+
+            return redirect('/users')
+    elif request.method == 'GET':
+        return render_template('delete_user.html', form=form)
     else:
         raise RuntimeError('This should not happen!')
