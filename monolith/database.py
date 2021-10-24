@@ -49,3 +49,60 @@ class User(db.Model):
     def get_email(self):
         return self.email
 
+
+class Message(db.Model):
+
+    __tablename__ = 'messages'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    text = db.Column(db.Unicode(128),nullable=False)
+    delivery_date = db.Column(db.DateTime)
+    is_draft = db.Column(db.Boolean, default=True)
+    last_update_date = db.Column(db.DateTime)
+    is_valid = db.Column(db.Boolean, default=True)
+    is_delivered = db.Column(db.Boolean, default=False)
+    attachment = db.Column(db.LargeBinary, default=None)
+
+    def __init__(self, *args, **kw):
+        super(Message, self).__init__(*args, **kw)
+
+    def get_id(self):
+        return self.id
+    
+    # get sender_id
+    def get_sender(self):
+        return self.sender_id
+
+    # get recipient_id
+    def get_recipient(self):
+        return self.recipient_id
+    
+    # get text
+    def get_text(self):
+        return self.text
+
+    # get delivery_date
+    def get_delivery_date(self):
+        return self.delivery_date
+
+    # get if draft
+    def is_draft(self):
+        return self.is_draft 
+
+    # get last update date
+    def last_update_date(self):
+        return self.last_update_date
+
+    # get is_valid
+    def is_valid(self):
+        return self.is_valid   
+    
+    # get is_delivered
+    def is_delivered(self):
+        return self.is_delivered
+
+    # get attachement
+    def get_attachement(self):
+        return self.attachment

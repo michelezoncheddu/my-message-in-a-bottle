@@ -2,9 +2,9 @@
     <body>
     <img width="150px" src="https://st.depositphotos.com/1537427/3571/v/950/depositphotos_35717211-stock-illustration-vector-user-icon.jpg">
     <h2>Profile Information</h2>
-    <div><strong>First Name</strong><input type="text" value= "{{ firstname }}" readonly>
-        <strong>Surname</strong><input type="text" value= "{{ surname }}" readonly></div></div>
-    <div><strong>Email</strong><input type="text" value= "{{ email }}" readonly>
+    <div><strong>First Name</strong><input type="text" value= "{{ user.get_firstname() }}" readonly>
+        <strong>Surname</strong><input type="text" value= "{{ user.get_surname() }}" readonly></div></div>
+    <div><strong>Email</strong><input type="text" value= "{{ user.get_email() }}" readonly>
         <strong>Location</strong><input type="text" value= "" readonly></div></div>
     </body>
 </html>

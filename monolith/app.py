@@ -1,9 +1,9 @@
-import datetime
-
 from flask import Flask
 
+from datetime import datetime
+
 from monolith.auth import login_manager
-from monolith.database import User, db
+from monolith.database import User, Message, db
 from monolith.views import blueprints
 
 
@@ -31,9 +31,26 @@ def create_app():
             example.firstname = 'Admin'
             example.lastname = 'Admin'
             example.email = 'example@example.com'
-            example.dateofbirth = datetime.datetime(2020, 10, 5)
+            example.dateofbirth = datetime(2020, 10, 5)
             example.is_admin = True
             example.set_password('admin')
+            db.session.add(example)
+            db.session.commit()
+
+        # getting the dummy message if any
+        m = db.session.query(Message).filter(Message.sender_id == 1 and Message.recipient_id==1)
+        message = m.first()
+        
+        # creating the dummy message
+        if message is None:
+            example = Message()
+            example.sender_id = 1
+            example.recipient_id = 1
+            example.text = "ciao"
+            now = datetime.now()
+            # now.replace(microsecond=0)  # maybe not needed
+            example.delivery_date = now
+            example.last_update_date = now           
             db.session.add(example)
             db.session.commit()
 

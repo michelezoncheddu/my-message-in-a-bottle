@@ -15,13 +15,12 @@ def _users():
 
 @users.route('/profile')
 def profile():
-    firstname   = current_user.get_firstname()
+    # old version commented : remember to check for test coverage
+    """firstname   = current_user.get_firstname()
     surname     = current_user.get_surname()
-    email       = current_user.get_email()
-    return render_template('profile.html', 
-                            firstname= firstname,
-                            surname= surname,
-                            email= email) 
+    email       = current_user.get_email()"""
+    _user = current_user
+    return render_template('profile.html', user=_user) 
 
 
 @users.route('/create_user', methods=['POST', 'GET'])
