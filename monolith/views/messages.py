@@ -77,7 +77,7 @@ def create_message():
 @messages.route('/messages/draft')
 def messages_draft():
     messages_draft = db.session.query(Message)
-    for i in messages_draft.filter_by(is_draft = True):
+    for i in messages_draft.filter_by(is_draft = False):
         print(i)
     return render_template("messages.html", messages=messages_draft)
 
