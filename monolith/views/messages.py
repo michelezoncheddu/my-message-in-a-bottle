@@ -20,7 +20,7 @@ def write_message():
     if request.method == 'POST':
         for recipient in form.recipient_id.data:
             new_message=Message()
-            new_message.recipient_id=recipient
+            new_message.recipient_id=form.recipient
             new_message.text=form.text_area
             new_message.delivery_date=form.delivery_date
             new_message.attachment=None

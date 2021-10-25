@@ -17,6 +17,16 @@ def admin_required(func):
     return _admin_required
 
 
+def login_required(func):
+    @functools.wraps(func)
+    def _login_required(*args, **kw):
+        # Checks if the user is logged in.
+        if not current_user.is_authenticated:  # TODO: compare with hasattr(id)
+            return login_manager.unauthorized()
+        return func(*args, **kw)
+    return _login_required
+
+
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(user_id)
