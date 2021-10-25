@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, request
 from monolith.database import User, Message, db
 from monolith.forms import UserForm,UserDelForm,MessageForm
 from ..auth import login_required
-#from flask_login import current_user
+from flask_login import current_user
 
 messages = Blueprint('messages', __name__)
 
