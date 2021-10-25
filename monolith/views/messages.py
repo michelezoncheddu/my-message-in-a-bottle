@@ -9,7 +9,6 @@ messages = Blueprint('messages', __name__)
 
 
 @messages.route('/mailbox')
-
 @login_required
 def mailbox():
     # Retrieve user <id>
@@ -35,7 +34,7 @@ def write_message():
     
     form = MessageForm()
     if request.method == 'POST':
-        for recipient in form.recipient_id.data:
+        #for recipient in form.recipient_id.data:
             new_message=Message()
             new_message.recipient_id=form.recipient
             new_message.text=form.text_area
@@ -46,9 +45,8 @@ def write_message():
             new_message.is_valid=True
             new_message.sender_id=form.sender_id
             db.session.add(new_message) 
-            db.session.commit()
-                      
-        return redirect('/messages')
+            db.session.commit()          
+            return redirect('/messages')
 
     elif request.method == 'GET':
         return render_template("create_message.html", form=form) 
