@@ -50,7 +50,7 @@ def create_app():
                 example.text = f"message from 1 to 1 n.{i+1}"
                 now = datetime.now()
                 example.delivery_date = now
-                example.last_update_date = now           
+                example.last_update_date = now
                 db.session.add(example)
                 db.session.commit()
 
@@ -61,7 +61,7 @@ def create_app():
                 example.text = f"message from 2 to 2 n.{i+1}"
                 now = datetime.now()
                 example.delivery_date = now
-                example.last_update_date = now           
+                example.last_update_date = now
                 db.session.add(example)
                 db.session.commit()
 

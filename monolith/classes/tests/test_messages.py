@@ -4,7 +4,6 @@ import unittest
 from bs4 import BeautifulSoup as bs
 
 from monolith.app import app
-from monolith.forms import UserForm
 
 
 class Test(unittest.TestCase):
@@ -61,6 +60,22 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/message/0')
         self.assertEqual(reply.status_code, 404)
 
+        # Existent message of other users.
+        reply = tested_app.get('/message/4')
+        self.assertEqual(reply.status_code, 401)
+
         # Existent message.
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 200)
+
+        # Delete message.
+        reply = tested_app.delete('/message/1')
+        self.assertEqual(reply.status_code, 200)
+
+        # Delete unexistent message.
+        reply = tested_app.delete('/message/1')
+        self.assertEqual(reply.status_code, 404)
+
+        # Delete message of other users.
+        reply = tested_app.delete('/message/4')
+        self.assertEqual(reply.status_code, 401)

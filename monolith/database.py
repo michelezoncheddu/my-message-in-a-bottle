@@ -92,13 +92,17 @@ class Message(db.Model):
         return self.is_draft 
 
     # get last update date
-    def last_update_date(self):
+    def get_last_update_date(self):
         return self.last_update_date
 
     # get is_valid
     def is_valid(self):
-        return self.is_valid   
+        return self.is_valid
     
+    # Set message as deleted.
+    def set_as_invalid(self):
+        self.is_valid = False
+
     # get is_delivered
     def is_delivered(self):
         return self.is_delivered
