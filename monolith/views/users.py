@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
+from monolith.auth import login_required
 from monolith.database import User, db
 from monolith.forms import UserForm,UserDelForm
 
