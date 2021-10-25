@@ -41,18 +41,29 @@ def create_app():
         m = db.session.query(Message).filter(Message.sender_id == 1 and Message.recipient_id==1)
         message = m.first()
         
-        # creating the dummy message
+        # creating dummy messages
         if message is None:
-            example = Message()
-            example.sender_id = 1
-            example.recipient_id = 1
-            example.text = "ciao"
-            now = datetime.now()
-            # now.replace(microsecond=0)  # maybe not needed
-            example.delivery_date = now
-            example.last_update_date = now           
-            db.session.add(example)
-            db.session.commit()
+            for i in range(3):
+                example = Message()
+                example.sender_id = 1
+                example.recipient_id = 1
+                example.text = f"message from 1 to 1 n.{i+1}"
+                now = datetime.now()
+                example.delivery_date = now
+                example.last_update_date = now           
+                db.session.add(example)
+                db.session.commit()
+
+            for i in range(3):
+                example = Message()
+                example.sender_id = 2
+                example.recipient_id = 2
+                example.text = f"message from 2 to 2 n.{i+1}"
+                now = datetime.now()
+                example.delivery_date = now
+                example.last_update_date = now           
+                db.session.add(example)
+                db.session.commit()
 
     return app
 
