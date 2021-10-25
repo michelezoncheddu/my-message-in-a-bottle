@@ -1,10 +1,14 @@
 from flask import Blueprint, redirect, render_template, request
+from flask_login import current_user
 
-from monolith.database import User, Message, db
-from monolith.forms import UserForm,UserDelForm,MessageForm
 from ..auth import login_required
+<<<<<<< HEAD
 from flask_login import current_user
 from datetime import datetime
+=======
+from monolith.database import User, Message, db
+from monolith.forms import UserForm, UserDelForm, MessageForm
+>>>>>>> 85b28ed99bc4972a2566b279dbdaaa9862dada75
 
 messages = Blueprint('messages', __name__)
 
@@ -14,25 +18,42 @@ messages = Blueprint('messages', __name__)
 def mailbox():
     # Retrieve user <id>
     id = current_user.get_id()
+    
     # Retrieve sent/received messages of user <id>
     _messages = db.session.query(Message).filter(
         Message.sender_id == id or Message.recipient_id == id
     )
     return render_template("mailbox.html", messages=_messages)
 
-@messages.route('/message/<int:id>')
+
+@messages.route('/message/<int:id>', methods=['GET', 'DELETE'])
 @login_required
 def message(id):
-    _message = db.session.query(Message).filter(Message.id == id).first()
+    _message = db.session.query(Message).filter(
+        Message.id == id and Message.is_valid
+    ).first()
+
     if _message is None:
         return {'msg': 'message not found'}, 404
-    return render_template('message.html', message=_message)
+
+    if _message.get_recipient() != current_user.get_id():
+        return {'msg': 'unauthorized'}, 401
+
+    if request.method == 'GET':
+        return render_template('message.html', message=_message)
+    
+    # DELETE
+    else:
+        _message.is_valid = False
+        db.session.commit()
+        
+        _message = db.session.merge(_message)
+        return {'msg': 'message deleted'}, 200
 
 
 @messages.route('/write_message', methods=['POST','GET'])
 #@login_required
 def write_message():
-    
     form = MessageForm()
     if request.method == 'POST':
         #for recipient in form.recipient_id.data:
