@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request
 
 from monolith.database import User, Message, db
 from monolith.forms import UserForm,UserDelForm,MessageForm
-
+from ..auth import login_required
 #from flask_login import current_user
 
 messages = Blueprint('messages', __name__)
@@ -11,7 +11,6 @@ messages = Blueprint('messages', __name__)
 @messages.route('/mailbox')
 
 @login_required
-
 def mailbox():
     # Retrieve user <id>
     id = current_user.get_id()
@@ -31,8 +30,9 @@ def message(id):
 
 
 @messages.route('/write_message', methods=['POST','GET'])
+@login_required
 def write_message():
-
+    
     form = MessageForm()
     if request.method == 'POST':
         for recipient in form.recipient_id.data:
