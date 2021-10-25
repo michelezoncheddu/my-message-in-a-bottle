@@ -1,9 +1,16 @@
 <h1>My Message in a Bottle -- Primer</h1>
 
 {% if current_user.is_authenticated %}
-  Hi {{ current_user.firstname }}! <a href="/logout">Logout</a>
+  Hi {{ current_user.firstname }}! <a href="/logout">Logout</a><br>
+  If you wish to unregister from our platform, <a href="/unregister">Unregister</a>
     <h2>{{ welcome }}</h2>
-
+    <a href="/profile"> 
+      <button>Profile</button>
+    </a>
+    <a href="/users"> 
+      <button>Users list</button>
+    </a>
 {% else %}
-  Hi Anonymous, <a href="/login">Log in</a>
+  Hi Anonymous, <a href="/login">Log in</a><br>
+  If you don't have an account you can create one, <a href="/create_user">Signup</a>
 {% endif %}
