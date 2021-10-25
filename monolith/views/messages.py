@@ -1,18 +1,16 @@
 from flask import Blueprint, render_template
+from flask_login import current_user
 
 from monolith.database import Message, db
 
-from flask_login import current_user
+from ..auth import login_required
 
 messages = Blueprint('messages', __name__)
 
 
 @messages.route('/mailbox')
+@login_required
 def mailbox():
-    # Check if the user is logged in.
-    if not current_user.is_authenticated:  # TODO: compare with hasattr(id)
-        return {"msg": "You must login"}, 401
-    
     # Retrieve user <id>
     id = current_user.get_id()
 
@@ -22,3 +20,14 @@ def mailbox():
     )
     
     return render_template("mailbox.html", messages=_messages)
+
+
+@messages.route('/message/<int:id>')
+@login_required
+def message(id):
+    _message = db.session.query(Message).filter(Message.id == id).first()
+
+    if _message is None:
+        return {'msg': 'message not found'}, 404
+    
+    return render_template('message.html', message=_message)
