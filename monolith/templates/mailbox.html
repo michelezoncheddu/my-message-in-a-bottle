@@ -3,10 +3,15 @@
     <h1>Mailbox</h1>
     <ul>
       {% for message in messages: %}
-      <li>
-      {{message.id}} {{message.text}} {{message.sender_id}} {{message.recipient_id}}
-      </li>
+        {% if message.is_valid %}
+      
+        <li>
+          <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+        </li>
+
+        {% endif %}
       {% endfor %}
     </ul>
+     <a href="/"> <button>Home</button> </a>
   </body>
 </html>
