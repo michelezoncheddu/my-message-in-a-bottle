@@ -24,11 +24,10 @@ def mailbox():
 @messages.route('/message/<int:id>', methods=['GET', 'DELETE'])
 @login_required
 def message(id):
-    _message = db.session.query(Message).filter(
-        Message.id == id and Message.is_valid
-    ).first()
-
-    if _message is None:
+    #TODO: Catch exception instead of if.
+    _message = db.session.query(Message).filter(Message.id == id).first()
+    
+    if _message is None or not _message.is_valid:
         return {'msg': 'message not found'}, 404
 
     if _message.get_recipient() != current_user.get_id():
@@ -37,16 +36,13 @@ def message(id):
     if request.method == 'GET':
         return render_template('message.html', message=_message)
     
-    # DELETE
-    else:
-        _message.is_valid = False
-        db.session.commit()
-        
-        _message = db.session.merge(_message)
-        return {'msg': 'message deleted'}, 200
+    # DELETE    
+    _message.is_valid = False
+    db.session.commit()
+    return {'msg': 'message deleted'}, 200
 
 
-@messages.route('/write_message', methods=['POST','GET'])
+@messages.route('/write_message', methods=['POST', 'GET'])
 @login_required
 def write_message():
     form = MessageForm()
