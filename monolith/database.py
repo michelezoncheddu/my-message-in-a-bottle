@@ -45,6 +45,10 @@ class User(db.Model):
     def get_surname(self):
         return self.lastname
     
+    #get password hash
+    def get_password_hash(self):
+        return self.password
+    
     # get email
     def get_email(self):
         return self.email

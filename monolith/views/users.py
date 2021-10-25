@@ -1,5 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
+from monolith.auth import login_required
 from monolith.database import User, db
 from monolith.forms import UserForm,UserDelForm
 
@@ -9,11 +10,13 @@ users = Blueprint('users', __name__)
 
 
 @users.route('/users')
+@login_required
 def _users():
     _users = db.session.query(User)
     return render_template("users.html", users=_users)
 
 @users.route('/profile')
+@login_required
 def profile():
     # old version commented : remember to check for test coverage
     """firstname   = current_user.get_firstname()
