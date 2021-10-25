@@ -2,13 +2,12 @@ from flask import Blueprint, redirect, render_template, request
 from flask_login import current_user
 
 from ..auth import login_required
-<<<<<<< HEAD
+
 from flask_login import current_user
 from datetime import datetime
-=======
+
 from monolith.database import User, Message, db
 from monolith.forms import UserForm, UserDelForm, MessageForm
->>>>>>> 85b28ed99bc4972a2566b279dbdaaa9862dada75
 
 messages = Blueprint('messages', __name__)
 
