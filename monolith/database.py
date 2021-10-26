@@ -5,6 +5,9 @@ from .access import Access
 
 db = SQLAlchemy()
 
+# needed for finding the profile pics in the HTML
+STATIC_PATH = 'static/profile/'
+
 
 class User(db.Model):
 
@@ -30,7 +33,7 @@ class User(db.Model):
         
     # update profile picture
     def set_profile_pic(self, image_path):
-        self.profile_pic = image_path
+        self.profile_pic = STATIC_PATH + image_path
 
     @property
     def is_authenticated(self):
