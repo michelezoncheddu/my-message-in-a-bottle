@@ -32,6 +32,7 @@ def create_app():
             example.lastname = 'Admin'
             example.email = 'example@example.com'
             example.dateofbirth = datetime(2020, 10, 5)
+            example.profile_pic = "static/profile/default.png"
             example.is_admin = True
             example.set_password('admin')
             db.session.add(example)
