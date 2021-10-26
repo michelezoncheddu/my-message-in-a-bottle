@@ -65,7 +65,7 @@ class Message(db.Model):
     last_update_date = db.Column(db.DateTime)
     access = db.Column(db.Integer, default=Access.ALL.value)  # Access rights.
     is_delivered = db.Column(db.Boolean, default=False)
-    attachment = db.Column(db.LargeBinary, default=None)
+    attachment = db.Column(db.String, default=None)
 
     def __init__(self, *args, **kw):
         super(Message, self).__init__(*args, **kw)

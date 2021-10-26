@@ -1,21 +1,22 @@
 <html>
  <body>
-  <form action="" method="POST">
+  <form action="" method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <dl>
-     {% for field in form.display %}
-     <dt>{{ form[field].label }}</dt>
-     <dd>{{ form[field]() }}</dd>
-       {% if form[field].errors %}
+    {% for field in form.display %}
+    <dt>{{ form[field].label }}</dt>
+    <dd>{{ form[field]() }}</dd>
+      {% if form[field].errors %}
           {% for e in form[field].errors %}
-           <p class="help-block">{{ e }}</p>
+          <p class="help-block">{{ e }}</p>
           {% endfor %}
-       {% endif %}
-     {% endfor %}
+      {% endif %}
+    {% endfor %}
     </dl>
     <p>
     <input type=submit name='submit_button' value="Draft">
     <input type=submit name='submit_button' value="Send">
+    </p>
   </form>
  </body>
 </html>

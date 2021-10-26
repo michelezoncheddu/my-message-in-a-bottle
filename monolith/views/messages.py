@@ -1,10 +1,10 @@
-from flask import Blueprint, redirect, render_template, request,session, url_for,jsonify
+from flask import Blueprint, redirect, render_template, request,session, url_for
 from flask_login import current_user
 from sqlalchemy import or_, and_
-from sqlalchemy.sql.expression import false
 
 from ..access import Access
 from ..auth import login_required
+from ..image import save_image
 
 from monolith.database import Message, db,User
 from monolith.forms import MessageForm, SearchRecipientForm
@@ -68,64 +68,75 @@ def create_message():
     form = MessageForm()
     if request.method == 'POST':
         #for recipient in form.recipient_id.data:
+
         new_message=Message()
+        #draft button is chosen
         if request.form['submit_button'] == 'Draft':
             is_draft = True
             new_message.recipient_id = 0
+
+        #send button is chosen
         else:
             is_draft = False
-            #recipient_list=[]
-            #new_message.recipient_id=form.recipient_id.data   
+            #the data from the form is saved to be sent later
             mydata={"text":form.text_area.data,
                      "delivery_date":form.delivery_date.data,
                      "sender_id":form.sender_id.data}
-            session['mydata'] = mydata         
+            session['mydata'] = mydata
+            #redirects to search_recipient page to choose recipients         
             return redirect(url_for('messages.search_recipient', mydata=mydata))
-            
-        #print(form.image_file.data)
-        
+
+        #create a draft message
         new_message.text=form.text_area.data
         new_message.delivery_date= form.delivery_date.data
         new_message.attachment=None
         new_message.is_draft= is_draft
         new_message.is_delivered=False
         new_message.sender_id=form.sender_id.data
-        #new_message.attachment=request.form['image_file']
+ 
+        #check if there's an image; if so the image is saved locally and its path added to db
+        file = request.files['image_file']
+        if file:
+            filename = save_image(file)
+            new_message.attachment = filename
+
         db.session.add(new_message) 
         db.session.commit() 
 
         return redirect('/messages')    
 
     elif request.method == 'GET':
-        #inizializzo il cookie per per i destinatari
+        #creating cookie for recipients
         session['chosen_recipient']=[]
         return render_template("create_message.html", form=form) 
     else:
         raise RuntimeError('This should not happen!')   
 
 
+#list of draft messages
 @messages.route('/messages/draft')
 def messages_draft():
     messages_draft = Message.query.filter_by(is_draft = True)
     return render_template("messages.html", messages=messages_draft)
 
-
+#list of sent messages
 @messages.route('/messages/sent')
 def messages_sent():
     messages_sent = Message.query.filter_by(is_draft = False, is_valid = True )
     return render_template("messages.html", messages=messages_sent)    
-
 
 @messages.route('/messages')
 def _messages():
     _messages = db.session.query(Message)
     return render_template("messages.html", messages=_messages)
 
+#search_recipient page called after hitting the send button on the create_message page
 @messages.route('/search_recipient', methods=['POST','GET'])
 #@login_required
 def search_recipient():
     form = SearchRecipientForm()
     if request.method == 'POST':
+        #add multiple recipients for a message
         print(request.form['submit_button'])
         if (request.form['submit_button'] == 'send') & (session['chosen_recipient']!=[]) :
             return redirect(url_for('messages.send_message'),code=307)
@@ -134,6 +145,7 @@ def search_recipient():
         elif request.form['submit_button'] == 'cancel':
             return redirect ('/')  
         else:    
+            #search recipients in the list of users
             to_search=form.search_recipient.data
             print('To search: '+to_search)
             found_recipient = User.query.filter_by(firstname = to_search).all()
