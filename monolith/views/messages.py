@@ -54,9 +54,9 @@ def message(id):
         return render_template('message.html', message=_message)
     
     # DELETE for the point of view of the current user.
-    if _message.sender_id == current_user.get_id():
+    if is_sender:
         _message.access -= Access.SENDER.value
-    else:
+    if is_recipient:
         _message.access -= Access.RECIPIENT.value
     db.session.commit()
     return {'msg': 'message deleted'}, 200
@@ -185,32 +185,6 @@ def add_recipient():
         print("FINALE: "+str(session['chosen_recipient']))
         return redirect('/search_recipient')
     if request.method == 'GET': 
-        print(session['found_recipient'])
-        return render_template("add_recipient.html",recipients=session['found_recipient']) 
-
-@messages.route('/send_message', methods=['POST'])
-def send_message(): 
-    if request.method == 'POST':
-
-        text=session['mydata']['text']
-        delivery_date=session['mydata']['delivery_date']
-        sender_id=session['mydata']['sender_id']
-        delivery_date_object = datetime.datetime.strptime(delivery_date, '%a, %d %b %Y %H:%M:%S GMT')
-        i=1
-        for recipient in session['chosen_recipient']:
-            print("invio messaggio"+str(i))
-            i+=1
-            new_message=Message()
-            new_message.text=text
-            new_message.delivery_date= delivery_date_object.date()
-            new_message.attachment=None
-            new_message.is_draft= False
-            new_message.is_delivered=False
-            new_message.sender_id=sender_id
-            new_message.recipient_id=recipient['id']
-            db.session.add(new_message) 
-        
-        db.session.commit() 
-        return redirect('/messages')       
-    else:
-        return 404
+        mydata=session['mydata']
+        print('print cookie:'+mydata['delivery_date'])
+        return render_template("search_recipient.html", form=form)

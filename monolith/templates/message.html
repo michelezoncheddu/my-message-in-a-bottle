@@ -1,7 +1,13 @@
 <html>
+  
+  <head>
+    <script type="text/javascript" src="js/utils.js"></script>
+  </head>
+
   <body>
     <h1>Message</h1>
       {{message.id}} {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+      <button type="submit" onclick="DeleteMessage('{{message.id}}')">Delete</button>
     <br> <br>
     <a href="/mailbox">  <button>Mailbox</button> </a>
   </body>
