@@ -1,3 +1,4 @@
+from operator import is_, not_, or_
 from flask import Blueprint, redirect, render_template, request
 from flask_login import current_user
 
@@ -19,8 +20,9 @@ def mailbox():
     
     # Retrieve sent/received messages of user <id>
     _messages = db.session.query(Message).filter(
-        Message.sender_id == id or Message.recipient_id == id
-    )
+        or_(Message.sender_id == id,Message.recipient_id == id), 
+            Message.is_valid, ~Message.is_draft)
+    
     return render_template("mailbox.html", messages=_messages)
 
 
@@ -28,9 +30,9 @@ def mailbox():
 @login_required
 def message(id):
     #TODO: Catch exception instead of if.
-    _message = db.session.query(Message).filter(Message.id == id).first()
+    _message = db.session.query(Message).filter_by(id=id, is_valid=True).first()
     
-    if _message is None or not _message.is_valid:
+    if _message is None:# or not _message.is_valid:
         return {'msg': 'message not found'}, 404
 
     if _message.get_recipient() != current_user.get_id():
