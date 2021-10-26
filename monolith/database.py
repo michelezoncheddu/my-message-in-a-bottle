@@ -19,6 +19,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_anonymous = False
+    profile_pic = db.Column(db.String, default=None)
 
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
@@ -26,6 +27,10 @@ class User(db.Model):
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
+        
+    # update profile picture
+    def set_profile_pic(self, image_path):
+        self.profile_pic = image_path
 
     @property
     def is_authenticated(self):
@@ -50,6 +55,10 @@ class User(db.Model):
     # get email
     def get_email(self):
         return self.email
+    
+    # get profile picture
+    def get_profile_pic(self):
+        return self.profile_pic
 
 
 class Message(db.Model):
