@@ -28,11 +28,12 @@ def profile():
         return render_template('profile.html', user=_user) 
     elif (request.method == 'POST'):
         if request.method == 'POST':
-            print("POST")
             # check if image present
             if ('file' not in request.files):
                 return redirect(request.url)
             file = request.files['file']
+            if (file.filename == ''):
+                return redirect(request.url)
             if file:
                 filename = PROFILE_PIC_PATH + save_profile_picture(file)
                 _user.set_profile_pic(filename)
