@@ -1,7 +1,9 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired,Regexp
 from wtforms import DateField, Form
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+
 
 
 class LoginForm(FlaskForm):
@@ -23,8 +25,14 @@ class UserDelForm(FlaskForm):
     display = ['firstname']
 
 class MessageForm(FlaskForm):
-    text_area = f.TextAreaField('text_area', validators=[DataRequired()])
-    sender_id = f.IntegerField('sender_id', validators=[DataRequired()])
-    recipient_id = f.IntegerField('recipient_id', validators=[DataRequired()])
-    delivery_date = f.DateField('delivery_date', format='%d/%m/%Y')
-    display = ['text_area','sender_id', 'recipient_id', 'delivery_date']    
+    text_area = f.TextAreaField('Insert message text', validators=[DataRequired()])
+    sender_id = f.IntegerField('Sender Id', validators=[DataRequired()])
+    #recipient_id = f.IntegerField('Recipient Id', validators=[DataRequired()])
+    delivery_date = f.DateField('Delivery Date', format='%d/%m/%Y')
+    #image_file = FileField('Image',validators=[FileAllowed(['jpg','png'])]) 
+    image_file = FileField('Image') 
+    display = ['text_area','sender_id', 'delivery_date','image_file']    
+
+class SearchRecipientForm(FlaskForm):
+    search_recipient = f.StringField('Search Recipient', validators=[DataRequired()])
+    display = ['search_recipient']

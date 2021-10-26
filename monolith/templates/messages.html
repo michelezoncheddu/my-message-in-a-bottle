@@ -4,7 +4,7 @@
     <ul>
       {% for message in messages: %}
       <li>
-      {{message.id}} {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+      {{message.id}} {{message.text}} {{message.sender_id}} {{message.recipient_id}} {{message.attachment}}
       </li>
       {% endfor %}
     </ul>

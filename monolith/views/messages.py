@@ -1,14 +1,17 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request,session, url_for
 from flask_login import current_user
+from sqlalchemy import or_
+#import requests
 
 from ..auth import login_required
 
-from monolith.database import Message, db
-from monolith.forms import MessageForm
+from monolith.database import Message, db,User
+from monolith.forms import MessageForm, SearchRecipientForm
 
 from sqlalchemy.sql.expression import false
 
 messages = Blueprint('messages', __name__)
+
 
 
 @messages.route('/mailbox')
@@ -51,13 +54,22 @@ def create_message():
     form = MessageForm()
     if request.method == 'POST':
         #for recipient in form.recipient_id.data:
+        new_message=Message()
         if request.form['submit_button'] == 'Draft':
             is_draft = True
+            new_message.recipient_id = 0
         else:
             is_draft = False
-
-        new_message=Message()
-        new_message.recipient_id=form.recipient_id.data
+            #recipient_list=[]
+            #new_message.recipient_id=form.recipient_id.data   
+            mydata={"text":form.text_area.data,
+                     "delivery_date":form.delivery_date.data,
+                     "sender_id":form.sender_id.data}
+            session['mydata'] = mydata         
+            return redirect(url_for('messages.add_recipient', mydata=mydata))
+            
+        #print(form.image_file.data)
+        
         new_message.text=form.text_area.data
         new_message.delivery_date= form.delivery_date.data
         new_message.attachment=None
@@ -65,9 +77,11 @@ def create_message():
         new_message.is_delivered=False
         new_message.is_valid=True
         new_message.sender_id=form.sender_id.data
+        #new_message.attachment=request.form['image_file']
         db.session.add(new_message) 
-        db.session.commit()          
-        return redirect('/messages')
+        db.session.commit() 
+
+        return redirect('/messages')    
 
     elif request.method == 'GET':
         return render_template("create_message.html", form=form) 
@@ -88,3 +102,18 @@ def messages_sent():
 def _messages():
     _messages = db.session.query(Message)
     return render_template("messages.html", messages=_messages)
+
+@messages.route('/add_recipient', methods=['POST','GET'])
+#@login_required
+def add_recipient():
+    form = SearchRecipientForm()
+    if request.method == 'POST':
+        to_search=form.search_recipient.data
+        print('To search: '+to_search)
+        recipient = User.query.filter_by(firstname = to_search).all()
+        print(recipient[0].firstname)
+        pass
+    if request.method == 'GET': 
+        mydata=session['mydata']
+        print('print cookie:'+mydata['delivery_date'])
+        return render_template("search_recipient.html", form=form)   
