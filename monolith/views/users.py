@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from ..image import save_profile_picture
+from ..image import save_image
 
 from monolith.auth import login_required
 from monolith.database import User, db
