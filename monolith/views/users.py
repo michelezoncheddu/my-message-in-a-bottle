@@ -10,6 +10,7 @@ from flask_login import current_user
 
 users = Blueprint('users', __name__)
 
+# GLOBALS
 DEFAULT_PROFILE_PIC = "static/profile/default.png"
 PROFILE_PIC_PATH = "monolith/static/profile/"
 
@@ -24,15 +25,18 @@ def _users():
 def profile():
     _user = current_user
     if (request.method == 'GET'):
-        return render_template('profile.html', user=_user) 
+        return render_template('profile.html', user=_user)
+    # change profile picture
     elif (request.method == 'POST'):
         if request.method == 'POST':
             # check if image present
             if ('file' not in request.files):
                 return redirect(request.url)
             file = request.files['file']
+            # check if path is empty
             if (file.filename == ''):
                 return redirect(request.url)
+            # OK : get new pic
             if file:
                 filename = save_image(file, PROFILE_PIC_PATH)
                 _user.set_profile_pic(filename)
