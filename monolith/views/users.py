@@ -10,9 +10,8 @@ from flask_login import current_user
 
 users = Blueprint('users', __name__)
 
-
 DEFAULT_PROFILE_PIC = "static/profile/default.png"
-PROFILE_PIC_PATH = "static/profile/"
+PROFILE_PIC_PATH = "monolith/static/profile/"
 
 @users.route('/users')
 @login_required
@@ -35,10 +34,10 @@ def profile():
             if (file.filename == ''):
                 return redirect(request.url)
             if file:
-                filename = PROFILE_PIC_PATH + save_profile_picture(file)
+                filename = save_image(file, PROFILE_PIC_PATH)
                 _user.set_profile_pic(filename)
                 db.session.commit()
-                return render_template('profile.html', user=_user) 
+                return render_template('profile.html', user=_user)
 
 
 @users.route('/create_user', methods=['POST', 'GET'])
