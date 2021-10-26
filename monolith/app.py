@@ -51,6 +51,7 @@ def create_app():
                 now = datetime.now()
                 example.delivery_date = now
                 example.last_update_date = now
+                example.is_draft = False
                 db.session.add(example)
                 db.session.commit()
 
@@ -62,6 +63,7 @@ def create_app():
                 now = datetime.now()
                 example.delivery_date = now
                 example.last_update_date = now
+                example.is_draft = False
                 db.session.add(example)
                 db.session.commit()
 

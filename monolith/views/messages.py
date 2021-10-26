@@ -1,18 +1,16 @@
 from flask import Blueprint, redirect, render_template, request,session, url_for,jsonify
 from flask_login import current_user
-from sqlalchemy import or_
-import datetime
-#import requests
+from sqlalchemy import or_, and_
+from sqlalchemy.sql.expression import false
 
+from ..access import Access
 from ..auth import login_required
 
 from monolith.database import Message, db,User
-from monolith.forms import AddRecipientForm, MessageForm, SearchRecipientForm
+from monolith.forms import MessageForm, SearchRecipientForm
 
-from sqlalchemy.sql.expression import false
 
 messages = Blueprint('messages', __name__)
-
 
 
 @messages.route('/mailbox')
@@ -23,28 +21,42 @@ def mailbox():
     
     # Retrieve sent/received messages of user <id>
     _messages = db.session.query(Message).filter(
-        Message.sender_id == id or Message.recipient_id == id
+        or_(
+            and_(Message.sender_id==id, Message.access.op('&')(Access.SENDER.value), ~Message.is_draft), 
+            and_(Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value))
+        )
     )
-    return render_template("mailbox.html", messages=_messages)
+    
+    return render_template("mailbox.html", messages=_messages, user_id=id)
 
 
 @messages.route('/message/<int:id>', methods=['GET', 'DELETE'])
 @login_required
 def message(id):
     #TODO: Catch exception instead of if.
-    _message = db.session.query(Message).filter(Message.id == id).first()
-    
-    if _message is None or not _message.is_valid:
+    _message = db.session.query(Message).filter(Message.id==id).first()
+
+    if _message is None:
         return {'msg': 'message not found'}, 404
 
-    if _message.get_recipient() != current_user.get_id():
+    # Check authorization.
+    is_sender = _message.sender_id == current_user.get_id()
+    is_recipient = _message.recipient_id == current_user.get_id()
+
+    if (not is_sender or not is_recipient
+        or (is_sender and not _message.access & Access.SENDER.value)
+        or (is_recipient and not _message.access & Access.RECIPIENT.value)
+    ):
         return {'msg': 'unauthorized'}, 401
 
     if request.method == 'GET':
         return render_template('message.html', message=_message)
     
-    # DELETE    
-    _message.is_valid = False
+    # DELETE for the point of view of the current user.
+    if _message.sender_id == current_user.get_id():
+        _message.access -= Access.SENDER.value
+    else:
+        _message.access -= Access.RECIPIENT.value
     db.session.commit()
     return {'msg': 'message deleted'}, 200
 
@@ -76,7 +88,6 @@ def create_message():
         new_message.attachment=None
         new_message.is_draft= is_draft
         new_message.is_delivered=False
-        new_message.is_valid=True
         new_message.sender_id=form.sender_id.data
         #new_message.attachment=request.form['image_file']
         db.session.add(new_message) 
@@ -90,16 +101,19 @@ def create_message():
         return render_template("create_message.html", form=form) 
     else:
         raise RuntimeError('This should not happen!')   
-    
+
+
 @messages.route('/messages/draft')
 def messages_draft():
     messages_draft = Message.query.filter_by(is_draft = True)
     return render_template("messages.html", messages=messages_draft)
 
+
 @messages.route('/messages/sent')
 def messages_sent():
     messages_sent = Message.query.filter_by(is_draft = False, is_valid = True )
     return render_template("messages.html", messages=messages_sent)    
+
 
 @messages.route('/messages')
 def _messages():

@@ -33,16 +33,19 @@ class Test(unittest.TestCase):
         
         reply = tested_app.get('/mailbox')
 
-        # Parse HTML and get list of sent/received messages.
+        # Parse HTML and get list of sent messages.
         parsed = bs(reply.data, 'html.parser')
-        parent = parsed.find('body').find('ul')
-        messages = parent.find_all('li')
+        parent = parsed.find(id='sent').find('ul')
+        sent_messages = parent.find_all('li')
+        assert(len(sent_messages) == 3)
 
-        # Check number of messages.
-        assert(len(messages) == 3)
+        # Get list of received messages.
+        parent = parsed.find(id='received').find('ul')
+        received_messages = parent.find_all('li')
+        assert(len(received_messages) == 3)
 
         # Check content of the messages.
-        for i, message in enumerate(messages):
+        for i, message in enumerate(sent_messages):
            assert(message.text.strip() == f'{i+1} message from 1 to 1 n.{i+1} 1 1')
 
 
@@ -72,12 +75,10 @@ class Test(unittest.TestCase):
         reply = tested_app.delete('/message/1')
         self.assertEqual(reply.status_code, 200)
 
-
         # Delete unexistent message.
         reply = tested_app.delete('/message/1')
-        self.assertEqual(reply.status_code, 404)
+        self.assertEqual(reply.status_code, 401)
 
         # Delete message of other users.
         reply = tested_app.delete('/message/4')
         self.assertEqual(reply.status_code, 401)
-

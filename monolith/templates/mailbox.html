@@ -1,17 +1,33 @@
 <html>
   <body>
     <h1>Mailbox</h1>
-    <ul>
-      {% for message in messages: %}
-        {% if message.is_valid %}
-      
-        <li>
-          <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
-        </li>
 
-        {% endif %}
-      {% endfor %}
-    </ul>
-     <a href="/"> <button>Home</button> </a>
+    <div>
+      <div id='sent' style='width: 50%; float: left'>
+        <ul>
+          {% for message in messages: %}
+            {% if message.sender_id == user_id %}
+              <li>
+                <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div id='received' style='width: 50%; float: left'>
+        <ul>
+          {% for message in messages: %}
+            {% if message.recipient_id == user_id %}
+              <li>
+                <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <a href="/"> <button>Home</button> </a>
   </body>
 </html>
