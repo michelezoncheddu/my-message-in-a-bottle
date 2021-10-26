@@ -8,6 +8,7 @@ from ..auth import login_required
 
 from monolith.database import Message, db,User
 from monolith.forms import MessageForm, SearchRecipientForm
+import datetime
 
 
 messages = Blueprint('messages', __name__)
