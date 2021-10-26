@@ -6,3 +6,9 @@ def save_image(file):
     filename = secure_filename(file.filename)
     file.save(os.path.join('monolith/images', filename))
     return filename
+
+#utility function to save profile pictures
+def save_profile_picture(file):
+    filename = secure_filename(file.filename)
+    file.save(os.path.join('monolith/static/profile', filename))
+    return filename
