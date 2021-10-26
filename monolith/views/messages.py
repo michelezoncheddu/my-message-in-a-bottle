@@ -27,7 +27,7 @@ def mailbox():
         )
     )
     
-    return render_template("mailbox.html", messages=_messages)
+    return render_template("mailbox.html", messages=_messages, user_id=id)
 
 
 @messages.route('/message/<int:id>', methods=['GET', 'DELETE'])
