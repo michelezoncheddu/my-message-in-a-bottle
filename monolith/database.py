@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from .access import Access
+
 db = SQLAlchemy()
 
 
@@ -61,7 +63,7 @@ class Message(db.Model):
     delivery_date = db.Column(db.DateTime)
     is_draft = db.Column(db.Boolean, default=True)
     last_update_date = db.Column(db.DateTime)
-    is_valid = db.Column(db.Boolean, default=True)
+    access = db.Column(db.Integer, default=Access.ALL.value)  # Access rights.
     is_delivered = db.Column(db.Boolean, default=False)
     attachment = db.Column(db.LargeBinary, default=None)
 
