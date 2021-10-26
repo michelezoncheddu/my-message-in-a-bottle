@@ -1,5 +1,7 @@
 from flask import Blueprint, redirect, render_template, request
 
+from ..image import save_profile_picture
+
 from monolith.auth import login_required
 from monolith.database import User, db
 from monolith.forms import UserForm,UserDelForm
@@ -9,21 +11,33 @@ from flask_login import current_user
 users = Blueprint('users', __name__)
 
 
+DEFAULT_PROFILE_PIC = "static/profile/default.png"
+PROFILE_PIC_PATH = "static/profile/"
+
 @users.route('/users')
 @login_required
 def _users():
     _users = db.session.query(User)
     return render_template("users.html", users=_users)
 
-@users.route('/profile')
+@users.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
-    # old version commented : remember to check for test coverage
-    """firstname   = current_user.get_firstname()
-    surname     = current_user.get_surname()
-    email       = current_user.get_email()"""
     _user = current_user
-    return render_template('profile.html', user=_user) 
+    if (request.method == 'GET'):
+        return render_template('profile.html', user=_user) 
+    elif (request.method == 'POST'):
+        if request.method == 'POST':
+            print("POST")
+            # check if image present
+            if ('file' not in request.files):
+                return redirect(request.url)
+            file = request.files['file']
+            if file:
+                filename = PROFILE_PIC_PATH + save_profile_picture(file)
+                _user.set_profile_pic(filename)
+                db.session.commit()
+                return render_template('profile.html', user=_user) 
 
 
 @users.route('/create_user', methods=['POST', 'GET'])
@@ -34,12 +48,8 @@ def create_user():
         if form.validate_on_submit():
             new_user = User()
             form.populate_obj(new_user)
-            """
-            Password should be hashed with some salt. For example if you choose a hash function x, 
-            where x is in [md5, sha1, bcrypt], the hashed_password should be = x(password + s) where
-            s is a secret key.
-            """
             new_user.set_password(form.password.data)
+            new_user.set_profile_pic(DEFAULT_PROFILE_PIC)
             db.session.add(new_user)
             db.session.commit()
             return redirect('/users')
