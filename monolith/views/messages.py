@@ -53,9 +53,9 @@ def message(id):
         return render_template('message.html', message=_message)
     
     # DELETE for the point of view of the current user.
-    if _message.sender_id == current_user.get_id():
+    if is_sender:
         _message.access -= Access.SENDER.value
-    else:
+    if is_recipient:
         _message.access -= Access.RECIPIENT.value
     db.session.commit()
     return {'msg': 'message deleted'}, 200
@@ -132,4 +132,4 @@ def add_recipient():
     if request.method == 'GET': 
         mydata=session['mydata']
         print('print cookie:'+mydata['delivery_date'])
-        return render_template("search_recipient.html", form=form)   
+        return render_template("search_recipient.html", form=form)
