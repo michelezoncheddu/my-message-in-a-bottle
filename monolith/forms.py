@@ -34,5 +34,9 @@ class MessageForm(FlaskForm):
     display = ['text_area','sender_id', 'delivery_date','image_file']    
 
 class SearchRecipientForm(FlaskForm):
-    search_recipient = f.StringField('Search Recipient', validators=[DataRequired()])
+    search_recipient = f.StringField('Search Recipient')
     display = ['search_recipient']
+
+class AddRecipientForm(FlaskForm):
+    search_recipient = f.SelectMultipleField('none')
+    display = ['add_recipient']

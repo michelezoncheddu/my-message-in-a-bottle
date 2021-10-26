@@ -16,6 +16,12 @@
     </dl>
     <p>
     <input type=submit name='submit_button' value="search">
+    <input type=submit name='submit_button' value="send">
+    <input type=submit name='submit_button' value="cancel">
   </form>
+  <h2>Chosen recipients:</h2>
+  {% for recipient in recipients %}
+   <h3>{{ recipient['firstname'] }}</h3>
+  {% endfor %}
  </body>
 </html>
