@@ -13,6 +13,7 @@ import datetime
 
 messages = Blueprint('messages', __name__)
 
+ATTACHMENTS_PATH = 'monolith/images'
 
 @messages.route('/mailbox')
 @login_required
@@ -97,7 +98,7 @@ def create_message():
         #check if there's an image; if so the image is saved locally and its path added to db
         file = request.files['image_file']
         if file:
-            filename = save_image(file)
+            filename = save_image(file, ATTACHMENTS_PATH)
             new_message.attachment = filename
 
         db.session.add(new_message) 
