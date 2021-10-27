@@ -13,7 +13,7 @@ import datetime
 
 messages = Blueprint('messages', __name__)
 
-ATTACHMENTS_PATH = 'monolith/images'
+ATTACHMENTS_PATH = 'monolith/static/images'
 
 @messages.route('/mailbox')
 @login_required
@@ -68,9 +68,15 @@ def message(id):
 def create_message():
     form = MessageForm()
     if request.method == 'POST':
-        #for recipient in form.recipient_id.data:
-
         new_message=Message()
+
+        #check if there's an image; if so the image is saved locally and its path is in filename
+        file = request.files['image_file']
+        if ('file' not in request.files):
+            filename = ''
+        if file:
+            filename = save_image(file, ATTACHMENTS_PATH)
+
         #draft button is chosen
         if request.form['submit_button'] == 'Save':
             is_draft = True
@@ -83,7 +89,8 @@ def create_message():
             #the data from the form is saved to be sent later
             mydata={"text":form.text_area.data,
                      "delivery_date":form.delivery_date.data,
-                     "sender_id":form.sender_id.data}
+                     "sender_id":form.sender_id.data,
+                     "attachment":filename}
             session['mydata'] = mydata
             #redirects to search_recipient page to choose recipients         
             return redirect(url_for('messages.search_recipient', mydata=mydata))
@@ -95,12 +102,7 @@ def create_message():
         new_message.is_draft= is_draft
         new_message.is_delivered=False
         new_message.sender_id=form.sender_id.data
- 
-        #check if there's an image; if so the image is saved locally and its path added to db
-        file = request.files['image_file']
-        if file:
-            filename = save_image(file, ATTACHMENTS_PATH)
-            new_message.attachment = filename
+        new_message.attachment = filename
 
         db.session.add(new_message) 
         db.session.commit() 
@@ -109,12 +111,14 @@ def create_message():
 
     elif request.method == 'GET':
         #creating cookie for recipients 
-        if  session['draft_id']:
-            message=Message.query.filter(Message.id==session['draft_id']).first()
-            text=message.text
-            date=message.delivery_date
-            form.text_area.data=text
-            form.delivery_date.data=date
+        #if  session['draft_id'] :
+        message=Message.query.filter(Message.id==session['draft_id']).first()
+        text=message.text
+        date=message.delivery_date
+        filename=message.attachment
+        form.text_area.data=text
+        form.delivery_date.data=date
+        form.image_file.data=open('monolith/static/profile/'+filename)
         session['chosen_recipient']=[]
         return render_template("create_message.html", form=form) 
     else:
@@ -130,7 +134,7 @@ def messages_draft():
 #list of sent messages
 @messages.route('/messages/sent')
 def messages_sent():
-    messages_sent = Message.query.filter_by(is_draft = False, is_valid = True )
+    messages_sent = Message.query.filter_by(is_draft = False, access = True )
     return render_template("messages.html", messages=messages_sent)    
 
 @messages.route('/messages')
@@ -198,6 +202,7 @@ def send_message():
         text=session['mydata']['text']
         delivery_date=session['mydata']['delivery_date']
         sender_id=session['mydata']['sender_id']
+        attachment=session['mydata']['attachment']
         delivery_date_object = datetime.datetime.strptime(delivery_date, '%a, %d %b %Y %H:%M:%S GMT')
         i=1
         for recipient in session['chosen_recipient']:
@@ -211,6 +216,7 @@ def send_message():
             new_message.is_delivered=False
             new_message.sender_id=sender_id
             new_message.recipient_id=recipient['id']
+            new_message.attachment=attachment
             db.session.add(new_message) 
         
         db.session.commit() 
