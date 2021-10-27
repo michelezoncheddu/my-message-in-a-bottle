@@ -228,7 +228,7 @@ def send_message():
             db.session.add(new_message) 
         
         db.session.commit() 
-        return redirect('/messages')      
+        return render_template("index.html", welcome=None)      
 
 
 @messages.route('/messages/load_draft', methods=['GET','POST'])
