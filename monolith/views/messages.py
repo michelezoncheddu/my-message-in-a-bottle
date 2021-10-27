@@ -75,7 +75,8 @@ def create_message():
         if request.form['submit_button'] == 'Save':
             is_draft = True
             new_message.recipient_id = 0
-
+        elif request.form['submit_button'] == 'Load':
+            return redirect('/messages/load_draft')
         #send button is chosen
         else:
             is_draft = False
@@ -107,7 +108,13 @@ def create_message():
         return redirect('/messages')    
 
     elif request.method == 'GET':
-        #creating cookie for recipients
+        #creating cookie for recipients 
+        if  session['draft_id']:
+            message=Message.query.filter(Message.id==session['draft_id']).first()
+            text=message.text
+            date=message.delivery_date
+            form.text_area.data=text
+            form.delivery_date.data=date
         session['chosen_recipient']=[]
         return render_template("create_message.html", form=form) 
     else:
@@ -138,7 +145,6 @@ def search_recipient():
     form = SearchRecipientForm()
     if request.method == 'POST':
         #add multiple recipients for a message
-        print(request.form['submit_button'])
         if (request.form['submit_button'] == 'send') & (session['chosen_recipient']!=[]) :
             return redirect(url_for('messages.send_message'),code=307)
         elif (request.form['submit_button'] == 'send') & (session['chosen_recipient']==[]):
@@ -208,6 +214,24 @@ def send_message():
             db.session.add(new_message) 
         
         db.session.commit() 
-        return redirect('/messages')          
+        return redirect('/messages')      
+
+
+@messages.route('/messages/load_draft', methods=['GET','POST'])
+def load_draft():
+    if request.method == 'POST':
+        draft_id = request.form['draft']
+        session['draft_id']=draft_id
+        return redirect('/create_message')
+        
+    if request.method == 'GET':
+        if current_user.get_id() == None:
+            id = 1
+        else:
+            id = current_user.get_id()
+        draft_list=Message.query.filter(Message.sender_id==id,Message.is_draft==True)
+        if draft_list ==[]:
+            return {'msg': 'No Saved Messages'}, 404
+        return render_template("load_draft.html",draft_list=draft_list)
 
 

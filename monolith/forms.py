@@ -25,9 +25,9 @@ class UserDelForm(FlaskForm):
     display = ['firstname']
 
 class MessageForm(FlaskForm):
-    text_area = f.TextAreaField('Insert message text', validators=[DataRequired()])
+    text_area = f.TextAreaField('Insert message text')
     sender_id = f.IntegerField('Sender Id', validators=[DataRequired()])
-    delivery_date = f.DateField('Delivery Date', format='%d/%m/%Y')
+    delivery_date = f.DateField('Delivery Date', format='%d/%m/%Y',validators=[DataRequired()])
     image_file = FileField('Image',validators=[FileAllowed(['jpg','png'])]) 
     display = ['text_area','sender_id', 'delivery_date','image_file']    
 
@@ -38,3 +38,5 @@ class SearchRecipientForm(FlaskForm):
 class AddRecipientForm(FlaskForm):
     search_recipient = f.SelectMultipleField('none')
     display = ['add_recipient']
+
+  
