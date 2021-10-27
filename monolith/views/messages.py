@@ -45,7 +45,7 @@ def message(id):
     is_sender = _message.sender_id == current_user.get_id()
     is_recipient = _message.recipient_id == current_user.get_id()
 
-    if (not is_sender or not is_recipient
+    if (not (is_sender or is_recipient)
         or (is_sender and not _message.access & Access.SENDER.value)
         or (is_recipient and not _message.access & Access.RECIPIENT.value)
     ):
