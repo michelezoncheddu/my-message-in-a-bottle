@@ -34,7 +34,7 @@ def unregister():
         return render_template('unregister.html')
     elif request.method == 'POST':
         password = current_user.get_password_hash()
-        inserted_password = request.form['Password']
+        inserted_password = request.form['password']
         # unregistration confirmed
         if (check_password_hash(password, inserted_password)):
             unregister_user = User.query.filter_by(firstname=current_user.get_firstname()).first()
@@ -44,4 +44,4 @@ def unregister():
         # try again (password does not match)
         else:
             error = "Wrong password, try again"
-            return render_template('unregister.html', error=error)
+            return {'msg': 'Password does not match, try again'}, 400
