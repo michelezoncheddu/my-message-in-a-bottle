@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, render_template, request, abort
 
 from ..image import allowed_file, save_image
 
+from werkzeug.utils import secure_filename
 from monolith.auth import login_required
 from monolith.database import User, db
 from monolith.forms import UserForm,UserDelForm
@@ -38,7 +39,9 @@ def profile():
                 return {'msg': 'No selected file'}, 400
             # OK : get new pic
             if file and allowed_file(file.filename):
-                filename = save_image(file, PROFILE_PIC_PATH)
+                filename = secure_filename(file.filename)
+                save_image(file, PROFILE_PIC_PATH)
+                filename = 'static/profile/' + filename
                 _user.set_profile_pic(filename)
                 db.session.commit()
                 return render_template('profile.html', user=_user)
