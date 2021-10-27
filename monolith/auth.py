@@ -6,7 +6,7 @@ from monolith.database import User
 
 login_manager = LoginManager()
 
-
+'''
 def admin_required(func):
     @functools.wraps(func)
     def _admin_required(*args, **kw):
@@ -15,7 +15,7 @@ def admin_required(func):
             return login_manager.unauthorized()
         return func(*args, **kw)
     return _admin_required
-
+'''
 
 def login_required(func):
     @functools.wraps(func)
@@ -31,5 +31,5 @@ def login_required(func):
 def load_user(user_id):
     user = User.query.get(user_id)
     if user is not None:
-        user._authenticated = True
+        user._authenticated = True # NOT COVERED
     return user

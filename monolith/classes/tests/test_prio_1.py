@@ -8,6 +8,28 @@ from monolith.forms import UserForm
 
 class Test(unittest.TestCase):
 
+    def __init__(self, *args, **kw):
+        super(Test, self).__init__(*args, **kw)
+        self.login_user = {
+            'email': 'example@example.com',
+            'password': 'admin'
+        }
+
+        self.login_user_fake = {
+            'email': 'fake@fake.com',
+            'password': 'fake'
+        }
+
+        self.create_user = {
+            'email': 'test@tet.com',
+            'firstname': 'testname',
+            'lastname': 'testlastname',
+            'password': 'testpassword',
+            'dateofbirth': '9/10/2020'
+        }
+
+
+
     def setUp(self):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
@@ -19,16 +41,9 @@ class Test(unittest.TestCase):
     def test_sign_up(self):
         tested_app = app.test_client()
 
-        test_user = {
-            'email': 'test@tet.com',
-            'firstname': 'testname',
-            'lastname': 'testlastname',
-            'password': 'testpassword',
-            'dateofbirth': '9/10/2020'
-        }
-
+        
         reply = tested_app.post('/create_user',
-                    data=json.dumps(test_user),
+                    data=json.dumps(self.create_user),
                     content_type='application/json', follow_redirects=True)
         
         self.assertEqual(reply.status_code, 200)
@@ -37,8 +52,24 @@ class Test(unittest.TestCase):
 
     #login
     def test_login(self):
-        pass
+        tested_app = app.test_client()
+
+        # login of unexistent user
+        reply = tested_app.post('/login',
+                    data=json.dumps(self.login_user_fake),
+                    content_type='application/json', follow_redirects=True)
+        
+        self.assertEqual(reply.status_code, 200)
     
+
+        # first time login user
+        reply = tested_app.post('/login',
+                    data=json.dumps(self.login_user),
+                    content_type='application/json', follow_redirects=True)
+        
+        self.assertEqual(reply.status_code, 200)
+
+        
     
     #logout
     def test_logout(self):
