@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
         self.user = {
-            'email': 'example@example.com',
+            'email': 'admin@admin',
             'password': 'admin'
         }
 
@@ -68,7 +68,7 @@ class Test(unittest.TestCase):
     def test_unregister(self):
         tested_app = app.test_client()
 
-        # unregister without login
+        # get /unregister without login
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 401)
 
@@ -76,7 +76,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # unregister with login
+        # get /unregister with login
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 200)
 
@@ -87,7 +87,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
-        # unregister 
+        # unregister correct
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
                 'password': 'admin'}

@@ -29,24 +29,23 @@ def profile():
         return render_template('profile.html', user=_user)
     # change profile picture
     elif (request.method == 'POST'):
-        if request.method == 'POST':
-            # check if image present
-            if ('file' not in request.files):
-                return {'msg': 'No selected file'}, 400
-            file = request.files['file']
-            # check if path is empty
-            if (file.filename == ''):
-                return {'msg': 'No selected file'}, 400
-            # OK : get new pic
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                save_image(file, PROFILE_PIC_PATH)
-                filename = 'static/profile/' + filename
-                _user.set_profile_pic(filename)
-                db.session.commit()
-                return render_template('profile.html', user=_user)
-            else:
-                return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
+        # check if image present
+        if ('file' not in request.files):
+            return {'msg': 'No selected file'}, 400
+        file = request.files['file']
+        # check if path is empty
+        if (file.filename == ''):
+            return {'msg': 'No selected file'}, 400
+        # OK : get new pic
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            save_image(file, PROFILE_PIC_PATH)
+            filename = 'static/profile/' + filename
+            _user.set_profile_pic(filename)
+            db.session.commit()
+            return render_template('profile.html', user=_user)
+        else:
+            return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
 
 
 @users.route('/create_user', methods=['POST', 'GET'])

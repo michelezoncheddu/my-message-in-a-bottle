@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
         self.login_user = {
-            'email': 'example@example.com',
+            'email': 'admin@admin',
             'password': 'admin'
         }
 
