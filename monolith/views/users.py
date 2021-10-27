@@ -1,6 +1,6 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request, abort
 
-from ..image import save_image
+from ..image import allowed_file, save_image
 
 from monolith.auth import login_required
 from monolith.database import User, db
@@ -31,17 +31,19 @@ def profile():
         if request.method == 'POST':
             # check if image present
             if ('file' not in request.files):
-                return redirect(request.url)
+                return {'msg': 'No selected file'}, 400
             file = request.files['file']
             # check if path is empty
             if (file.filename == ''):
-                return redirect(request.url)
+                return {'msg': 'No selected file'}, 400
             # OK : get new pic
-            if file:
+            if file and allowed_file(file.filename):
                 filename = save_image(file, PROFILE_PIC_PATH)
                 _user.set_profile_pic(filename)
                 db.session.commit()
                 return render_template('profile.html', user=_user)
+            else:
+                return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
 
 
 @users.route('/create_user', methods=['POST', 'GET'])
@@ -55,6 +57,7 @@ def create_user():
             new_user.set_password(form.password.data)
             new_user.set_profile_pic(DEFAULT_PROFILE_PIC)
             db.session.add(new_user)
+            db.session.commit()
             db.session.commit()
             return redirect('/users')
     elif request.method == 'GET':
