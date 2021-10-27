@@ -7,6 +7,8 @@ from werkzeug.utils import redirect
 
 from monolith.app import app
 
+from monolith.forms import UserForm
+
 
 class Test(unittest.TestCase):
 
@@ -26,7 +28,7 @@ class Test(unittest.TestCase):
     def test_profile(self):
         tested_app = app.test_client()
 
-        # /profile without login
+        # profile without login
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 401)
 
@@ -34,7 +36,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # /profile with login
+        # profile with login
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)
 
@@ -66,7 +68,7 @@ class Test(unittest.TestCase):
     def test_unregister(self):
         tested_app = app.test_client()
 
-        # /unregister without login
+        # unregister without login
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 401)
 
@@ -74,21 +76,20 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # /unregister with login
+        # unregister with login
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 200)
 
-        # /unregister wrong password on confirm
+        # try unregister with wrong password
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
                 'password': 'incorrectpw'}
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
-        # add create_user dummy to do the unregister
-        """# /unregister 
+        # unregister 
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
-                'password': 'notcorrect'}
+                'password': 'admin'}
         reply = tested_app.post('/unregister', data=data)
-        print("aaa")"""
+        self.assertEqual(reply.status_code, 302)

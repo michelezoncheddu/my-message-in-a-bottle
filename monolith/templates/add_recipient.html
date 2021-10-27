@@ -4,7 +4,7 @@
     <dl>
       <H3>Add a recipient</H3>
      {% for choice in recipients %}
-     <input type="checkbox" name="recipient_list" value={{choice['id']}}>{{choice['firstname']}}<br>  
+     <input type="checkbox" name="recipient_list" multiple class="form-control" value={{choice['id']}} >{{choice['firstname']}}<br>  
      {% endfor %}
     </dl>
     <p>
