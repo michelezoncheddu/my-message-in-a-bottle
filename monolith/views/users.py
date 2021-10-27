@@ -58,8 +58,7 @@ def create_user():
             new_user.set_profile_pic(DEFAULT_PROFILE_PIC)
             db.session.add(new_user)
             db.session.commit()
-            db.session.commit()
-            return redirect('/users')
+            return redirect('/')
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
     else:

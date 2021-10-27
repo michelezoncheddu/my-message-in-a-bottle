@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template,session
 
 from monolith.auth import current_user
 
@@ -11,4 +11,5 @@ def index():
         welcome = "Logged In!"
     else:
         welcome = None
+        session['draft_id']=None
     return render_template("index.html", welcome=welcome)
