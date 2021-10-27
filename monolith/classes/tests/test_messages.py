@@ -10,9 +10,15 @@ class Test(unittest.TestCase):
 
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
-        self.user = {
-            'email': 'example@example.com',
-            'password': 'admin'
+
+        self.sender = {
+            'email': 's@s',
+            'password': 'sender'
+        }
+
+        self.recipient = {
+            'email': 'r@r',
+            'password': 'recipient'
         }
 
 
@@ -28,7 +34,7 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/mailbox')
         self.assertEqual(reply.status_code, 401)
 
-        reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
+        reply = tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
         
         reply = tested_app.get('/mailbox')
@@ -37,16 +43,16 @@ class Test(unittest.TestCase):
         parsed = bs(reply.data, 'html.parser')
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
-        assert(len(sent_messages) == 3)
+        assert(len(sent_messages) == 1)
 
         # Get list of received messages.
         parent = parsed.find(id='received').find('ul')
         received_messages = parent.find_all('li')
-        assert(len(received_messages) == 3)
+        assert(len(received_messages) == 0)
 
         # Check content of the messages.
-        for i, message in enumerate(sent_messages):
-           assert(message.text.strip() == f'{i+1} message from 1 to 1 n.{i+1} 1 1')
+        #for i, message in enumerate(sent_messages):
+        #   assert(message.text.strip() == f'{i+1} message from 1 to 1 n.{i+1} 1 1')
 
 
     def test_message(self):
@@ -56,7 +62,7 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 401)
 
-        reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
+        reply = tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
         
         # Unexistent message.
@@ -65,20 +71,34 @@ class Test(unittest.TestCase):
 
         # Existent message of other users.
         reply = tested_app.get('/message/4')
-        self.assertEqual(reply.status_code, 401)
+        self.assertEqual(reply.status_code, 404)
 
         # Existent message.
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 200)
 
         # Delete message.
-        reply = tested_app.delete('/message/1')
-        self.assertEqual(reply.status_code, 200)
+        #reply = tested_app.delete('/message/1')
+        #self.assertEqual(reply.status_code, 200)
 
         # Delete unexistent message.
-        reply = tested_app.delete('/message/1')
-        self.assertEqual(reply.status_code, 401)
+        #reply = tested_app.delete('/message/1')
+        #self.assertEqual(reply.status_code, 401)
 
         # Delete message of other users.
         reply = tested_app.delete('/message/4')
-        self.assertEqual(reply.status_code, 401)
+        self.assertEqual(reply.status_code, 404)
+
+        reply = tested_app.get('/mailbox')
+
+        # Parse HTML and get list of sent messages.
+        parsed = bs(reply.data, 'html.parser')
+        parent = parsed.find(id='sent').find('ul')
+        sent_messages = parent.find_all('li')
+        assert(len(sent_messages) == 1)
+
+        # Forward message
+        reply = tested_app.get('/forward/1')
+        self.assertEqual(reply.status_code, 302)
+
+        

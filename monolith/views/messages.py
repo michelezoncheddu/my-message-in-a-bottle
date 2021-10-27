@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request,session, url_for
+from flask import Blueprint, redirect, render_template, request, session, url_for, abort
 from flask_login import current_user
 from sqlalchemy import or_, and_
 
@@ -14,6 +14,26 @@ import datetime
 messages = Blueprint('messages', __name__)
 
 ATTACHMENTS_PATH = 'monolith/static/images'
+
+
+def retrieve_message(message_id):
+    _message = db.session.query(Message).filter(Message.id==message_id).first()
+    if _message is None:
+        abort(404, 'message not found')
+    return _message
+
+
+def is_sender_or_recipient(message, user_id):
+    # Check authorization.
+    is_sender = message.sender_id == user_id
+    is_recipient = message.recipient_id == user_id
+
+    if (not (is_sender or is_recipient)
+        or (is_sender and not message.access & Access.SENDER.value)
+        or (is_recipient and not message.access & Access.RECIPIENT.value)
+    ):
+        abort(401, 'unauthorized')
+
 
 @messages.route('/mailbox')
 @login_required
@@ -32,38 +52,38 @@ def mailbox():
     return render_template("mailbox.html", messages=_messages, user_id=id)
 
 
-@messages.route('/message/<int:id>', methods=['GET', 'DELETE'])
+@messages.route('/message/<int:message_id>', methods=['GET', 'DELETE'])
 @login_required
-def message(id):
-    #TODO: Catch exception instead of if.
-    _message = db.session.query(Message).filter(Message.id==id).first()
-
-    if _message is None:
-        return {'msg': 'message not found'}, 404
-
-    # Check authorization.
-    is_sender = _message.sender_id == current_user.get_id()
-    is_recipient = _message.recipient_id == current_user.get_id()
-
-    if (not (is_sender or is_recipient)
-        or (is_sender and not _message.access & Access.SENDER.value)
-        or (is_recipient and not _message.access & Access.RECIPIENT.value)
-    ):
-        return {'msg': 'unauthorized'}, 401
+def message(message_id):
+    # TODO: Catch exception instead of if.
+    _message = retrieve_message(message_id)
+    user_id = current_user.get_id()
+    is_sender_or_recipient(_message, user_id)
 
     if request.method == 'GET':
         return render_template('message.html', message=_message)
     
     # DELETE for the point of view of the current user.
-    if is_sender:
+    if _message.sender_id == current_user.get_id():
         _message.access -= Access.SENDER.value
-    if is_recipient:
+    if _message.recipient_id == current_user.get_id():
         _message.access -= Access.RECIPIENT.value
     db.session.commit()
     return {'msg': 'message deleted'}, 200
 
 
-@messages.route('/create_message', methods=['POST','GET'])
+@messages.route('/forward/<int:message_id>')
+@login_required
+def forward(message_id):
+    message = retrieve_message(message_id)
+    user_id = current_user.get_id()
+    is_sender_or_recipient(message, user_id)
+
+    session['draft_id'] = message_id
+    return redirect(url_for('messages.create_message'))
+
+
+@messages.route('/create_message', methods=['POST', 'GET'])
 @login_required
 def create_message():
     form = MessageForm()

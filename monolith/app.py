@@ -28,15 +28,27 @@ def create_app():
         user = q.first()
         if user is None:
             example = User()
-            example.firstname = 'Admin'
-            example.lastname = 'Admin'
-            example.email = 'example@example.com'
+            example.firstname = 'sender'
+            example.lastname = 'sender'
+            example.email = 's@s'
             example.dateofbirth = datetime(2020, 10, 5)
             example.profile_pic = "static/profile/default.png"
-            example.is_admin = True
-            example.set_password('admin')
+            example.is_admin = False
+            example.set_password('sender')
             db.session.add(example)
             db.session.commit()
+
+            example = User()
+            example.firstname = 'recipient'
+            example.lastname = 'recipient'
+            example.email = 'r@r'
+            example.dateofbirth = datetime(2020, 10, 5)
+            example.profile_pic = "static/profile/default.png"
+            example.is_admin = False
+            example.set_password('recipient')
+            db.session.add(example)
+            db.session.commit()
+
 
         # getting the dummy message if any
         m = db.session.query(Message).filter(Message.sender_id == 1 and Message.recipient_id==1)
@@ -44,30 +56,17 @@ def create_app():
         
         # creating dummy messages
         if message is None:
-            for i in range(3):
-                example = Message()
-                example.sender_id = 1
-                example.recipient_id = 1
-                example.text = f"message from 1 to 1 n.{i+1}"
-                now = datetime.now()
-                example.delivery_date = now
-                example.last_update_date = now
-                example.is_draft = False
-                db.session.add(example)
-                db.session.commit()
-
-            for i in range(3):
-                example = Message()
-                example.sender_id = 2
-                example.recipient_id = 2
-                example.text = f"message from 2 to 2 n.{i+1}"
-                now = datetime.now()
-                example.delivery_date = now
-                example.last_update_date = now
-                example.is_draft = False
-                db.session.add(example)
-                db.session.commit()
-
+            example = Message()
+            example.sender_id = 1
+            example.recipient_id = 0
+            example.text = "hello by 1"
+            now = datetime.now()
+            example.delivery_date = now
+            example.last_update_date = now
+            example.is_draft = False
+            db.session.add(example)
+            db.session.commit()
+            
     return app
 
 
