@@ -115,6 +115,8 @@ def create_message():
             date=message.delivery_date
             form.text_area.data=text
             form.delivery_date.data=date
+            session['draft_id']=0
+
         session['chosen_recipient']=[]
         return render_template("create_message.html", form=form) 
     else:
