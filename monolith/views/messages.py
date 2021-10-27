@@ -188,7 +188,8 @@ def add_recipient():
     #session['chosen_recipient']=[]   
     if request.method == 'POST':
         chosen_recipients_temp=[]
-        for id in request.form['recipient_list']:
+        selected_recipient = request.form.getlist('recipient_list')
+        for id in selected_recipient:
          found_recipient = User.query.filter_by(id = id).first()
          chosen_recipients_temp.append({'id':found_recipient.id,'firstname':found_recipient.firstname})
 
