@@ -84,7 +84,7 @@ def create_message():
             return redirect('/messages/load_draft')
         elif request.form['submit_button'] == 'Home':
             session['draft_id']=None  
-            return render_template("index.html", welcome=None) 
+            return render_template("index.html", welcome=None)  
         #send button is chosen
         else:
             is_draft = False
@@ -94,6 +94,8 @@ def create_message():
                      #"sender_id":form.sender_id.data,
                      "attachment":filename}
             session['mydata'] = mydata
+            if session['chosen_recipient'] != []:
+                redirect(url_for('messages.send_message'),code=307) 
             #redirects to search_recipient page to choose recipients         
             return redirect(url_for('messages.search_recipient', mydata=mydata))
 
@@ -114,7 +116,7 @@ def create_message():
 
     elif request.method == 'GET':
         #creating cookie for recipients 
-        session['chosen_recipient']=[]
+        #session['chosen_recipient']=[]
         if  session.get('draft_id') != None :
             message=Message.query.filter(Message.id==session['draft_id']).first()
             text=message.text
@@ -191,7 +193,7 @@ def add_recipient():
         for id in request.form['recipient_list']:
          found_recipient = User.query.filter_by(id = id).first()
          chosen_recipients_temp.append({'id':found_recipient.id,'firstname':found_recipient.firstname})
-
+        print(chosen_recipients_temp)
         #chosen_recipients_temp = request.form['recipient_list']
 
         chosen_recipients =session['chosen_recipient']+chosen_recipients_temp
