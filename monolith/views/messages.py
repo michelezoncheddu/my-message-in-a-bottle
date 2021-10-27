@@ -84,6 +84,7 @@ def create_message():
             return redirect('/messages/load_draft')
         elif request.form['submit_button'] == 'Home':
             session['draft_id']=None  
+            session['chosen_recipient']=[]
             return render_template("index.html", welcome=None)  
         #send button is chosen
         else:
@@ -161,6 +162,8 @@ def search_recipient():
         elif (request.form['submit_button'] == 'send') & (session['chosen_recipient']==[]):
             return redirect ('/search_recipient')
         elif request.form['submit_button'] == 'cancel':
+            session['chosen_recipient']=[]
+            session['draft_id']=None
             return redirect ('/')  
         else:    
             #search recipients in the list of users
@@ -231,6 +234,8 @@ def send_message():
             db.session.add(new_message) 
         
         db.session.commit() 
+        session['chosen_recipient']=[]
+        session['draft_id']=None
         return render_template("index.html", welcome=None)      
 
 
