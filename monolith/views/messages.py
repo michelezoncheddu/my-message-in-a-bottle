@@ -169,6 +169,7 @@ def add_recipient():
     '''if session['chosen_recipient'] != '':
         pass
     else:'''
+    form = SearchRecipientForm()
     #session['chosen_recipient']=[]   
     if request.method == 'POST':
         print(request.form['recipient_list'])
@@ -186,6 +187,32 @@ def add_recipient():
         print("FINALE: "+str(session['chosen_recipient']))
         return redirect('/search_recipient')
     if request.method == 'GET': 
-        mydata=session['mydata']
-        print('print cookie:'+mydata['delivery_date'])
-        return render_template("search_recipient.html", form=form)
+        print(session['found_recipient'])
+        return render_template("add_recipient.html",recipients=session['found_recipient']) 
+
+@messages.route('/send_message', methods=['POST'])
+def send_message(): 
+    if request.method == 'POST':
+
+        text=session['mydata']['text']
+        delivery_date=session['mydata']['delivery_date']
+        sender_id=session['mydata']['sender_id']
+        delivery_date_object = datetime.datetime.strptime(delivery_date, '%a, %d %b %Y %H:%M:%S GMT')
+        i=1
+        for recipient in session['chosen_recipient']:
+            print("invio messaggio"+str(i))
+            i+=1
+            new_message=Message()
+            new_message.text=text
+            new_message.delivery_date= delivery_date_object.date()
+            new_message.attachment=None
+            new_message.is_draft= False
+            new_message.is_delivered=False
+            new_message.sender_id=sender_id
+            new_message.recipient_id=recipient['id']
+            db.session.add(new_message) 
+        
+        db.session.commit() 
+        return redirect('/messages')       
+    else:
+        return 404        
