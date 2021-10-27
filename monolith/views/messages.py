@@ -72,7 +72,7 @@ def create_message():
 
         new_message=Message()
         #draft button is chosen
-        if request.form['submit_button'] == 'Draft':
+        if request.form['submit_button'] == 'Save':
             is_draft = True
             new_message.recipient_id = 0
 
@@ -148,15 +148,14 @@ def search_recipient():
         else:    
             #search recipients in the list of users
             to_search=form.search_recipient.data
-            print('To search: '+to_search)
-            found_recipient = User.query.filter_by(firstname = to_search).all()
-            print(found_recipient[0].firstname)
+            found_recipient = User.query.filter(User.firstname.ilike("%{}%".format(to_search))).all()
+            if found_recipient == []:
+                return redirect('/search_recipient')
             recipient_list=[]
             for rec in found_recipient:
                  recipient_list.append({'id':rec.id,'firstname':rec.firstname})
 
             session['found_recipient'] =recipient_list
-            print(session['found_recipient'])
             return redirect(url_for('messages.add_recipient'))
     if request.method == 'GET': 
         #mydata=session['mydata']
@@ -172,22 +171,18 @@ def add_recipient():
     form = SearchRecipientForm()
     #session['chosen_recipient']=[]   
     if request.method == 'POST':
-        print(request.form['recipient_list'])
         chosen_recipients_temp=[]
         for id in request.form['recipient_list']:
          found_recipient = User.query.filter_by(id = id).first()
-         print(found_recipient.firstname)
          chosen_recipients_temp.append({'id':found_recipient.id,'firstname':found_recipient.firstname})
 
         #chosen_recipients_temp = request.form['recipient_list']
-        print("INTERMEDIO: "+str(session['chosen_recipient']))
-        print("CHOSEN: "+str(chosen_recipients_temp))
+
         chosen_recipients =session['chosen_recipient']+chosen_recipients_temp
         session['chosen_recipient'] = chosen_recipients
-        print("FINALE: "+str(session['chosen_recipient']))
+
         return redirect('/search_recipient')
     if request.method == 'GET': 
-        print(session['found_recipient'])
         return render_template("add_recipient.html",recipients=session['found_recipient']) 
 
 @messages.route('/send_message', methods=['POST'])
@@ -213,6 +208,6 @@ def send_message():
             db.session.add(new_message) 
         
         db.session.commit() 
-        return redirect('/messages')       
-    else:
-        return 404        
+        return redirect('/messages')          
+
+
