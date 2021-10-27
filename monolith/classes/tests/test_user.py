@@ -87,23 +87,6 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
-        """create dummy user for unregister
-        # logout
-        reply = tested_app.get('/logout')
-        self.assertEqual(reply.status_code, 302)
-        # signup
-        data = {'dir': '/create_user',
-                'submit': 'Submit'
-        }
-        reply = tested_app.post('/create_user', data=data)
-        self.assertEqual(reply.status_code, 302)
-        # login
-        data = {'dir': '/login',
-                'submit': 'Publish',
-                'email': 'todelete@todelete.it',
-                'password': 'pwdummy'}
-        reply = tested_app.post('/createform', data=data)
-        self.assertEqual(reply.status_code, 200)"""
         # unregister 
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
