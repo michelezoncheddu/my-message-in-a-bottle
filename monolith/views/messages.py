@@ -234,6 +234,8 @@ def send_message():
             db.session.add(new_message) 
         
         db.session.commit() 
+        session['chosen_recipient']=[]
+        session['draft_id']=None
         return render_template("index.html", welcome=None)      
 
 
