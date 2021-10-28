@@ -6,15 +6,6 @@ from monolith.database import User
 
 login_manager = LoginManager()
 
-def login_required(func):
-    @functools.wraps(func)
-    def _login_required(*args, **kw):
-        # Checks if the user is logged in.
-        if not current_user.is_authenticated:  # TODO: compare with hasattr(id)
-            return login_manager.unauthorized()
-        return func(*args, **kw)
-    return _login_required
-
 def admin_required(func):
     @functools.wraps(func)
     def _admin_required(*args, **kw):
@@ -23,6 +14,16 @@ def admin_required(func):
             return login_manager.unauthorized()
         return func(*args, **kw)
     return _admin_required
+
+
+def login_required(func):
+    @functools.wraps(func)
+    def _login_required(*args, **kw):
+        # Checks if the user is logged in.
+        if not current_user.is_authenticated:  # TODO: compare with hasattr(id)
+            return login_manager.unauthorized()
+        return func(*args, **kw)
+    return _login_required
 
 
 @login_manager.user_loader
