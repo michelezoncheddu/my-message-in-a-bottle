@@ -1,6 +1,10 @@
+import datetime
+
 from flask import Blueprint, redirect, render_template, request, session, url_for, abort
 from flask_login import current_user
 from sqlalchemy import or_, and_
+
+from .users import get_users
 
 from ..access import Access
 from ..auth import login_required
@@ -8,7 +12,6 @@ from ..image import save_image
 
 from monolith.database import Message, db,User
 from monolith.forms import MessageForm, SearchRecipientForm
-import datetime
 
 
 messages = Blueprint('messages', __name__)
@@ -147,17 +150,20 @@ def create_message():
         return redirect('/messages')    
 
     elif request.method == 'GET':
-        #creating cookie for recipients 
-        #session['chosen_recipient']=[]
-        if  session.get('draft_id') != None :
+        '''FOR POST
+        if session.get('draft_id') != None :
             message=Message.query.filter(Message.id==session['draft_id']).first()
             text=message.text
             date=message.delivery_date
             filename=message.attachment
             form.text_area.data=text
-            form.delivery_date.data=date
+            form.delivery_date.data=date'''
+        users_list = []
+        for i, user in enumerate(get_users()):
+            users_list.append((i, user.get_email()))
+        form.users_list.choices = users_list
         
-        return render_template("create_message.html", form=form) 
+        return render_template("create_message.html", form=form, users_list=users_list) 
     else:
         raise RuntimeError('This should not happen!')   
 

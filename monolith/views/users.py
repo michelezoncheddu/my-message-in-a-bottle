@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, abort
+from flask import Blueprint, redirect, render_template, request, abort, jsonify
 
 from ..image import allowed_file, save_image
 
@@ -15,11 +15,18 @@ users = Blueprint('users', __name__)
 DEFAULT_PROFILE_PIC = "static/profile/default.png"
 PROFILE_PIC_PATH = "monolith/static/profile/"
 
+
+@login_required
+def get_users():
+    return db.session.query(User)
+
+
 @users.route('/users')
 @login_required
 def _users():
-    _users = db.session.query(User)
+    _users = get_users()
     return render_template("users.html", users=_users)
+
 
 @users.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -65,6 +72,7 @@ def create_user():
         return render_template('create_user.html', form=form)
     else:
         raise RuntimeError('This should not happen!')
+
 
 @users.route('/delete_user', methods=['POST','GET'])
 def delete_user():
