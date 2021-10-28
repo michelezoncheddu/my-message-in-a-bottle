@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, abort, jsonify
+from flask import Blueprint, redirect, render_template, request
 
 from ..image import allowed_file, save_image
 
@@ -15,21 +15,48 @@ users = Blueprint('users', __name__)
 DEFAULT_PROFILE_PIC = "static/profile/default.png"
 PROFILE_PIC_PATH = "monolith/static/profile/"
 
+# utility function for reporting/banning an user
+def moderateAction(email, isAdmin):
+    u = db.session.query(User).filter(User.email == email)
+    _user = u.first()
+    if (_user is None):
+        raise RuntimeError('Reported user not found in DB, this should not happen!')
+    
+    # if issued by admin -> ban
+    if (isAdmin):
+        _user.set_banned(True)
+        _user.set_reported(False)
+        db.session.commit()
+    # if issued by user -> report
+    else:
+        _user.set_reported(True)
+        db.session.commit()
+
 
 @login_required
 def get_users():
     return db.session.query(User)
 
-
-@users.route('/users')
+@users.route('/users', methods=['POST', 'GET'])
 @login_required
-def _users():
+# TODO: Unban option
+def _users(): # TODO: IMPLEMENT UNBANN OPTION?
+    isAdmin = current_user.is_admin
     _users = db.session.query(User)
-    if (current_user.is_admin):
+    if (isAdmin): 
         action = "Ban"
     else:
         action = "Report"
-    return render_template("users.html", users=_users, action=action)
+    
+    if (request.method == 'GET'):
+        return render_template("users.html", users=_users, action=action)
+    # report (if user) | ban (if admin)
+    elif (request.method == 'POST'):
+        # retrieve email of the user to report/ban
+        email = request.form["action1"]
+        print(email)
+        moderateAction(email, isAdmin)
+        return render_template("users.html", users=_users, action=action)
 
 
 @users.route('/profile', methods=['GET', 'POST'])
@@ -77,12 +104,18 @@ def create_user():
     else:
         raise RuntimeError('This should not happen!')
 
-
-@users.route('/moderate', methods=['POST', 'GET'])
+@users.route('/reported_users', methods=['POST', 'GET'])
 @login_required
 @admin_required
 def moderate():
-    return render_template("moderate.html")
+    _users = db.session.query(User)    
+    if (request.method == 'GET'):
+        return render_template("reported_users.html", users=_users)
+    elif (request.method == 'POST'):
+        # retrieve email of the user to ban
+        email = request.form["ban"]
+        moderateAction(email, True)
+        return render_template("reported_users.html", users=_users)
 
 @users.route('/delete_user', methods=['POST','GET'])
 def delete_user():

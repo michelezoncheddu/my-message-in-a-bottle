@@ -17,8 +17,12 @@ def login():
         q = db.session.query(User).filter(User.email == email)
         user = q.first()
         if user is not None and user.authenticate(password):
-            login_user(user)
-            return redirect('/')
+            if not user.is_banned:
+                login_user(user)
+                return redirect('/')
+            else:
+                return {'msg': 'Your account has been permanently banned!'}, 403
+
     return render_template('login.html', form=form)
 
 

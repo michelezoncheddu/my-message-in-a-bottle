@@ -3,7 +3,6 @@ import unittest
 import datetime
 
 from monolith.app import app
-from monolith.forms import UserForm
 
 
 class Test(unittest.TestCase):
