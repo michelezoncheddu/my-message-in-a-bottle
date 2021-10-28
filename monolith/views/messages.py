@@ -76,6 +76,8 @@ def message(message_id):
     return {'msg': 'message deleted'}, 200
 
 
+# -------------------------------------------------------------------
+# TODO: TEST WITH THE NEW SEND
 @messages.route('/forward/<int:message_id>')
 @login_required
 def forward(message_id):
@@ -96,64 +98,88 @@ def reply(message_id):
 
     session['chosen_recipient'] = [{'id': message.get_sender(), 'firstname': 'reply'}]
     return redirect(url_for('messages.create_message'))
+# -------------------------------------------------------------------
 
 
-@messages.route('/create_message', methods=['POST', 'GET'])
+'''
+    Examples of usage:
+    - (GET) localhost:5000/create_message
+    - (GET) localhost:5000/create_message?draft_id=2
+'''
+@messages.route('/create_message', methods=['GET', 'POST'])
 @login_required
 def create_message():
-    draft_id = None
-    try:
-        draft_id = int(request.args.get('draft_id'))
-    except:
-        abort(400, 'draft_id must be integer')
-
     form = MessageForm()
     
     if request.method == 'POST':
+        # Save the choices of recipients.
         form.users_list.choices = form.users_list.data
+        
         if form.validate_on_submit():
-            
-            #check if there's an image; if so the image is saved locally and its path is in filename
             file = request.files['image_file']
-            if ('file' not in request.files):
+            if 'file' not in request.files:
                 filename = ''
             if file:
                 filename = save_image(file, ATTACHMENTS_PATH)
             
+            # Save draft.
             if request.form['submit_button'] == 'Save':
+                '''
+                    TODO: a new message is required only if the draft is not
+                          a modification of a previous draft.
+                          In that case, just the old draft from the DB needs to be modifed.
+                '''
                 new_message = Message()
                 new_message.text = form.text_area.data
-                new_message.delivery_date = form.delivery_date.data
+                new_message.delivery_date = form.delivery_date.data  # TODO: check.
                 new_message.sender_id = current_user.get_id()
                 new_message.attachment = filename
-                new_message.recipient_id = 0
+                new_message.recipient_id = 0  # TODO: put the first recipient in the list.
                 db.session.add(new_message) 
                 db.session.commit() 
-                return redirect('/')
-            elif request.form['submit_button'] == 'Load':
-                return redirect('/messages/load_draft')
-            elif request.form['submit_button'] == 'Home':
-                return render_template("index.html", welcome=None)  
-            #send button is chosen
+                return redirect('messages/draft')
+
+            # Send.
             else:
-                pass
-                
-    elif request.method == 'GET':
-        users_list = []
-        for i, user in enumerate(get_users()):
-            users_list.append((i, user.get_email()))
-        form.users_list.choices = users_list
-        
+                for recipient in form.users_list.data:
+                    new_message = Message()
+                    new_message.text = form.text_area.data
+                    new_message.delivery_date = form.delivery_date.data  # TODO: check.
+                    new_message.attachment = filename
+                    new_message.is_draft = False
+                    new_message.is_delivered = True  # TODO: change after Celery.
+                    new_message.sender_id = current_user.get_id()
+                    new_message.recipient_id = recipient
+                    db.session.add(new_message) 
+                    db.session.commit()
+                return redirect('/mailbox')
+
+        '''
+            This is the case of invalid form.
+            TODO: stay on the same form without losing input and show an error message.
+        '''
+        return redirect('/create_message')
+    
+    # GET
+    else:
+        form.users_list.choices = [
+            (user.get_id(), user.get_email()) for user in get_users()
+        ]
+
+        draft_id = None
+        try:
+            draft_id = int(request.args.get('draft_id'))
+        except:
+            pass  # This is safe, draft_id will be ignored.
+
         if draft_id is not None:
             message = retrieve_message(draft_id)
             print(message.get_text())
-            form.text_area = message.get_text()
-            form.delivery_date = message.get_delivery_date()
-            form.image_file = message.get_attachement()
+            form.text_area.data = message.get_text()
+            form.delivery_date.data = message.get_delivery_date()
+            form.image_file.data = message.get_attachement()  # TODO: doesn't work
         
-        return render_template("create_message.html", form=form) 
-    else:
-        raise RuntimeError('This should not happen!')   
+        return render_template("create_message.html", form=form)
 
 
 #list of draft messages
@@ -162,44 +188,3 @@ def create_message():
 def messages_draft():
     messages_draft = Message.query.filter_by(is_draft = True)
     return render_template("messages.html", messages=messages_draft)
-
-#list of sent messages
-@messages.route('/messages/sent')
-@login_required
-def messages_sent():
-    messages_sent = Message.query.filter_by(is_draft = False, access = True )
-    return render_template("messages.html", messages=messages_sent)    
-
-
-
-@messages.route('/send_message', methods=['POST'])
-@login_required
-def send_message(): 
-    if request.method == 'POST':
-
-        text=session['mydata']['text']
-        delivery_date=session['mydata']['delivery_date']
-        #sender_id=session['mydata']['sender_id']
-        sender_id=current_user.get_id()
-        attachment=session['mydata']['attachment']
-        delivery_date_object = datetime.datetime.strptime(delivery_date, '%a, %d %b %Y %H:%M:%S GMT')
-        i=1
-        for recipient in session['chosen_recipient']:
-            print("invio messaggio"+str(i))
-            i+=1
-            new_message=Message()
-            new_message.text=text
-            new_message.delivery_date= delivery_date_object.date()
-            new_message.attachment=None
-            new_message.is_draft= False
-            new_message.is_delivered=False
-            new_message.sender_id=sender_id
-            new_message.recipient_id=recipient['id']
-            new_message.attachment=attachment
-            db.session.add(new_message) 
-        
-        db.session.commit() 
-        session['chosen_recipient']=[]
-        session['draft_id']=None
-        return render_template("index.html", welcome=None)      
-
