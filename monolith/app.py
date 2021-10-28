@@ -28,6 +28,17 @@ def create_app():
         user = q.first()
         if user is None:
             example = User()
+            example.firstname = 'admin'
+            example.lastname = 'admin'
+            example.email = 'admin@admin'
+            example.dateofbirth = datetime(2020, 10, 5)
+            example.profile_pic = "static/profile/default.png"
+            example.is_admin = True
+            example.set_password('admin')
+            db.session.add(example)
+            db.session.commit()
+
+            example = User()
             example.firstname = 'sender'
             example.lastname = 'sender'
             example.email = 's@s'
