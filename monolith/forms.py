@@ -2,7 +2,8 @@ import wtforms as f
 from flask_wtf import FlaskForm
 from wtforms import Form
 from wtforms.validators import DataRequired
-from wtforms.fields.html5 import DateField
+#from wtforms.fields.html5 import DateField
+from wtforms import DateField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 

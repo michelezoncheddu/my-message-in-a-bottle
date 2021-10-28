@@ -83,6 +83,17 @@ def forward(message_id):
     return redirect(url_for('messages.create_message'))
 
 
+@messages.route('/reply/<int:message_id>')
+@login_required
+def reply(message_id):
+    message = retrieve_message(message_id)
+    user_id = current_user.get_id()
+    is_sender_or_recipient(message, user_id)
+
+    session['chosen_recipient'] = [message.get_sender()]
+    return redirect(url_for('messages.create_message'))
+
+
 @messages.route('/create_message', methods=['POST', 'GET'])
 @login_required
 def create_message():
