@@ -90,7 +90,7 @@ def reply(message_id):
     user_id = current_user.get_id()
     is_sender_or_recipient(message, user_id)
 
-    session['chosen_recipient'] = [message.get_sender()]
+    session['chosen_recipient'] = [{'id': message.get_sender(), 'firstname': 'reply'}]
     return redirect(url_for('messages.create_message'))
 
 

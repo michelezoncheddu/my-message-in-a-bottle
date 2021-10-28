@@ -36,6 +36,10 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
+        # users
+        reply = tested_app.get('/users')
+        self.assertEqual(reply.status_code, 200)
+
         # profile with login
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)

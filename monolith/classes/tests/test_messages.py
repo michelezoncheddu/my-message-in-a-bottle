@@ -11,6 +11,11 @@ class Test(unittest.TestCase):
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
 
+        self.admin = {
+            'email': 'admin@admin',
+            'password': 'admin'
+        }
+
         self.sender = {
             'email': 's@s',
             'password': 'sender'
@@ -61,6 +66,16 @@ class Test(unittest.TestCase):
         # Test without login.
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 401)
+        
+        reply = tested_app.post('/login', data=json.dumps(self.recipient), content_type='application/json')
+        self.assertEqual(reply.status_code, 302)
+
+        # Existent message of other users.
+        reply = tested_app.get('/message/1')
+        self.assertEqual(reply.status_code, 401)
+        
+        tested_app = app.test_client()
+    
 
         reply = tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
@@ -69,36 +84,45 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/message/0')
         self.assertEqual(reply.status_code, 404)
 
-        # Existent message of other users.
-        reply = tested_app.get('/message/4')
-        self.assertEqual(reply.status_code, 404)
-
         # Existent message.
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 200)
 
-        # Delete message.
-        #reply = tested_app.delete('/message/1')
-        #self.assertEqual(reply.status_code, 200)
-
-        # Delete unexistent message.
-        #reply = tested_app.delete('/message/1')
-        #self.assertEqual(reply.status_code, 401)
-
-        # Delete message of other users.
-        reply = tested_app.delete('/message/4')
-        self.assertEqual(reply.status_code, 404)
-
         reply = tested_app.get('/mailbox')
-
         # Parse HTML and get list of sent messages.
         parsed = bs(reply.data, 'html.parser')
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
         assert(len(sent_messages) == 1)
-
+        
         # Forward message
         reply = tested_app.get('/forward/1')
         self.assertEqual(reply.status_code, 302)
+
+        # Reply message
+        reply = tested_app.get('/reply/1')
+        self.assertEqual(reply.status_code, 302)
+
+        # Delete message.
+        reply = tested_app.delete('/message/1')
+        self.assertEqual(reply.status_code, 200)
+
+        # Delete unexistent message.
+        reply = tested_app.delete('/message/1')
+        self.assertEqual(reply.status_code, 401)
+
+        # Delete message of other users.
+        reply = tested_app.delete('/message/4')
+        self.assertEqual(reply.status_code, 404)
+
+        reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
+        self.assertEqual(reply.status_code, 302)
+
+        # Delete message of other users.
+        reply = tested_app.delete('/message/1')
+        self.assertEqual(reply.status_code, 200)
+        
+
+
 
         
