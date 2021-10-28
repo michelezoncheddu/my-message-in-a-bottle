@@ -2,6 +2,8 @@ import os
 import json
 import unittest
 
+import pytest
+
 from bs4 import BeautifulSoup as bs
 from werkzeug.utils import redirect
 
@@ -72,6 +74,7 @@ class Test(unittest.TestCase):
 
 
     # general tests for common user
+    @pytest.mark.run(order=1)
     def test_user(self):
         tested_app = app.test_client()
 
@@ -126,6 +129,7 @@ class Test(unittest.TestCase):
 
 
     # general tests for admin
+    @pytest.mark.run(order=2)
     def test_admin(self):
         tested_app = app.test_client()
 
@@ -180,6 +184,7 @@ class Test(unittest.TestCase):
 
 
     # /unregister tests
+    @pytest.mark.run(order=3)
     def test_unregister(self):
         tested_app = app.test_client()
 
@@ -217,8 +222,8 @@ class Test(unittest.TestCase):
 
         print("UNREGISTER USER: OK")
 
-
     # report tests
+    @pytest.mark.run(order=4)
     def test_report(self):
         tested_app = app.test_client()
 
@@ -245,6 +250,7 @@ class Test(unittest.TestCase):
 
 
     # ban tests
+    @pytest.mark.run(order=5)
     def test_ban(self):
         tested_app = app.test_client()
 
@@ -252,7 +258,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # create toban 2 account
+        # create toban account 2
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_toban2_user),
                     content_type='application/json', follow_redirects=True)
@@ -270,9 +276,24 @@ class Test(unittest.TestCase):
         toban1_email = self.toban1_user['email']
         data = {'dir': '/reported_users',
                 'submit': 'Ban', 
-                'action1': toban1_email}
+                'ban': toban1_email}
         reply = tested_app.post('/reported_users', data=data)
         self.assertEqual(reply.status_code, 200)
 
+        # logout
+        reply = tested_app.get('/logout')
+        self.assertEqual(reply.status_code, 302)
+
+        # try login as banned 1
+        reply = tested_app.post('/login', data=json.dumps(self.toban1_user), content_type='application/json')
+        body = json.loads(str(reply.data, 'utf8'))
+        self.assertEqual(reply.status_code, 403)
+        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
+
+        # try login as banned 2
+        reply = tested_app.post('/login', data=json.dumps(self.toban2_user), content_type='application/json')
+        body = json.loads(str(reply.data, 'utf8'))
+        self.assertEqual(reply.status_code, 403)
+        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
 
         print("BAN USER: OK")

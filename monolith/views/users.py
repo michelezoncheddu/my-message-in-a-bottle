@@ -37,6 +37,7 @@ def moderateAction(email, isAdmin):
 def get_users():
     return db.session.query(User)
 
+
 @users.route('/users', methods=['POST', 'GET'])
 @login_required
 # TODO: Unban option
