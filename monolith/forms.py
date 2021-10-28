@@ -1,6 +1,7 @@
 import wtforms as f
 from flask_wtf import FlaskForm
 from wtforms import Form
+from wtforms.fields.core import SelectMultipleField
 from wtforms.validators import DataRequired
 #from wtforms.fields.html5 import DateField
 from wtforms import DateField
@@ -30,8 +31,9 @@ class MessageForm(FlaskForm):
     text_area = f.TextAreaField('Insert message text')
     #sender_id = f.IntegerField('Sender Id', validators=[DataRequired()])
     delivery_date = DateField('Delivery Date', format='%d/%m/%Y')
-    image_file = FileField('Image',validators=[FileAllowed(['jpg','png'])]) 
-    display = ['text_area', 'delivery_date','image_file']    
+    image_file = FileField('Image', validators=[FileAllowed(['jpg','png'])])
+    users_list = SelectMultipleField('Select recipients', id='users_list')
+    display = ['text_area', 'delivery_date', 'image_file', 'users_list']
 
 class SearchRecipientForm(FlaskForm):
     search_recipient = f.StringField('Search Recipient')

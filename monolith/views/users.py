@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, abort
+from flask import Blueprint, redirect, render_template, request, abort, jsonify
 
 from ..image import allowed_file, save_image
 
@@ -15,6 +15,12 @@ users = Blueprint('users', __name__)
 DEFAULT_PROFILE_PIC = "static/profile/default.png"
 PROFILE_PIC_PATH = "monolith/static/profile/"
 
+
+@login_required
+def get_users():
+    return db.session.query(User)
+
+
 @users.route('/users')
 @login_required
 def _users():
@@ -24,6 +30,7 @@ def _users():
     else:
         action = "Report"
     return render_template("users.html", users=_users, action=action)
+
 
 @users.route('/profile', methods=['GET', 'POST'])
 @login_required

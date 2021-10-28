@@ -1,4 +1,8 @@
 <html>
+ <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+ </head>
  <body>
   <form action="" method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
@@ -15,10 +19,12 @@
     </dl>
     <p>
     <input type=submit name='submit_button' value="Save">
-    <input type=submit name='submit_button' value="Load">
     <input type=submit name='submit_button' value="Send">
-    <input type=submit name='submit_button' value="Home">
     </p>
   </form>
+  <a href="/"> <button>Home</button> </a>
  </body>
+ <script>
+   $("#users_list").selectize({'placeholder': 'Select recipients'})
+ </script>
 </html>
