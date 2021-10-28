@@ -62,14 +62,14 @@ def create_app():
 
 
         # getting the dummy message if any
-        m = db.session.query(Message).filter(Message.sender_id == 1 and Message.recipient_id==1)
+        m = db.session.query(Message).filter(Message.sender_id == 2 and Message.recipient_id==1)
         message = m.first()
         
         # creating dummy messages
         if message is None:
             example = Message()
-            example.sender_id = 1
-            example.recipient_id = 0
+            example.sender_id = 2
+            example.recipient_id = 1
             example.text = "hello by 1"
             now = datetime.now()
             example.delivery_date = now
