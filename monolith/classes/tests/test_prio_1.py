@@ -25,7 +25,8 @@ class Test(unittest.TestCase):
             'firstname': 'testname',
             'lastname': 'testlastname',
             'password': 'testpassword',
-            'dateofbirth': '9/10/2020'
+            'dateofbirth': '9/10/2020',
+            'location': 'Pisa'
         }
 
 
@@ -48,7 +49,6 @@ class Test(unittest.TestCase):
         
         self.assertEqual(reply.status_code, 200)
     
-      
 
     #login
     def test_login(self):

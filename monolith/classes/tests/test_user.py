@@ -19,6 +19,20 @@ class Test(unittest.TestCase):
             'password': 'admin'
         }
 
+        self.create_user = {
+            'email': 'todelete@todelete',
+            'firstname': 'todelete',
+            'lastname': 'todelete',
+            'password': 'todelete',
+            'dateofbirth': '9/10/2020',
+            'location': 'Pisa'
+        }
+
+        self.todelete_user = {
+            'email': 'todelete@todelete',
+            'password': 'todelete'
+        }
+
 
     def setUp(self):
         app.config['TESTING'] = True
@@ -76,8 +90,15 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 401)
 
+        # create todelete account
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_user),
+                    content_type='application/json', follow_redirects=True)
+        
+        self.assertEqual(reply.status_code, 200)
+
         # login
-        reply = tested_app.post('/login', data=json.dumps(self.user), content_type='application/json')
+        reply = tested_app.post('/login', data=json.dumps(self.todelete_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
         # get /unregister with login
@@ -91,9 +112,9 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
-        # unregister correct
+        # try unregister with wrong password
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
-                'password': 'admin'}
+                'password': 'todelete'}
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 302)

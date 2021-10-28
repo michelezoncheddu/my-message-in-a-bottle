@@ -32,8 +32,10 @@ def create_app():
             example.lastname = 'admin'
             example.email = 'admin@admin'
             example.dateofbirth = datetime(2020, 10, 5)
+            example.location = 'Pisa'
             example.profile_pic = "static/profile/default.png"
             example.is_admin = True
+            example.is_banned = False
             example.set_password('admin')
             db.session.add(example)
             db.session.commit()
@@ -43,8 +45,10 @@ def create_app():
             example.lastname = 'sender'
             example.email = 's@s'
             example.dateofbirth = datetime(2020, 10, 5)
+            example.location = 'Pisa'
             example.profile_pic = "static/profile/default.png"
             example.is_admin = False
+            example.is_banned = False
             example.set_password('sender')
             db.session.add(example)
             db.session.commit()
@@ -54,8 +58,10 @@ def create_app():
             example.lastname = 'recipient'
             example.email = 'r@r'
             example.dateofbirth = datetime(2020, 10, 5)
+            example.location = 'Pisa'
             example.profile_pic = "static/profile/default.png"
             example.is_admin = False
+            example.is_banned = False
             example.set_password('recipient')
             db.session.add(example)
             db.session.commit()

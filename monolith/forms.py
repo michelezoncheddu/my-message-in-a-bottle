@@ -19,7 +19,8 @@ class UserForm(FlaskForm):
     lastname = f.StringField('lastname', validators=[DataRequired()])
     password = f.PasswordField('password', validators=[DataRequired()])
     dateofbirth = DateField('dateofbirth', format='%d/%m/%Y')
-    display = ['email', 'firstname', 'lastname', 'password', 'dateofbirth']
+    location = f.StringField('location', validators=[DataRequired()])
+    display = ['email', 'firstname', 'lastname', 'password', 'dateofbirth', 'location']
 
 class UserDelForm(FlaskForm):
     firstname = f.StringField('firstname', validators=[DataRequired()])
@@ -39,5 +40,4 @@ class SearchRecipientForm(FlaskForm):
 class AddRecipientForm(FlaskForm):
     search_recipient = f.SelectMultipleField('none')
     display = ['add_recipient']
-
   

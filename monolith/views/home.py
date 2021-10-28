@@ -8,7 +8,10 @@ home = Blueprint('home', __name__)
 @home.route('/')
 def index():
     if current_user is not None and hasattr(current_user, 'id'):
-        welcome = "Logged In!"
+        if current_user.is_admin:
+            welcome = "Logged In as Admin!"
+        else:
+            welcome = "Logged In!"
     else:
         welcome = None
         session['draft_id']=None

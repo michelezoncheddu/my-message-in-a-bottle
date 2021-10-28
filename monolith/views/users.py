@@ -3,7 +3,7 @@ from flask import Blueprint, redirect, render_template, request, abort
 from ..image import allowed_file, save_image
 
 from werkzeug.utils import secure_filename
-from monolith.auth import login_required
+from monolith.auth import login_required, admin_required
 from monolith.database import User, db
 from monolith.forms import UserForm,UserDelForm
 
@@ -19,7 +19,11 @@ PROFILE_PIC_PATH = "monolith/static/profile/"
 @login_required
 def _users():
     _users = db.session.query(User)
-    return render_template("users.html", users=_users)
+    if (current_user.is_admin):
+        action = "Ban"
+    else:
+        action = "Report"
+    return render_template("users.html", users=_users, action=action)
 
 @users.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -65,6 +69,13 @@ def create_user():
         return render_template('create_user.html', form=form)
     else:
         raise RuntimeError('This should not happen!')
+
+
+@users.route('/moderate', methods=['POST', 'GET'])
+@login_required
+@admin_required
+def moderate():
+    return render_template("moderate.html")
 
 @users.route('/delete_user', methods=['POST','GET'])
 def delete_user():

@@ -4,6 +4,12 @@
   Hi {{ current_user.firstname }}! <a href="/logout">Logout</a><br>
   If you wish to unregister from our platform, <a href="/unregister">Unregister</a>
     <h2>{{ welcome }}</h2>
+    {% if current_user.is_admin %}
+    <div></div><a href="/moderate">
+      <button id='admin_button' name='admin_button'><strong>Moderate</strong></button>
+    </a></div>
+    {% endif %}
+    <br><br>
     <a href="/profile"> 
       <button>Profile</button>
     </a>
