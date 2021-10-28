@@ -23,12 +23,12 @@ def moderateAction(email, isAdmin):
         raise RuntimeError('Reported user not found in DB, this should not happen!')
     
     # if issued by admin -> ban
-    if (isAdmin):
+    if (isAdmin and not _user.is_banned):
         _user.set_banned(True)
         _user.set_reported(False)
         db.session.commit()
     # if issued by user -> report
-    else:
+    elif (not _user.is_reported):
         _user.set_reported(True)
         db.session.commit()
 
@@ -54,7 +54,6 @@ def _users(): # TODO: IMPLEMENT UNBANN OPTION?
     elif (request.method == 'POST'):
         # retrieve email of the user to report/ban
         email = request.form["action1"]
-        print(email)
         moderateAction(email, isAdmin)
         return render_template("users.html", users=_users, action=action)
 
@@ -71,9 +70,6 @@ def profile():
         if ('file' not in request.files):
             return {'msg': 'No selected file'}, 400
         file = request.files['file']
-        # check if path is empty
-        if (file.filename == ''):
-            return {'msg': 'No selected file'}, 400
         # OK : get new pic
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
