@@ -8,6 +8,9 @@
     <h1>Message</h1>
       {{message.id}} {{message.text}} {{message.sender_id}} {{message.recipient_id}}
       <button type="submit" onclick="DeleteMessage('{{message.id}}')">Delete</button>
+      <a href="/create_message?forw_id={{message.id}}"> <button>Forward</button> </a>
+      <a href="/create_message?reply_id={{message.id}}"> <button>Reply</button> </a>
+           
     <br> <br>
     <a href="/mailbox"> <button>Mailbox</button> </a>
   </body>

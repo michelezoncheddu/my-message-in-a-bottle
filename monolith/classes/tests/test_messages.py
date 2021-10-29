@@ -95,14 +95,30 @@ class Test(unittest.TestCase):
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
         assert(len(sent_messages) == 1)
+
+        # Edit an alredy sent message
+        reply = tested_app.get('/create_message?draft_id=1')
+        self.assertEqual(reply.status_code, 404)
+
+        # Edit a draft
+        reply = tested_app.get('/create_message?draft_id=2')
+        self.assertEqual(reply.status_code, 200)
+
+        # Forward a draft
+        reply = tested_app.get('/create_message?forw_id=2')
+        self.assertEqual(reply.status_code, 404)
+
+        # Reply to a draft
+        reply = tested_app.get('/create_message?reply_id=2')
+        self.assertEqual(reply.status_code, 404)
         
         # Forward message
-        reply = tested_app.get('/forward/1')
-        self.assertEqual(reply.status_code, 302)
+        reply = tested_app.get('/create_message?forw_id=1')
+        self.assertEqual(reply.status_code, 200)
 
         # Reply message
-        reply = tested_app.get('/reply/1')
-        self.assertEqual(reply.status_code, 302)
+        reply = tested_app.get('/create_message?reply_id=1')
+        self.assertEqual(reply.status_code, 200)
 
         # Delete message.
         reply = tested_app.delete('/message/1')
