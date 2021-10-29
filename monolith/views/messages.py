@@ -85,9 +85,8 @@ def forward(message_id):
     user_id = current_user.get_id()
     is_sender_or_recipient(message, user_id)
 
-    session['draft_id'] = message_id
-    return redirect(url_for('messages.create_message'))
-
+    return redirect(url_for('messages.create_message', forw_id=message_id))    
+ 
 
 @messages.route('/reply/<int:message_id>')
 @login_required
@@ -96,8 +95,7 @@ def reply(message_id):
     user_id = current_user.get_id()
     is_sender_or_recipient(message, user_id)
 
-    session['chosen_recipient'] = [{'id': message.get_sender(), 'firstname': 'reply'}]
-    return redirect(url_for('messages.create_message'))
+    return redirect(url_for('messages.create_message', recipient_id=message.get_sender()))   
 # -------------------------------------------------------------------
 
 
@@ -167,18 +165,41 @@ def create_message():
         ]
 
         draft_id = None
+        forw_id = None
+        recipient_id = None
+        
         try:
             draft_id = int(request.args.get('draft_id'))
         except:
             pass  # This is safe, draft_id will be ignored.
+        
+        try:
+            forw_id = int(request.args.get('forw_id'))
+        except:
+            pass  # This is safe, forw_id will be ignored.
+        
+        try:
+            recipient_id = int(request.args.get('recipient_id'))
+        except:
+            pass  # This is safe, recipient_id will be ignored.
+
 
         if draft_id is not None:
             message = retrieve_message(draft_id)
-            print(message.get_text())
             form.text_area.data = message.get_text()
             form.delivery_date.data = message.get_delivery_date()
             form.image_file.data = message.get_attachement()  # TODO: doesn't work
+
+        if forw_id is not None:
+            message = retrieve_message(forw_id)
+            form.text_area.data = "Forwarded: " + message.get_text()
+            form.image_file.data = message.get_attachement()  # TODO: doesn't work
         
+        if recipient_id is not None:
+            form.text_area.data = "Reply: "
+            form.users_list.choices = [(recipient_id, recipient_id)]
+        
+
         return render_template("create_message.html", form=form)
 
 
