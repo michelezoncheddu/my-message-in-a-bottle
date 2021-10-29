@@ -64,9 +64,6 @@ def _users(): # TODO: IMPLEMENT UNBANN OPTION?
         # retrieve email of the user to report/ban
         action_todo = request.form["action"]
         email = request.form.get("email")
-        print(request.form)
-        print(request.args)
-        print(request.json)
         moderateAction(email, action_todo)
         if (action_todo == "Report"):
             return {'msg': 'User successfully reported'}, 200
