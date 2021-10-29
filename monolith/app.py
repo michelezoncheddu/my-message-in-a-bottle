@@ -82,6 +82,16 @@ def create_app():
             example.last_update_date = now
             example.is_draft = False
             db.session.add(example)
+            
+            example = Message()
+            example.sender_id = 2
+            example.recipient_id = 1
+            example.text = "draft by 2"
+            now = datetime.now()
+            example.delivery_date = now
+            example.last_update_date = now
+            example.is_draft = True
+            db.session.add(example)
             db.session.commit()
             
     return app

@@ -17,7 +17,7 @@ from monolith.forms import MessageForm, SearchRecipientForm
 
 messages = Blueprint('messages', __name__)
 
-ATTACHMENTS_PATH = 'monolith/static/images'
+ATTACHMENTS_PATH = 'monolith/static'
 
 
 def retrieve_message(message_id):
@@ -116,14 +116,18 @@ def create_message():
         form.users_list.choices = form.users_list.data
         
         if form.validate_on_submit():
-            file = request.files['image_file']
-            if 'file' not in request.files:
+            filename = ''
+            file = form.image_file.data
+            if 'image_file' not in request.files:
                 filename = ''
             if file:
+                filename = form.image_file.data.filename
+                file = form.image_file.data
                 filename = save_image(file, ATTACHMENTS_PATH)
             
             # Save draft.
-            if request.form['submit_button'] == 'Save':
+            print(form.users_list.data)
+            if form.submit_button.data:
                 '''
                     TODO: a new message is required only if the draft is not
                           a modification of a previous draft.
