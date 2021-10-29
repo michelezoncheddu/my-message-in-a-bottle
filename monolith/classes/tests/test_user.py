@@ -86,17 +86,17 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
+        # profile
+        reply = tested_app.get('/profile')
+        self.assertEqual(reply.status_code, 200)
+
         # users
         reply = tested_app.get('/users')
         self.assertEqual(reply.status_code, 200)
 
-        # reported_users
+        # reported_users (denied access)
         reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 401)
-
-        # profile with login
-        reply = tested_app.get('/profile')
-        self.assertEqual(reply.status_code, 200)
 
         # change profile pic : no selected file
         data = {'dir': '/profile', 'submit': 'Upload'}
@@ -141,16 +141,16 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # reported_users
-        reply = tested_app.get('reported_users')
+        # profile
+        reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)
 
         # users
         reply = tested_app.get('/users')
         self.assertEqual(reply.status_code, 200)
 
-        # profile with login
-        reply = tested_app.get('/profile')
+        # reported_users
+        reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 200)
 
         # change profile pic : no selected file
