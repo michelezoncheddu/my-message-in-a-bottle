@@ -25,6 +25,7 @@ class Test(unittest.TestCase):
             'email': 'r@r',
             'password': 'recipient'
         }
+        
 
 
     def setUp(self):
