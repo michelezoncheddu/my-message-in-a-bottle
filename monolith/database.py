@@ -21,6 +21,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
+    is_reported = db.Column(db.Boolean, default=False)
     is_anonymous = False
     profile_pic = db.Column(db.String, default=None)
 
@@ -47,6 +48,14 @@ class User(db.Model):
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
         return self._authenticated
+
+    # set user to reported
+    def set_reported(self, bool):
+        self.is_reported = bool
+
+    # set user to banned
+    def set_banned(self, bool):
+        self.is_banned = bool
 
     def get_id(self):
         return self.id

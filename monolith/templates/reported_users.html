@@ -1,0 +1,23 @@
+<html>
+    <body>
+        <a href="/"> 
+            <button>Home</button>
+        </a>
+
+        <ul>
+            <ul style="width:20%; float:left;">
+              <h1>Reported Users</h1>
+              {% for user in users: %}
+                {% if user.is_reported and not user.is_banned %}
+                  <li>
+                  {{user.id}} {{user.firstname}} {{user.lastname}}
+                  <br>
+                  <form action="/reported_users" method="POST">
+                    <button type="submit" id="ban" name="ban" value="{{ user.email }}">Ban</button>
+                  </form>
+                  </li>
+                {% endif %}
+              {% endfor %}
+          </ul>
+    </body>
+</html>
