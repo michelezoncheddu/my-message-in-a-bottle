@@ -28,6 +28,19 @@ class Test(unittest.TestCase):
             'password': 'sender'
         }
         # dummy user for /unregister
+        self.create_tounregister_user = {
+            'email': 'tounregister@tounregister',
+            'firstname': 'tounregister',
+            'lastname': 'tounregister',
+            'password': 'tounregister',
+            'dateofbirth': '9/10/2020',
+            'location': 'Pisa'
+        }
+        self.tounregister_user = {
+            'email': 'tounregister@tounregister',
+            'password': 'tounregister'
+        }
+        # dummy user for delete user
         self.create_todelete_user = {
             'email': 'todelete@todelete',
             'firstname': 'todelete',
@@ -86,17 +99,21 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # profile
+        # /profile
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)
 
-        # users
+        # /users
         reply = tested_app.get('/users')
         self.assertEqual(reply.status_code, 200)
 
-        # reported_users (denied access)
+        # /reported_users (denied access)
         reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 401)
+
+        """# get /delete_user (denied access)
+        reply = tested_app.get('/delete_user')
+        self.assertEqual(reply.status_code, 401)"""
 
         # change profile pic : no selected file
         data = {'dir': '/profile', 'submit': 'Upload'}
@@ -141,15 +158,33 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # profile
+        # /profile
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)
 
-        # users
+        # /users
         reply = tested_app.get('/users')
         self.assertEqual(reply.status_code, 200)
 
-        # reported_users
+
+        # create todelete account
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_todelete_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+        # /delete_user
+        reply = tested_app.get('/delete_user')
+        self.assertEqual(reply.status_code, 200)
+
+        # delete user
+        data = {'dir': '/delete_user',
+                'submit': 'Submit', 
+                'firstname': 'todelete'}
+        reply = tested_app.post('/delete_user', data=data)
+        self.assertEqual(reply.status_code, 302)
+
+
+        # /reported_users
         reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 200)
 
@@ -192,35 +227,36 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 401)
 
-        # create todelete account
+        # create tounregister account
         reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_todelete_user),
+                    data=json.dumps(self.create_tounregister_user),
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
         # login
-        reply = tested_app.post('/login', data=json.dumps(self.todelete_user), content_type='application/json')
+        reply = tested_app.post('/login', data=json.dumps(self.tounregister_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # get /unregister with login
+        # get /unregister
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 200)
 
-        # try unregister with wrong password
+        # unregister with wrong password
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
                 'password': 'incorrectpw'}
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
-        # try unregister with wrong password
+        # unregister
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
-                'password': 'todelete'}
+                'password': 'tounregister'}
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 302)
 
         print("UNREGISTER USER: OK")
+
 
     # report tests
     @pytest.mark.run(order=4)

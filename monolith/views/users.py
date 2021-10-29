@@ -98,8 +98,6 @@ def create_user():
             return redirect('/')
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
-    else:
-        raise RuntimeError('This should not happen!')
 
 @users.route('/reported_users', methods=['POST', 'GET'])
 @login_required
@@ -115,6 +113,8 @@ def moderate():
         return render_template("reported_users.html", users=_users)
 
 @users.route('/delete_user', methods=['POST','GET'])
+@login_required
+@admin_required
 def delete_user():
     form = UserDelForm()
 
@@ -128,5 +128,3 @@ def delete_user():
             return redirect('/users')
     elif request.method == 'GET':
         return render_template('delete_user.html', form=form)
-    else:
-        raise RuntimeError('This should not happen!')
