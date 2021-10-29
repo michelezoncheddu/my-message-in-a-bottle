@@ -46,7 +46,7 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 200)
         reply = tested_app.get('/create_message?draft_id=1')
         # Test with user not logged in.
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 401)
         
         reply = tested_app.get('/create_message')
         self.assertEqual(reply.status_code, 200)

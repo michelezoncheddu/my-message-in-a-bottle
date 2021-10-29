@@ -75,8 +75,7 @@ def message(message_id):
     db.session.commit()
     return {'msg': 'message deleted'}, 200
 
-
-# -------------------------------------------------------------------
+'''
 # TODO: TEST WITH THE NEW SEND
 @messages.route('/forward/<int:message_id>')
 @login_required
@@ -97,7 +96,7 @@ def reply(message_id):
 
     return redirect(url_for('messages.create_message', recipient_id=message.get_sender()))   
 # -------------------------------------------------------------------
-
+'''
 
 '''
     Examples of usage:
@@ -108,7 +107,9 @@ def reply(message_id):
 @login_required
 def create_message():
     form = MessageForm()
+    user_id = current_user.get_id()
     
+
     if request.method == 'POST':
         # Save the choices of recipients.
         form.users_list.choices = form.users_list.data
@@ -170,7 +171,7 @@ def create_message():
 
         draft_id = None
         forw_id = None
-        recipient_id = None
+        reply_id = None
         
         try:
             draft_id = int(request.args.get('draft_id'))
@@ -183,25 +184,42 @@ def create_message():
             pass  # This is safe, forw_id will be ignored.
         
         try:
-            recipient_id = int(request.args.get('recipient_id'))
+            reply_id = int(request.args.get('reply_id'))
         except:
             pass  # This is safe, recipient_id will be ignored.
 
 
         if draft_id is not None:
             message = retrieve_message(draft_id)
+            is_sender_or_recipient(message, user_id)
+
+            if not message.is_draft:
+                abort(404, "not a draft")
+            
             form.text_area.data = message.get_text()
             form.delivery_date.data = message.get_delivery_date()
             form.image_file.data = message.get_attachement()  # TODO: doesn't work
 
-        if forw_id is not None:
+        elif forw_id is not None:
             message = retrieve_message(forw_id)
+            is_sender_or_recipient(message, user_id)
+
+            if message.is_draft:
+                abort(404, "you cannot forward a draft")
+
             form.text_area.data = "Forwarded: " + message.get_text()
             form.image_file.data = message.get_attachement()  # TODO: doesn't work
         
-        if recipient_id is not None:
+        elif reply_id is not None:
+            message = retrieve_message(reply_id)
+            is_sender_or_recipient(message, user_id)
+
+            if message.is_draft:
+                abort(404, "you cannot reply to a draft")
+
+
             form.text_area.data = "Reply: "
-            form.users_list.choices = [(recipient_id, recipient_id)]
+            form.users_list.choices = [(message.get_sender(), message.get_sender())]
         
 
         return render_template("create_message.html", form=form)

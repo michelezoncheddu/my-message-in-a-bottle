@@ -97,12 +97,12 @@ class Test(unittest.TestCase):
         assert(len(sent_messages) == 1)
         
         # Forward message
-        reply = tested_app.get('/forward/1')
-        self.assertEqual(reply.status_code, 302)
+        reply = tested_app.get('/create_message?forw_id=1')
+        self.assertEqual(reply.status_code, 200)
 
         # Reply message
-        reply = tested_app.get('/reply/1')
-        self.assertEqual(reply.status_code, 302)
+        reply = tested_app.get('/create_message?reply_id=1')
+        self.assertEqual(reply.status_code, 200)
 
         # Delete message.
         reply = tested_app.delete('/message/1')
