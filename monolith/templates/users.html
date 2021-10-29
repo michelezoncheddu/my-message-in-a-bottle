@@ -13,7 +13,8 @@
             {{user.id}} {{user.firstname}} {{user.lastname}}
             <br>
             <form action="/users" method="POST">
-              <button type="submit" id="action1" name="action1" value="{{ user.email }}">{{ action }}</button>
+              <button type="submit" id="action" name="action" value="{{ action }}">{{ action }}</button>
+              <input type="hidden" id="email" name="email" value="{{ user.email }}">
             </form>
             </li>
           {% endif %}
@@ -35,6 +36,10 @@
           {% if current_user.is_admin and user.is_banned %}
             <li>
             <p style="color:red">{{user.id}} {{user.firstname}} {{user.lastname}}</p>
+            <form action="/users" method="POST">
+              <button type="submit" id="action" name="action" value="Unban">Unban</button>
+              <input type="hidden" id="email" name="email" value="{{ user.email }}">
+            </form>
             </li>
           {% endif %}
         {% endfor %}

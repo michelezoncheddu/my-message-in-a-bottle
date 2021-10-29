@@ -16,19 +16,27 @@ DEFAULT_PROFILE_PIC = "static/profile/default.png"
 PROFILE_PIC_PATH = "monolith/static/profile/"
 
 # utility function for reporting/banning an user
-def moderateAction(email, isAdmin):
+def moderateAction(email, action):
     u = db.session.query(User).filter(User.email == email)
     _user = u.first()
     if (_user is None):
         raise RuntimeError('Reported user not found in DB, this should not happen!')
     
-    # if issued by admin -> ban
-    if (isAdmin and not _user.is_banned):
+    # if ban
+    if (action == "Ban" and not _user.is_banned):
         _user.set_banned(True)
         _user.set_reported(False)
         db.session.commit()
-    # if issued by user -> report
-    elif (not _user.is_reported):
+    # if unban
+    elif (action == "Unban" and _user.is_banned):
+        _user.set_banned(False)
+        db.session.commit()
+    # if reject a report
+    elif (action == "Reject"):
+        _user.set_reported(False)
+        db.session.commit()
+    # if report
+    elif (action == "Report" and not _user.is_reported):
         _user.set_reported(True)
         db.session.commit()
 
@@ -45,18 +53,25 @@ def _users(): # TODO: IMPLEMENT UNBANN OPTION?
     isAdmin = current_user.is_admin
     _users = db.session.query(User)
     if (isAdmin): 
-        action = "Ban"
+        action_template = "Ban"
     else:
-        action = "Report"
+        action_template = "Report"
     
     if (request.method == 'GET'):
-        return render_template("users.html", users=_users, action=action)
+        return render_template("users.html", users=_users, action=action_template)
     # report (if user) | ban (if admin)
     elif (request.method == 'POST'):
         # retrieve email of the user to report/ban
-        email = request.form["action1"]
-        moderateAction(email, isAdmin)
-        return render_template("users.html", users=_users, action=action)
+        action_todo = request.form["action"]
+        email = request.form.get("email")
+        print(request.form)
+        print(request.args)
+        print(request.json)
+        moderateAction(email, action_todo)
+        if (action_todo == "Report"):
+            return {'msg': 'User successfully reported'}, 200
+        elif (action_todo == "Ban" or action_todo == "Unban"):
+            return render_template("users.html", users=_users, action=action_template)
 
 
 @users.route('/profile', methods=['GET', 'POST'])
@@ -107,9 +122,10 @@ def moderate():
     if (request.method == 'GET'):
         return render_template("reported_users.html", users=_users)
     elif (request.method == 'POST'):
-        # retrieve email of the user to ban
-        email = request.form["ban"]
-        moderateAction(email, True)
+        # retrieve email of the user
+        action = request.form["action"]
+        email = request.form.get("email")
+        moderateAction(email, action)
         return render_template("reported_users.html", users=_users)
 
 @users.route('/delete_user', methods=['POST','GET'])

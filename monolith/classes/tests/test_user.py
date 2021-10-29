@@ -53,6 +53,15 @@ class Test(unittest.TestCase):
             'email': 'todelete@todelete',
             'password': 'todelete'
         }
+        # dummy user for testing reject reported user
+        self.create_toreject_user = {
+            'email': 'toreject@toreject',
+            'firstname': 'toreject',
+            'lastname': 'toreject',
+            'password': 'toreject',
+            'dateofbirth': '9/10/2020',
+            'location': 'Pisa'
+        }
         # dummy user for testing ban 1
         self.create_toban1_user = {
             'email': 'toban1@toban1',
@@ -66,7 +75,7 @@ class Test(unittest.TestCase):
             'email': 'toban1@toban1',
             'password': 'toban1'
         }
-        # dummy user for testing ban 1
+        # dummy user for testing ban 2
         self.create_toban2_user = {
             'email': 'toban2@toban2',
             'firstname': 'toban2',
@@ -110,10 +119,6 @@ class Test(unittest.TestCase):
         # /reported_users (denied access)
         reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 401)
-
-        """# get /delete_user (denied access)
-        reply = tested_app.get('/delete_user')
-        self.assertEqual(reply.status_code, 401)"""
 
         # change profile pic : no selected file
         data = {'dir': '/profile', 'submit': 'Upload'}
@@ -263,7 +268,13 @@ class Test(unittest.TestCase):
     def test_report(self):
         tested_app = app.test_client()
 
-        # create toreport account
+        # create toreport account 1
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toreject_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+
+        # create toreport account 2
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_toban1_user),
                     content_type='application/json', follow_redirects=True)
@@ -273,12 +284,19 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-
-        # report
-        toreport_email = self.toban1_user['email']
+        # report 1
         data = {'dir': '/users',
                 'submit': 'Report', 
-                'action1': toreport_email}
+                'action': 'Report',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+        
+        # report 2
+        data = {'dir': '/users',
+                'submit': 'Report', 
+                'action': 'Report',
+                'email': 'toban1@toban1'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -300,19 +318,30 @@ class Test(unittest.TestCase):
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
+        # reject reported user
+        data = {'dir': '/reported_users',
+                'submit': 'Reject', 
+                'action': "Reject",
+                'email': 'toreject@toreject'
+                }
+        reply = tested_app.post('/reported_users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
         # ban on /users endpoint
-        toban2_email = self.toban2_user['email']
         data = {'dir': '/users',
                 'submit': 'Ban', 
-                'action1': toban2_email}
+                'action': 'Ban',
+                'email': 'toban2@toban2'
+                }
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
         # ban on /reported_users endpoint
-        toban1_email = self.toban1_user['email']
         data = {'dir': '/reported_users',
                 'submit': 'Ban', 
-                'ban': toban1_email}
+                'action': "Ban",
+                'email': 'toban1@toban1'
+                }
         reply = tested_app.post('/reported_users', data=data)
         self.assertEqual(reply.status_code, 200)
 
