@@ -16,6 +16,7 @@ messages = Blueprint('messages', __name__)
 
 ATTACHMENTS_PATH = 'monolith/static'
 
+# utility function for checking if recipient has sender on blacklist
 def is_blocked(recipient):
     recipient_id = (db.session.query(User).filter(User.id == recipient).first()).id
     # get list of blocked users ids
@@ -149,6 +150,7 @@ def create_message():
             # Send.
             else:
                 for recipient in form.users_list.data:
+                    # if not blocked : send
                     if (not is_blocked(recipient)):
                         new_message = Message()
                         new_message.text = form.text_area.data
