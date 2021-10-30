@@ -6,6 +6,7 @@ from monolith.auth import login_required
 from monolith.database import User, db
 from monolith.forms import LoginForm
 
+
 auth = Blueprint('auth', __name__)
 
 
@@ -30,6 +31,7 @@ def login():
 def logout():
     logout_user()
     return redirect('/')
+
 
 @auth.route('/unregister', methods=['GET', 'POST'])
 @login_required

@@ -6,7 +6,6 @@ from .access import Access
 db = SQLAlchemy()
 
 
-
 class User(db.Model):
 
     __tablename__ = 'user'
