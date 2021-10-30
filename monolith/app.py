@@ -33,7 +33,7 @@ def create_app():
             example.email = 'admin@admin'
             example.dateofbirth = datetime(2020, 10, 5)
             example.location = 'Pisa'
-            example.profile_pic = "static/profile/default.png"
+            example.profile_pic = 'static/profile/default.png'
             example.is_admin = True
             example.is_banned = False
             example.set_password('admin')
@@ -46,7 +46,7 @@ def create_app():
             example.email = 's@s'
             example.dateofbirth = datetime(2020, 10, 5)
             example.location = 'Pisa'
-            example.profile_pic = "static/profile/default.png"
+            example.profile_pic = 'static/profile/default.png'
             example.is_admin = False
             example.is_banned = False
             example.set_password('sender')
@@ -59,7 +59,7 @@ def create_app():
             example.email = 'r@r'
             example.dateofbirth = datetime(2020, 10, 5)
             example.location = 'Pisa'
-            example.profile_pic = "static/profile/default.png"
+            example.profile_pic = 'static/profile/default.png'
             example.is_admin = False
             example.is_banned = False
             example.set_password('recipient')
@@ -76,7 +76,7 @@ def create_app():
             example = Message()
             example.sender_id = 2
             example.recipient_id = 1
-            example.text = "hello by 1"
+            example.text = 'hello by 1'
             now = datetime.now()
             example.delivery_date = now
             example.last_update_date = now
@@ -86,7 +86,7 @@ def create_app():
             example = Message()
             example.sender_id = 2
             example.recipient_id = 1
-            example.text = "draft by 2"
+            example.text = 'draft by 2'
             now = datetime.now()
             example.delivery_date = now
             example.last_update_date = now

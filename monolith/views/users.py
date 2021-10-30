@@ -9,11 +9,14 @@ from monolith.forms import UserForm,UserDelForm
 
 from flask_login import current_user
 
+
 users = Blueprint('users', __name__)
+
 
 # GLOBALS
 DEFAULT_PROFILE_PIC = 'static/profile/default.png'
 PROFILE_PIC_PATH = 'monolith/static/profile/'
+
 
 # utility function for applying an action: Ban, Unban, Report, Reject (a report request)
 def moderate_action(email, action):
@@ -157,6 +160,21 @@ def create_user():
             return redirect('/')
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
+
+
+@users.route('/reported_users', methods=['POST', 'GET'])
+@login_required
+@admin_required
+def moderate():
+    _users = db.session.query(User)    
+    if (request.method == 'GET'):
+        return render_template("reported_users.html", users=_users)
+    elif (request.method == 'POST'):
+        # retrieve action and target user email
+        action = request.form["action"]
+        email = request.form.get("email")
+        moderate_action(email, action) # apply action
+        return render_template("reported_users.html", users=_users)
 
 
 @users.route('/delete_user', methods=['POST','GET'])
