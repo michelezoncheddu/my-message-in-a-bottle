@@ -122,8 +122,7 @@ def moderate():
         # retrieve action and target user email
         action = request.form["action"]
         email = request.form.get("email")
-        # apply action
-        moderateAction(email, action)
+        moderateAction(email, action) # apply action
         return render_template("reported_users.html", users=_users)
 
 @users.route('/delete_user', methods=['POST','GET'])
