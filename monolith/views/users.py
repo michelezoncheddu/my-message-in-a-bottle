@@ -64,34 +64,6 @@ def get_users():
     return db.session.query(User)
 
 
-@users.route('/users', methods=['POST', 'GET'])
-@login_required
-def _users():
-    isAdmin = current_user.is_admin
-    _users = db.session.query(User)
-    # get list of blocked users ids
-    _blocked_users = [r.id_blocked for r in db.session.query(BlackList.id_blocked).filter(BlackList.id_user == current_user.id)]
-
-    # if admin
-    if (isAdmin): 
-        action_template = 'Ban'
-    # if user 
-    else:
-        action_template = 'Report'
-    
-    if (request.method == 'GET'):
-        return render_template('users.html', users=_users, blocked_users=_blocked_users, action=action_template)
-    elif (request.method == 'POST'):
-        # retrieve action and target user email
-        action_todo = request.form['action']
-        email = request.form.get('email')
-        moderate_action(email, action_todo) # apply action
-        if (action_todo == "Report"):
-            return {'msg': 'User successfully reported'}, 200
-        else:
-            return render_template('users.html', users=_users, blocked_users=_blocked_users, action=action_template)
-
-
 @users.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
