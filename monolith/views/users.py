@@ -19,7 +19,7 @@ PROFILE_PIC_PATH = "monolith/static/profile/"
 
 
 # utility function for applying an action: Ban, Unban, Report, Reject (a report request)
-def moderateAction(email, action):
+def moderate_action(email, action):
     u = db.session.query(User).filter(User.email == email)
     _user = u.first()
     if (_user is None):
@@ -67,7 +67,7 @@ def _users():
         # retrieve action and target user email
         action_todo = request.form["action"]
         email = request.form.get("email")
-        moderateAction(email, action_todo) # apply action
+        moderate_action(email, action_todo) # apply action
         if (action_todo == "Report"):
             return {'msg': 'User successfully reported'}, 200
         elif (action_todo == "Ban" or action_todo == "Unban"):
@@ -126,7 +126,7 @@ def moderate():
         # retrieve action and target user email
         action = request.form["action"]
         email = request.form.get("email")
-        moderateAction(email, action) # apply action
+        moderate_action(email, action) # apply action
         return render_template("reported_users.html", users=_users)
 
 
