@@ -8,7 +8,7 @@ from ..access import Access
 from ..auth import login_required
 from ..image import save_image
 
-from monolith.database import Message, db
+from monolith.database import User, Message, BlackList, db
 from monolith.forms import MessageForm
 
 
@@ -16,6 +16,14 @@ messages = Blueprint('messages', __name__)
 
 ATTACHMENTS_PATH = 'monolith/static'
 
+def is_blocked(recipient):
+    recipient_id = (db.session.query(User).filter(User.id == recipient).first()).id
+    # get list of blocked users ids
+    _blocked_users = [r.id_blocked for r in db.session.query(BlackList.id_blocked).filter(BlackList.id_user == recipient_id)]
+    if current_user.id in _blocked_users:
+        return True
+    else:
+        return False
 
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
@@ -141,16 +149,17 @@ def create_message():
             # Send.
             else:
                 for recipient in form.users_list.data:
-                    new_message = Message()
-                    new_message.text = form.text_area.data
-                    new_message.delivery_date = form.delivery_date.data
-                    new_message.attachment = filename
-                    new_message.is_draft = False
-                    new_message.is_delivered = True  # TODO: change after Celery.
-                    new_message.sender_id = user_id
-                    new_message.recipient_id = recipient
-                    db.session.add(new_message) 
-                    db.session.commit()
+                    if (not is_blocked(recipient)):
+                        new_message = Message()
+                        new_message.text = form.text_area.data
+                        new_message.delivery_date = form.delivery_date.data
+                        new_message.attachment = filename
+                        new_message.is_draft = False
+                        new_message.is_delivered = True  # TODO: change after Celery.
+                        new_message.sender_id = user_id
+                        new_message.recipient_id = recipient
+                        db.session.add(new_message) 
+                        db.session.commit()
                 return redirect('/mailbox')
 
         '''

@@ -91,13 +91,13 @@ def profile():
 @users.route('/users', methods=['POST', 'GET'])
 @login_required
 def _users():
-    isAdmin = current_user.is_admin
+    is_admin = current_user.is_admin
     _users = db.session.query(User)
     # get list of blocked users ids
     _blocked_users = [r.id_blocked for r in db.session.query(BlackList.id_blocked).filter(BlackList.id_user == current_user.id)]
 
     # if admin
-    if (isAdmin): 
+    if (is_admin): 
         action_template = 'Ban'
     # if user 
     else:
