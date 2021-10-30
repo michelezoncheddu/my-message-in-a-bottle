@@ -15,7 +15,7 @@ users = Blueprint('users', __name__)
 DEFAULT_PROFILE_PIC = "static/profile/default.png"
 PROFILE_PIC_PATH = "monolith/static/profile/"
 
-# utility function for reporting/banning an user
+# utility function for applying an action: Ban, Unban, Report, Reject (a report request)
 def moderateAction(email, action):
     u = db.session.query(User).filter(User.email == email)
     _user = u.first()
@@ -31,7 +31,7 @@ def moderateAction(email, action):
     elif (action == "Unban" and _user.is_banned):
         _user.set_banned(False)
         db.session.commit()
-    # if reject a report
+    # if reject
     elif (action == "Reject"):
         _user.set_reported(False)
         db.session.commit()
@@ -48,26 +48,23 @@ def get_users():
 
 @users.route('/users', methods=['POST', 'GET'])
 @login_required
-# TODO: Unban option
-def _users(): # TODO: IMPLEMENT UNBANN OPTION?
+def _users():
     isAdmin = current_user.is_admin
     _users = db.session.query(User)
+    # if admin : show Ban button
     if (isAdmin): 
         action_template = "Ban"
+    # if user : show Report button
     else:
         action_template = "Report"
     
     if (request.method == 'GET'):
         return render_template("users.html", users=_users, action=action_template)
-    # report (if user) | ban (if admin)
     elif (request.method == 'POST'):
-        # retrieve email of the user to report/ban
+        # retrieve action and target user email
         action_todo = request.form["action"]
         email = request.form.get("email")
-        print(request.form)
-        print(request.args)
-        print(request.json)
-        moderateAction(email, action_todo)
+        moderateAction(email, action_todo) # apply action
         if (action_todo == "Report"):
             return {'msg': 'User successfully reported'}, 200
         elif (action_todo == "Ban" or action_todo == "Unban"):
@@ -82,14 +79,14 @@ def profile():
         return render_template('profile.html', user=_user)
     # change profile picture
     elif (request.method == 'POST'):
-        # check if image present
+        # image not present : error
         if ('file' not in request.files):
             return {'msg': 'No selected file'}, 400
         file = request.files['file']
-        # OK : get new pic
+        # image present : get file
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            save_image(file, PROFILE_PIC_PATH)
+            save_image(file, PROFILE_PIC_PATH) # store
             filename = 'static/profile/' + filename
             _user.set_profile_pic(filename)
             db.session.commit()
@@ -122,9 +119,10 @@ def moderate():
     if (request.method == 'GET'):
         return render_template("reported_users.html", users=_users)
     elif (request.method == 'POST'):
-        # retrieve email of the user
+        # retrieve action and target user email
         action = request.form["action"]
         email = request.form.get("email")
+        # apply action
         moderateAction(email, action)
         return render_template("reported_users.html", users=_users)
 
