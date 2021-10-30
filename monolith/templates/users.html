@@ -10,9 +10,14 @@
         {% for user in users: %}
           {% if not user.is_admin and not user.is_banned and not (user == current_user) %}
             <li>
-            {{user.id}} {{user.firstname}} {{user.lastname}}
+            {{user.id}} {{user.firstname}} {{user.lastname}} ({{user.email}})
             <br>
             <form action="/users" method="POST">
+              {% if user.id not in blocked_users %}
+              <button type="submit" id="action" name="action" value="Block">Block</button>
+              {% else %}
+              <button type="submit" id="action" name="action" value="Unblock">Unblock</button>
+              {% endif %}
               <button type="submit" id="action" name="action" value="{{ action }}">{{ action }}</button>
               <input type="hidden" id="email" name="email" value="{{ user.email }}">
             </form>
@@ -25,7 +30,7 @@
         {% for user in users: %}
           {% if user.is_admin %}
             <li>
-            {{user.id}} {{user.firstname}} {{user.lastname}}
+            {{user.id}} {{user.firstname}} {{user.lastname}} ({{user.email}})
             </li>
           {% endif %}
         {% endfor %}
@@ -35,7 +40,7 @@
         {% for user in users: %}
           {% if current_user.is_admin and user.is_banned %}
             <li>
-            <p style="color:red">{{user.id}} {{user.firstname}} {{user.lastname}}</p>
+            <p style="color:red">{{user.id}} {{user.firstname}} {{user.lastname}} ({{user.email}})</p>
             <form action="/users" method="POST">
               <button type="submit" id="action" name="action" value="Unban">Unban</button>
               <input type="hidden" id="email" name="email" value="{{ user.email }}">

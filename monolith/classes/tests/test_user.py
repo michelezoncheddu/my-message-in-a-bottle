@@ -100,6 +100,22 @@ class Test(unittest.TestCase):
     def test_user(self):
         tested_app = app.test_client()
 
+        # /create_user
+        reply = tested_app.get('/create_user')
+        self.assertEqual(reply.status_code, 200)
+
+        # create dummy account 1
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toreject_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+
+        # create dummy account 2
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toban1_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+
         # /profile without login
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 401)
@@ -147,6 +163,60 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/profile', data=data)
         self.assertEqual(reply.status_code, 200)
 
+        # report 1
+        data = {'dir': '/users',
+                'submit': 'Report', 
+                'action': 'Report',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+        
+        # report 2
+        data = {'dir': '/users',
+                'submit': 'Report', 
+                'action': 'Report',
+                'email': 'toban1@toban1'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # block 
+        data = {'dir': '/users',
+                'submit': 'Block', 
+                'action': 'Block',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # block 2
+        data = {'dir': '/users',
+                'submit': 'Block', 
+                'action': 'Block',
+                'email': 'toban1@toban1'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # unblock on /users
+        data = {'dir': '/users',
+                'submit': 'Unblock', 
+                'action': 'Unblock',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # /blacklist
+        reply = tested_app.get('blacklist')
+        self.assertEqual(reply.status_code, 200)
+
+        # unblock on /blacklist
+        data = {'dir': '/blacklist',
+                'submit': 'Unblock', 
+                'unblock': 'toban1@toban1'
+                }
+        reply = tested_app.post('/blacklist', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+
+
         print("COMMON USER: OK")
 
 
@@ -154,6 +224,12 @@ class Test(unittest.TestCase):
     @pytest.mark.run(order=2)
     def test_admin(self):
         tested_app = app.test_client()
+
+        # create dummy account 3
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toban2_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
 
         # /profile without login
         reply = tested_app.get('/profile')
@@ -220,102 +296,40 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/profile', data=data)
         self.assertEqual(reply.status_code, 200)
 
-        print("ADMIN USER: OK")
-
-
-    # /unregister tests
-    @pytest.mark.run(order=3)
-    def test_unregister(self):
-        tested_app = app.test_client()
-
-        # get /unregister without login
-        reply = tested_app.get('/unregister')
-        self.assertEqual(reply.status_code, 401)
-
-        # create tounregister account
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_tounregister_user),
-                    content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
-
-        # login
-        reply = tested_app.post('/login', data=json.dumps(self.tounregister_user), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-
-        # get /unregister
-        reply = tested_app.get('/unregister')
-        self.assertEqual(reply.status_code, 200)
-
-        # unregister with wrong password
-        data = {'dir': '/unregister',
-                'submit': 'Confirm', 
-                'password': 'incorrectpw'}
-        reply = tested_app.post('/unregister', data=data)
-        self.assertEqual(reply.status_code, 400)
-
-        # unregister
-        data = {'dir': '/unregister',
-                'submit': 'Confirm', 
-                'password': 'tounregister'}
-        reply = tested_app.post('/unregister', data=data)
-        self.assertEqual(reply.status_code, 302)
-
-        print("UNREGISTER USER: OK")
-
-
-    # report tests
-    @pytest.mark.run(order=4)
-    def test_report(self):
-        tested_app = app.test_client()
-
-        # create toreport account 1
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_toreject_user),
-                    content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
-
-        # create toreport account 2
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_toban1_user),
-                    content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
-
-        # login
-        reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-
-        # report 1
+        # block 
         data = {'dir': '/users',
-                'submit': 'Report', 
-                'action': 'Report',
+                'submit': 'Block', 
+                'action': 'Block',
                 'email': 'toreject@toreject'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
-        
-        # report 2
+
+        # block 2
         data = {'dir': '/users',
-                'submit': 'Report', 
-                'action': 'Report',
+                'submit': 'Block', 
+                'action': 'Block',
                 'email': 'toban1@toban1'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
-        print("REPORT USER: OK")
+        # unblock on /users
+        data = {'dir': '/users',
+                'submit': 'Unblock', 
+                'action': 'Unblock',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
 
+        # /blacklist
+        reply = tested_app.get('blacklist')
+        self.assertEqual(reply.status_code, 200)
 
-    # ban tests
-    @pytest.mark.run(order=5)
-    def test_ban(self):
-        tested_app = app.test_client()
-
-        # login
-        reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-
-        # create toban account 2
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_toban2_user),
-                    content_type='application/json', follow_redirects=True)
+        # unblock on /blacklist
+        data = {'dir': '/blacklist',
+                'submit': 'Unblock', 
+                'unblock': 'toban1@toban1'
+                }
+        reply = tested_app.post('/blacklist', data=data)
         self.assertEqual(reply.status_code, 200)
 
         # reject reported user
@@ -361,4 +375,44 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 403)
         self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
 
-        print("BAN USER: OK")
+        print("ADMIN USER: OK")
+
+
+    # /unregister tests
+    @pytest.mark.run(order=3)
+    def test_unregister(self):
+        tested_app = app.test_client()
+
+        # get /unregister without login
+        reply = tested_app.get('/unregister')
+        self.assertEqual(reply.status_code, 401)
+
+        # create tounregister account
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_tounregister_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+
+        # login
+        reply = tested_app.post('/login', data=json.dumps(self.tounregister_user), content_type='application/json')
+        self.assertEqual(reply.status_code, 302)
+
+        # get /unregister
+        reply = tested_app.get('/unregister')
+        self.assertEqual(reply.status_code, 200)
+
+        # unregister with wrong password
+        data = {'dir': '/unregister',
+                'submit': 'Confirm', 
+                'password': 'incorrectpw'}
+        reply = tested_app.post('/unregister', data=data)
+        self.assertEqual(reply.status_code, 400)
+
+        # unregister
+        data = {'dir': '/unregister',
+                'submit': 'Confirm', 
+                'password': 'tounregister'}
+        reply = tested_app.post('/unregister', data=data)
+        self.assertEqual(reply.status_code, 302)
+
+        print("UNREGISTER USER: OK")

@@ -1,25 +1,25 @@
 <html>
-    <body>
-        <a href="/"> 
-            <button>Home</button>
-        </a>
+  <body>
+    <a href="/"> 
+        <button>Home</button>
+    </a>
 
-        <ul>
-            <ul style="width:30%; float:left;">
-              <h1>Reported Users</h1>
-              {% for user in users: %}
-                {% if user.is_reported and not user.is_banned %} 
-                  <li>
-                    {{user.id}} {{user.firstname}} {{user.lastname}}
-                    <form action="/reported_users" method="POST">
-                      <button type="submit" name="action" value="Reject">Reject</button>
-                      <button type="submit" name="action" value="Ban">Ban</button>
-                      <input type="hidden" id="email" name="email" value="{{ user.email }}">
-                    </form>
-                  </li>
-            </ul>
-                {% endif %}
-              {% endfor %}
-          </ul>
-    </body>
+    <ul>
+      <ul style="width:20%; float:left;">
+        <h1>Reported Users</h1>
+        {% for user in users: %}
+          {% if user.is_reported and not user.is_banned %} 
+            <li>
+              {{user.id}} {{user.firstname}} {{user.lastname}} {{user.email}} ({{user.email}})
+              <form action="/reported_users" method="POST">
+                <button type="submit" name="action" value="Reject">Reject</button>
+                <button type="submit" name="action" value="Ban">Ban</button>
+                <input type="hidden" id="email" name="email" value="{{ user.email }}">
+              </form>
+            </li>
+      </ul>
+          {% endif %}
+        {% endfor %}
+    </ul>
+  </body>
 </html>
