@@ -64,7 +64,7 @@ def _users(): # TODO: IMPLEMENT UNBANN OPTION?
         # retrieve email of the user to report/ban
         action_todo = request.form["action"]
         email = request.form.get("email")
-        moderateAction(email, action_todo)
+        moderateAction(email, action_todo) # apply action
         if (action_todo == "Report"):
             return {'msg': 'User successfully reported'}, 200
         elif (action_todo == "Ban" or action_todo == "Unban"):
@@ -122,7 +122,7 @@ def moderate():
         # retrieve email of the user
         action = request.form["action"]
         email = request.form.get("email")
-        moderateAction(email, action)
+        moderateAction(email, action) # apply action
         return render_template("reported_users.html", users=_users)
 
 @users.route('/delete_user', methods=['POST','GET'])
