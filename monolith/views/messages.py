@@ -106,6 +106,7 @@ def create_message():
         form.users_list.choices = form.users_list.data
         
         if form.validate_on_submit():
+            '''
             filename = ''
             file = form.image_file.data
             if 'image_file' not in request.files:
@@ -113,7 +114,7 @@ def create_message():
             if file:
                 filename = form.image_file.data.filename
                 file = form.image_file.data
-                filename = save_image(file, ATTACHMENTS_PATH)
+                filename = save_image(file, ATTACHMENTS_PATH)'''
             
             # Save draft.
             if form.submit_button.data:
@@ -126,7 +127,7 @@ def create_message():
                 new_message.text = form.text_area.data
                 new_message.delivery_date = form.delivery_date.data
                 new_message.sender_id = user_id
-                new_message.attachment = filename
+                #new_message.attachment = filename
                 new_message.recipient_id = 0  # TODO: put the first recipient in the list.
                 db.session.add(new_message) 
                 db.session.commit() 
@@ -140,7 +141,7 @@ def create_message():
                         new_message = Message()
                         new_message.text = form.text_area.data
                         new_message.delivery_date = form.delivery_date.data
-                        new_message.attachment = filename
+                        #new_message.attachment = filename
                         new_message.is_draft = False
                         new_message.is_delivered = True  # TODO: change after Celery.
                         new_message.sender_id = user_id
