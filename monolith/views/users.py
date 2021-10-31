@@ -162,21 +162,6 @@ def create_user():
         return render_template('create_user.html', form=form)
 
 
-@users.route('/reported_users', methods=['POST', 'GET'])
-@login_required
-@admin_required
-def moderate():
-    _users = db.session.query(User)    
-    if (request.method == 'GET'):
-        return render_template("reported_users.html", users=_users)
-    elif (request.method == 'POST'):
-        # retrieve action and target user email
-        action = request.form["action"]
-        email = request.form.get("email")
-        moderate_action(email, action) # apply action
-        return render_template("reported_users.html", users=_users)
-
-
 @users.route('/delete_user', methods=['POST','GET'])
 @login_required
 @admin_required
