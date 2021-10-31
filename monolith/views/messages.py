@@ -188,7 +188,7 @@ def create_message():
 
             form.text_area.data = message.get_text()
             form.delivery_date.data = message.get_delivery_date()
-            form.image_file.data = message.get_attachement()  # TODO: doesn't work
+            #form.image_file.data = message.get_attachement()  # TODO: doesn't work
 
         elif forw_id is not None:
             message = retrieve_message(forw_id)
@@ -198,7 +198,7 @@ def create_message():
                 abort(400, 'you cannot forward a draft')
 
             form.text_area.data = 'Forwarded: ' + message.get_text()
-            form.image_file.data = message.get_attachement()  # TODO: doesn't work
+            #form.image_file.data = message.get_attachement()  # TODO: doesn't work
         
         elif reply_id is not None:
             message = retrieve_message(reply_id)

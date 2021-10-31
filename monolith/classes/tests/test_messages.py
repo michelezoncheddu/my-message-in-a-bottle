@@ -51,8 +51,8 @@ class Test(unittest.TestCase):
         sent_messages = parent.find_all('li')
         assert(len(sent_messages) == 1)
 
-        # Get list of received messages.
-        parent = parsed.find(id='received').find('ul')
+        # Get list of recieved messages.
+        parent = parsed.find(id='recieved').find('ul')
         received_messages = parent.find_all('li')
         assert(len(received_messages) == 0)
 
@@ -98,7 +98,7 @@ class Test(unittest.TestCase):
 
         # Edit an alredy sent message
         reply = tested_app.get('/create_message?draft_id=1')
-        self.assertEqual(reply.status_code, 404)
+        self.assertEqual(reply.status_code, 400)
 
         # Edit a draft
         reply = tested_app.get('/create_message?draft_id=2')
@@ -110,7 +110,7 @@ class Test(unittest.TestCase):
 
         # Reply to a draft
         reply = tested_app.get('/create_message?reply_id=2')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 404)
         
         # Forward message
         reply = tested_app.get('/create_message?forw_id=1')
