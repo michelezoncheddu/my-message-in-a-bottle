@@ -3,31 +3,42 @@
     <h1>Mailbox</h1>
 
     <div>
-      <div id='sent' style='width: 50%; float: left'>
+      <div id='sent' style='width: 33%; float: left'>
+        <h2>Sent messages</h2>
         <ul>
-          {% for message in messages: %}
-            {% if message.sender_id == user_id %}
-              <li>
-                <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
-              </li>
-            {% endif %}
+          {% for message in sent_messages: %}
+            <li>
+              <a href="/message/{{message.id}}">To</a> {{message.recipient_id}} {{message.text}}
+            </li>
           {% endfor %}
         </ul>
       </div>
 
-      <div id='received' style='width: 50%; float: left'>
+      <div id='recieved' style='width: 34%; float: left'>
+        <h2>Recieved messages</h2>
         <ul>
-          {% for message in messages: %}
-            {% if message.recipient_id == user_id %}
+          {% for message in recieved_messages: %}
               <li>
-                <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+                <a href="/message/{{message.id}}">From </a> {{message.sender_id}}
               </li>
-            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div id='drafts' style='width: 32%; float: left'>
+        <h2>Draft messages</h2>
+        <ul>
+          {% for message in draft_messages: %}
+              <li>
+                {{message.text}}
+                <a href="/create_message?draft_id={{message.id}}">Edit</a> 
+                <a href="/message/{{message.id}}">View</a> 
+              </li>
           {% endfor %}
         </ul>
       </div>
     </div>
-
+    
     <a href="/"> <button>Home</button> </a>
   </body>
 </html>

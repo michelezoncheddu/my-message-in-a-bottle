@@ -106,11 +106,11 @@ class Test(unittest.TestCase):
 
         # Forward a draft
         reply = tested_app.get('/create_message?forw_id=2')
-        self.assertEqual(reply.status_code, 404)
+        self.assertEqual(reply.status_code, 400)
 
         # Reply to a draft
         reply = tested_app.get('/create_message?reply_id=2')
-        self.assertEqual(reply.status_code, 404)
+        self.assertEqual(reply.status_code, 400)
         
         # Forward message
         reply = tested_app.get('/create_message?forw_id=1')

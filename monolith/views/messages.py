@@ -50,15 +50,25 @@ def mailbox():
     # Retrieve user <id>
     id = current_user.get_id()
     
-    # Retrieve sent/received messages of user <id>
-    _messages = db.session.query(Message).filter(
-        or_(
-            and_(Message.sender_id==id, Message.access.op('&')(Access.SENDER.value), ~Message.is_draft), 
-            and_(Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value))
-        )
+    # Retrieve sent messages of user <id>
+    sent_messages = db.session.query(Message).filter(
+        Message.sender_id==id, Message.access.op('&')(Access.SENDER.value), ~Message.is_draft
     )
     
-    return render_template('mailbox.html', messages=_messages, user_id=id)
+    # Retrieve recieved messages of user <id>
+    recieved_messages = db.session.query(Message).filter(
+        Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value)
+    )
+    
+    # Retrieve draft messages of user <id>
+    draft_messages = db.session.query(Message).filter(
+        Message.sender_id==id, Message.is_draft
+    )
+    
+    return render_template('mailbox.html', sent_messages=sent_messages,
+                                           recieved_messages=recieved_messages,
+                                           draft_messages=draft_messages
+    )
 
 
 @messages.route('/message/<int:message_id>', methods=['GET', 'DELETE'])
@@ -79,31 +89,6 @@ def message(message_id):
         _message.access -= Access.RECIPIENT.value
     db.session.commit()
     return {'msg': 'message deleted'}, 200
-
-
-'''
-# TODO: TEST WITH THE NEW SEND
-@messages.route('/forward/<int:message_id>')
-@login_required
-def forward(message_id):
-    message = retrieve_message(message_id)
-    user_id = current_user.get_id()
-    is_sender_or_recipient(message, user_id)
-
-    return redirect(url_for('messages.create_message', forw_id=message_id))    
- 
-
-@messages.route('/reply/<int:message_id>')
-@login_required
-def reply(message_id):
-    message = retrieve_message(message_id)
-    user_id = current_user.get_id()
-    is_sender_or_recipient(message, user_id)
-
-    return redirect(url_for('messages.create_message', recipient_id=message.get_sender()))   
-# -------------------------------------------------------------------
-'''
-
 
 '''
     Examples of usage:
@@ -198,7 +183,7 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if not message.is_draft:
-                abort(404, 'not a draft')
+                abort(400, 'not a draft')
 
             form.text_area.data = message.get_text()
             form.delivery_date.data = message.get_delivery_date()
@@ -209,7 +194,7 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if message.is_draft:
-                abort(404, 'you cannot forward a draft')
+                abort(400, 'you cannot forward a draft')
 
             form.text_area.data = 'Forwarded: ' + message.get_text()
             form.image_file.data = message.get_attachement()  # TODO: doesn't work
