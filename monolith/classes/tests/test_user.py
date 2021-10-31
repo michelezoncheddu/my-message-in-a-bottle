@@ -169,7 +169,9 @@ class Test(unittest.TestCase):
                 'action': 'Report',
                 'email': 'toreject@toreject'}
         reply = tested_app.post('/users', data=data)
+        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 200)
+        self.assertEqual(body, {"msg":"User successfully reported"})
         
         # report 2
         data = {'dir': '/users',
@@ -177,7 +179,9 @@ class Test(unittest.TestCase):
                 'action': 'Report',
                 'email': 'toban1@toban1'}
         reply = tested_app.post('/users', data=data)
+        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 200)
+        self.assertEqual(body, {"msg":"User successfully reported"})
 
         # block 
         data = {'dir': '/users',
@@ -214,7 +218,6 @@ class Test(unittest.TestCase):
                 }
         reply = tested_app.post('/blacklist', data=data)
         self.assertEqual(reply.status_code, 200)
-
 
 
         print("COMMON USER: OK")
