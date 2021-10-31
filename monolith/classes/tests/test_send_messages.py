@@ -22,10 +22,7 @@ class Test(unittest.TestCase):
         self.recipient = {
             'email': 'admin',
             'password': 'admin'
-        }
-
-
-        
+        }      
 
 
     def setUp(self):

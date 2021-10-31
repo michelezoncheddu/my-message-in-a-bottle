@@ -53,6 +53,15 @@ class Test(unittest.TestCase):
             'email': 'todelete@todelete',
             'password': 'todelete'
         }
+        # dummy user for testing reject reported user
+        self.create_toreject_user = {
+            'email': 'toreject@toreject',
+            'firstname': 'toreject',
+            'lastname': 'toreject',
+            'password': 'toreject',
+            'dateofbirth': '9/10/2020',
+            'location': 'Pisa'
+        }
         # dummy user for testing ban 1
         self.create_toban1_user = {
             'email': 'toban1@toban1',
@@ -66,7 +75,7 @@ class Test(unittest.TestCase):
             'email': 'toban1@toban1',
             'password': 'toban1'
         }
-        # dummy user for testing ban 1
+        # dummy user for testing ban 2
         self.create_toban2_user = {
             'email': 'toban2@toban2',
             'firstname': 'toban2',
@@ -91,6 +100,22 @@ class Test(unittest.TestCase):
     def test_user(self):
         tested_app = app.test_client()
 
+        # /create_user
+        reply = tested_app.get('/create_user')
+        self.assertEqual(reply.status_code, 200)
+
+        # create dummy account 1
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toreject_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+
+        # create dummy account 2
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toban1_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
+
         # /profile without login
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 401)
@@ -110,10 +135,6 @@ class Test(unittest.TestCase):
         # /reported_users (denied access)
         reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 401)
-
-        """# get /delete_user (denied access)
-        reply = tested_app.get('/delete_user')
-        self.assertEqual(reply.status_code, 401)"""
 
         # change profile pic : no selected file
         data = {'dir': '/profile', 'submit': 'Upload'}
@@ -142,6 +163,60 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/profile', data=data)
         self.assertEqual(reply.status_code, 200)
 
+        # report 1
+        data = {'dir': '/users',
+                'submit': 'Report', 
+                'action': 'Report',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+        
+        # report 2
+        data = {'dir': '/users',
+                'submit': 'Report', 
+                'action': 'Report',
+                'email': 'toban1@toban1'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # block 
+        data = {'dir': '/users',
+                'submit': 'Block', 
+                'action': 'Block',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # block 2
+        data = {'dir': '/users',
+                'submit': 'Block', 
+                'action': 'Block',
+                'email': 'toban1@toban1'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # unblock on /users
+        data = {'dir': '/users',
+                'submit': 'Unblock', 
+                'action': 'Unblock',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # /blacklist
+        reply = tested_app.get('blacklist')
+        self.assertEqual(reply.status_code, 200)
+
+        # unblock on /blacklist
+        data = {'dir': '/blacklist',
+                'submit': 'Unblock', 
+                'unblock': 'toban1@toban1'
+                }
+        reply = tested_app.post('/blacklist', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+
+
         print("COMMON USER: OK")
 
 
@@ -149,6 +224,12 @@ class Test(unittest.TestCase):
     @pytest.mark.run(order=2)
     def test_admin(self):
         tested_app = app.test_client()
+
+        # create dummy account 3
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_toban2_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
 
         # /profile without login
         reply = tested_app.get('/profile')
@@ -215,6 +296,85 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/profile', data=data)
         self.assertEqual(reply.status_code, 200)
 
+        # block 
+        data = {'dir': '/users',
+                'submit': 'Block', 
+                'action': 'Block',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # block 2
+        data = {'dir': '/users',
+                'submit': 'Block', 
+                'action': 'Block',
+                'email': 'toban1@toban1'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # unblock on /users
+        data = {'dir': '/users',
+                'submit': 'Unblock', 
+                'action': 'Unblock',
+                'email': 'toreject@toreject'}
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # /blacklist
+        reply = tested_app.get('blacklist')
+        self.assertEqual(reply.status_code, 200)
+
+        # unblock on /blacklist
+        data = {'dir': '/blacklist',
+                'submit': 'Unblock', 
+                'unblock': 'toban1@toban1'
+                }
+        reply = tested_app.post('/blacklist', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # reject reported user
+        data = {'dir': '/reported_users',
+                'submit': 'Reject', 
+                'action': "Reject",
+                'email': 'toreject@toreject'
+                }
+        reply = tested_app.post('/reported_users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # ban on /users endpoint
+        data = {'dir': '/users',
+                'submit': 'Ban', 
+                'action': 'Ban',
+                'email': 'toban2@toban2'
+                }
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # ban on /reported_users endpoint
+        data = {'dir': '/reported_users',
+                'submit': 'Ban', 
+                'action': "Ban",
+                'email': 'toban1@toban1'
+                }
+        reply = tested_app.post('/reported_users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # logout
+        reply = tested_app.get('/logout')
+        self.assertEqual(reply.status_code, 302)
+
+        # try login as banned 1
+        reply = tested_app.post('/login', data=json.dumps(self.toban1_user), content_type='application/json')
+        body = json.loads(str(reply.data, 'utf8'))
+        self.assertEqual(reply.status_code, 403)
+        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
+
+        # try login as banned 2
+        reply = tested_app.post('/login', data=json.dumps(self.toban2_user), content_type='application/json')
+        body = json.loads(str(reply.data, 'utf8'))
+        self.assertEqual(reply.status_code, 403)
+        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
+
         print("ADMIN USER: OK")
 
 
@@ -256,80 +416,3 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 302)
 
         print("UNREGISTER USER: OK")
-
-
-    # report tests
-    @pytest.mark.run(order=4)
-    def test_report(self):
-        tested_app = app.test_client()
-
-        # create toreport account
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_toban1_user),
-                    content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
-
-        # login
-        reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-
-
-        # report
-        toreport_email = self.toban1_user['email']
-        data = {'dir': '/users',
-                'submit': 'Report', 
-                'action1': toreport_email}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        print("REPORT USER: OK")
-
-
-    # ban tests
-    @pytest.mark.run(order=5)
-    def test_ban(self):
-        tested_app = app.test_client()
-
-        # login
-        reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-
-        # create toban account 2
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_toban2_user),
-                    content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
-
-        # ban on /users endpoint
-        toban2_email = self.toban2_user['email']
-        data = {'dir': '/users',
-                'submit': 'Ban', 
-                'action1': toban2_email}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # ban on /reported_users endpoint
-        toban1_email = self.toban1_user['email']
-        data = {'dir': '/reported_users',
-                'submit': 'Ban', 
-                'ban': toban1_email}
-        reply = tested_app.post('/reported_users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # logout
-        reply = tested_app.get('/logout')
-        self.assertEqual(reply.status_code, 302)
-
-        # try login as banned 1
-        reply = tested_app.post('/login', data=json.dumps(self.toban1_user), content_type='application/json')
-        body = json.loads(str(reply.data, 'utf8'))
-        self.assertEqual(reply.status_code, 403)
-        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
-
-        # try login as banned 2
-        reply = tested_app.post('/login', data=json.dumps(self.toban2_user), content_type='application/json')
-        body = json.loads(str(reply.data, 'utf8'))
-        self.assertEqual(reply.status_code, 403)
-        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
-
-        print("BAN USER: OK")

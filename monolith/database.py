@@ -6,11 +6,11 @@ from .access import Access
 db = SQLAlchemy()
 
 
-
 class User(db.Model):
 
     __tablename__ = 'user'
 
+    # information
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.Unicode(128), nullable=False)
     firstname = db.Column(db.Unicode(128))
@@ -18,11 +18,13 @@ class User(db.Model):
     password = db.Column(db.Unicode(128))
     date_of_birth = db.Column(db.DateTime)
     location = db.Column(db.Unicode(128))
+    # booleans
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)
     is_reported = db.Column(db.Boolean, default=False)
     is_anonymous = False
+    # files
     profile_pic = db.Column(db.String, default=None)
 
     def __init__(self, *args, **kw):
@@ -76,6 +78,24 @@ class User(db.Model):
     def get_profile_pic(self):
         return self.profile_pic
 
+
+class BlackList(db.Model):
+
+    __tablename__ = 'black_list'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_user = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    # informatio of user being blocked
+    # TODO: foreignkey
+    id_blocked = db.Column(db.Integer, db.ForeignKey('user.id'))
+    firstname_blocked = db.Column(db.Unicode(128), db.ForeignKey('user.firstname'))
+    lastname_blocked = db.Column(db.Unicode(128), db.ForeignKey('user.lastname'))
+    email_blocked = db.Column(db.Unicode(128), db.ForeignKey('user.email'))
+
+
+    def __init__(self, *args, **kw):
+        super(BlackList, self).__init__(*args, **kw)
 
 class Message(db.Model):
 

@@ -1,0 +1,21 @@
+<html>
+  <body>
+    <a href="/"> 
+      <button>Home</button>
+    </a>
+    
+    <ul>
+      <ul style="width:20%; float:left;">
+        <h1>Black List</h1>
+        {% for entry in black_list: %}
+            <li>
+            {{entry.id_blocked}} {{entry.firstname_blocked}} {{entry.lastname_blocked}} ({{entry.email_blocked}}) 
+            <br>
+            <form action="/blacklist" method="POST">
+              <button type="submit" id="unblock" name="unblock" value="{{ entry.email_blocked }}">Unblock</button>
+            </form>
+            </li>
+        {% endfor %}
+  </body>
+</html>
+
