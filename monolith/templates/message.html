@@ -1,18 +1,14 @@
-<html>
-  
-  <head>
-     <script src="{{ url_for('static',filename='js/utils.js') }}"></script>
-  </head>
+{% extends "template.html" %}
+{% block content %}
 
-  <body>
-    <h1>Message</h1>
-      {{message.text}} {{message.delivery_date}} {{message.recipient_id}}
-      <button type="submit" onclick="DeleteMessage('{{message.id}}')">Delete</button>
-      {% if not message.is_draft %}
-        <a href="/create_message?forw_id={{message.id}}"> <button>Forward</button> </a>
-        <a href="/create_message?reply_id={{message.id}}"> <button>Reply</button> </a>
-      {% endif %}      
-    <br> <br>
-    <a href="/mailbox"> <button>Mailbox</button> </a>
-  </body>
-</html>
+<h1>Message</h1>
+  {{message.text}} {{message.delivery_date}} {{message.recipient_id}}
+  <button type="submit" onclick="DeleteMessage('{{message.id}}')">Delete</button>
+  {% if not message.is_draft %}
+    <a href="/create_message?forw_id={{message.id}}"> <button>Forward</button> </a>
+    <a href="/create_message?reply_id={{message.id}}"> <button>Reply</button> </a>
+  {% endif %}      
+<br> <br>
+<a href="/mailbox"> <button>Mailbox</button> </a>
+
+{% endblock %}

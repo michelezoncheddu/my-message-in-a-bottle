@@ -1,9 +1,8 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.fields.core import SelectMultipleField
 from wtforms.validators import DataRequired, InputRequired
 from wtforms.fields.html5 import DateTimeLocalField
-from wtforms import SubmitField, DateField
+from wtforms import SubmitField, DateField, SelectMultipleField
 from flask_wtf.file import FileField, FileAllowed
 
 

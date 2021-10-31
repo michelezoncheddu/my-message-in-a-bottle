@@ -208,7 +208,7 @@ def create_message():
                 abort(404, 'you cannot reply to a draft')
 
             form.text_area.data = 'Reply: '
-            form.users_list.choices = [(message.get_sender(), message.get_sender())]
+            form.users_list.data = [str(message.get_sender())]
         
         return render_template('create_message.html', form=form)
 

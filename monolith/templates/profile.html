@@ -1,21 +1,22 @@
-<html>
-    <body>
-        <form action="/profile" method="POST" enctype="multipart/form-data">
-                <p>
-                    <input type="file" id="file" name="file"/>
-                    <input type="submit" value="Upload"/><br>
-                </p>
-        </form>
+{% extends "template.html" %}
+{% block content %}
 
-        <img src="{{ user.get_profile_pic() }}" width="200" />
-        <h2>Profile Information</h2>
-        <div><strong>First Name</strong><input type="text" value= "{{ user.firstname }}" readonly>
-            <strong>Surname</strong><input type="text" value= "{{ user.lastname }}" readonly></div></div>
-        <div><strong>Email</strong><input type="text" value= "{{ user.email }}" readonly>
-            <strong>Location</strong><input type="text" value= "{{ user.location }}" readonly></div></div>
-        <br>
-        <a href="/"> 
-            <button>Home</button>
-        </a>
-    </body>
-</html>
+<form action="/profile" method="POST" enctype="multipart/form-data">
+        <p>
+            <input type="file" id="file" name="file"/>
+            <input type="submit" value="Upload"/><br>
+        </p>
+</form>
+
+<img src="{{ user.get_profile_pic() }}" width="200" />
+<h2>Profile Information</h2>
+<div><strong>First Name</strong><input type="text" value= "{{ user.firstname }}" readonly>
+    <strong>Surname</strong><input type="text" value= "{{ user.lastname }}" readonly></div></div>
+<div><strong>Email</strong><input type="text" value= "{{ user.email }}" readonly>
+    <strong>Location</strong><input type="text" value= "{{ user.location }}" readonly></div></div>
+<br>
+<a href="/"> 
+    <button>Home</button>
+</a>
+
+{% endblock %}

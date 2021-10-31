@@ -1,14 +1,15 @@
-<html>
-  <body>
-    <form action="/unregister" method="POST">
-      <div><strong>Verify your password in order to finalize the unregistration</strong></div>
-      <input type="text" id="password" name="password">
-      <input type="submit" value="Confirm">
-      <p style="color:red">{{ error }}</p>
-    </form>
-    <br>
-    <a href="/"> 
-      <button>Cancel</button>
-    </a>
-  </body>
-</html>
+{% extends "template.html" %}
+{% block content %}
+
+<form action="/unregister" method="POST">
+  <div><strong>Verify your password in order to finalize the unregistration</strong></div>
+  <input type="text" id="password" name="password">
+  <input type="submit" value="Confirm">
+  <p style="color:red">{{ error }}</p>
+</form>
+<br>
+<a href="/"> 
+  <button>Cancel</button>
+</a>
+
+{% endblock %}
