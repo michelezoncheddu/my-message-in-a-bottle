@@ -28,7 +28,7 @@ class UserDelForm(FlaskForm):
     display = ['firstname']
 
 class MessageForm(FlaskForm):
-    text_area = f.TextAreaField('Insert message text')
+    text_area = f.TextAreaField('Insert message text',id='text')
     #sender_id = f.IntegerField('Sender Id', validators=[DataRequired()])
     delivery_date = DateField('Delivery Date', format='%d/%m/%Y')
     image_file = FileField('Image', validators=[FileAllowed(['jpg','png'])])

@@ -8,7 +8,7 @@
           {% for message in messages: %}
             {% if message.sender_id == user_id %}
               <li>
-                <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text}} {{message.sender_id}} {{message.recipient_id}}
+                <a href="/message/{{message.id}}">{{message.id}}</a> {{message.text | safe}} {{message.sender_id}} {{message.recipient_id}}
               </li>
             {% endif %}
           {% endfor %}
