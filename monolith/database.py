@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .access import Access
@@ -84,15 +85,10 @@ class BlackList(db.Model):
     __tablename__ = 'black_list'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_user = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-    # informatio of user being blocked
-    # TODO: foreignkey
+    id_user = db.Column(db.Integer)
     id_blocked = db.Column(db.Integer, db.ForeignKey('user.id'))
-    firstname_blocked = db.Column(db.Unicode(128), db.ForeignKey('user.firstname'))
-    lastname_blocked = db.Column(db.Unicode(128), db.ForeignKey('user.lastname'))
-    email_blocked = db.Column(db.Unicode(128), db.ForeignKey('user.email'))
 
+    user_blocked = relationship('User', foreign_keys='BlackList.id_blocked', lazy='joined')
 
     def __init__(self, *args, **kw):
         super(BlackList, self).__init__(*args, **kw)

@@ -44,9 +44,6 @@ def moderate_action(email, action):
         entry = BlackList()
         entry.id_user = current_user.id
         entry.id_blocked = _user.id
-        entry.firstname_blocked = _user.firstname
-        entry.lastname_blocked = _user.lastname
-        entry.email_blocked = _user.email
         db.session.add(entry)
         db.session.commit()
     # unblock
