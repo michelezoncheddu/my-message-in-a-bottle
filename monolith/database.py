@@ -89,7 +89,7 @@ class BlackList(db.Model):
     id_user = db.Column(db.Integer)
     id_blocked = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    user_blocked = relationship('User', foreign_keys='BlackList.id_blocked', lazy='joined')
+    user_blocked = relationship('User', foreign_keys='BlackList.id_blocked')
 
     def __init__(self, *args, **kw):
         super(BlackList, self).__init__(*args, **kw)

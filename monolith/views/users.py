@@ -124,6 +124,7 @@ def _users():
         if (action_todo == "Report"):
             return {'msg': 'User successfully reported'}, 200
         else:
+            _blocked_users = [r.id_blocked for r in db.session.query(BlackList.id_blocked).filter(BlackList.id_user == current_user.id)]
             return render_template('users.html', users=_users, blocked_users=_blocked_users, action=action_template)
 
 
@@ -138,6 +139,7 @@ def blacklist():
         # retrieve target user email
         email = request.form['unblock']
         moderate_action(email, 'Unblock')
+        _black_list = db.session.query(BlackList).filter(BlackList.id_user == current_user.id).all()
         return render_template('blacklist.html', black_list=_black_list)
 
 
