@@ -20,7 +20,7 @@ class UserForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired()])
     dateofbirth = DateField('Date of Birth', format='%d/%m/%Y')
     location = f.StringField('Location', validators=[DataRequired()])
-    display = ['email', 'firstname', 'lastname', 'password', 'dateofbirth', 'location', 'submit_button']
+    display = ['email', 'firstname', 'lastname', 'password', 'dateofbirth', 'location']
 
 
 class UserDelForm(FlaskForm):

@@ -4,46 +4,33 @@
 <form action="/profile" method="POST" enctype="multipart/form-data">
     <p>
         <input type="file" id="file" name="file"/>
-        <button type="submit" name="action" value="Upload">Upload</button>
+        <button type="submit" name="action" value="Upload" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Upload</button>
     </p>
     <img src="{{ user.get_profile_pic() }}" width="200" />
 
     <h2>Profile Information</h2>
     <div style="margin-bottom:10">
-        <div>
-            <strong>First Name</strong>
-        </div> 
-        <input type="text" id="firstname" name="firstname" value= "{{ user.firstname }}" readonly>
+        <strong>First Name</strong> 
+        <input type="text" id="firstname" name="firstname" value= "{{ user.firstname }}" readonly style="margin-left: 10; margin-right: 60">
+        <strong>Surname</strong> 
+        <input type="text" id="lastname" name="lastname" value= "{{ user.lastname }}" readonly style="margin-left: 10;">
     </div>
     <div style="margin-bottom:10">
-        <div>
-            <strong>Surname</strong> 
-        </div>
-        <input type="text" id="lastname" name="lastname" value= "{{ user.lastname }}" readonly>
-    </div>
-    <div style="margin-bottom:10">
-        <div>
-            <strong>Email</strong> 
-        </div>
-        <input type="text" id="email" name="email" value= "{{ user.email }}" readonly>
-    </div>
-    <div style="margin-bottom:10">
-        <div>
-            <strong>Location</strong>
-        </div>
-        <input type="text" id="location" name="location" value= "{{ user.location }}" readonly>
+        <strong>Email</strong> 
+        <input type="text" id="email" name="email" value= "{{ user.email }}" readonly style="margin-left: 49; margin-right: 60;">
+        <strong>Location</strong> <input type="text" id="location" name="location" value= "{{ user.location }}" readonly style="margin-left: 12;">
     </div>
     <br>
 
-    <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()">
+    <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">
     <a>
-        <input type="submit" id="action" name="action" value="Save">
+        <input type="submit" id="action" name="action" value="Save" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">
     </a></div>
     <br><br>
     {% if user.has_language_filter %}
-        <button type="submit" id="action" name="action" value="toggleFilter">Language Filter: on</button>
+        <button type="submit" id="action" name="action" value="toggleFilter" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Language Filter: on</button>
     {% else %}
-        <button type="submit" id="action" name="action" value="toggleFilter">Language Filter: off</button>
+        <button type="submit" id="action" name="action" value="toggleFilter" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Language Filter: off</button>
     {% endif %}
 </form>
 
