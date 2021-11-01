@@ -33,10 +33,16 @@ def do_task():
             print("MESSAGGIO SPEDITO")
         #message_g=message
             db.session.commit() 
+        notify.delay(1)    
     return 'delivered'
+
+@celery.task
+def notify(id):    
+    print('Notifica inviata a utente'+str(id))
+    return 'done'
 
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Calls test('hello') every 10 seconds.
-    sender.add_periodic_task(300.0, do_task.s(), name='add every 10')
+    sender.add_periodic_task(10.0, do_task.s(), name='add every 10')

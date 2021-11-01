@@ -256,4 +256,4 @@ def create_message():
 @login_required
 def messages_draft():
     messages_draft = Message.query.filter_by(is_draft = True)
-    return render_template('messages.html', messages=messages_draft)
+    return render_template('mailbox.html', messages=messages_draft)

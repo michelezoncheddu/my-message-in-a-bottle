@@ -6,6 +6,9 @@ import flask
 from bs4 import BeautifulSoup as bs
 from werkzeug import test
 
+from ...views.messages import filter_language
+from ...database import Message
+
 from monolith.app import app
 
 
@@ -87,15 +90,23 @@ class Test(unittest.TestCase):
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
+        
 
     def test_message_read(self):
         tested_app = app.test_client()
-
+          
         # Read message
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.get('/message/2')
         self.assertEqual(reply.status_code, 200)
-        
+
+        # Check bad language message
+        tocensor_message = Message()
+        Message.recipient_id = '1'
+        Message.delivery_date = '10/10/2022'
+        Message.text = 'Asshole'
+        self.assertEqual({'recipient_id': '1', 'delivery_date': '10/10/2022', 'text': '****'}, filter_language(tocensor_message))
+
 
     def test_message_read_draft(self):
         tested_app = app.test_client()
