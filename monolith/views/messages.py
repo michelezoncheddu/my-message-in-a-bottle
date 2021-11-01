@@ -118,36 +118,53 @@ def create_message():
             
             # Save draft.
             if form.submit_button.data:
-                '''
-                    TODO: a new message is required only if the draft is not
-                          a modification of a previous draft.
-                          In that case, just the old draft from the DB needs to be modifed.
-                '''
-                new_message = Message()
-                new_message.text = form.text_area.data
-                new_message.delivery_date = form.delivery_date.data
-                new_message.sender_id = user_id
-                #new_message.attachment = filename
-                new_message.recipient_id = 0  # TODO: put the first recipient in the list.
-                db.session.add(new_message) 
-                db.session.commit() 
-                return redirect('messages/draft')
+                
+                if form.message_id_hidden.data>0:
+                    message = retrieve_message(form.message_id_hidden.data)
+                    message.text = form.text_area.data
+                    message.delivery_date = form.delivery_date.data
+                    message.sender_id = user_id
+                    message.recipient_id = 0  # TODO: put the first recipient in the list.
+                    db.session.commit() 
+                    
+                else:
+                    new_message = Message()
+                    new_message.text = form.text_area.data
+                    new_message.delivery_date = form.delivery_date.data
+                    new_message.sender_id = user_id
+                    new_message.recipient_id = 0  # TODO: put the first recipient in the list.
+                    db.session.add(new_message) 
+                    db.session.commit() 
+
+                return redirect('/mailbox')
 
             # Send.
             else:
                 for recipient in form.users_list.data:
                     # if not blocked : send
                     if (not is_blocked(recipient)):
-                        new_message = Message()
-                        new_message.text = form.text_area.data
-                        new_message.delivery_date = form.delivery_date.data
-                        #new_message.attachment = filename
-                        new_message.is_draft = False
-                        new_message.is_delivered = True  # TODO: change after Celery.
-                        new_message.sender_id = user_id
-                        new_message.recipient_id = recipient
-                        db.session.add(new_message) 
-                        db.session.commit()
+                        # send new message from draft to first recipient
+                        if form.message_id_hidden.data>0:
+                            message = retrieve_message(form.message_id_hidden.data)
+                            message.is_draft = False
+                            message.text = form.text_area.data
+                            message.delivery_date = form.delivery_date.data
+                            message.is_delivered = True  # TODO: change after Celery.
+                            message.sender_id = user_id
+                            message.recipient_id = recipient
+                            form.message_id_hidden.data=-1
+                            db.session.commit()
+                        else:
+                            # send new message [from draft] to [other] recipients 
+                            new_message = Message()
+                            new_message.text = form.text_area.data
+                            new_message.delivery_date = form.delivery_date.data
+                            new_message.is_draft = False
+                            new_message.is_delivered = True  # TODO: change after Celery.
+                            new_message.sender_id = user_id
+                            new_message.recipient_id = recipient
+                            db.session.add(new_message) 
+                            db.session.commit()
                 return redirect('/mailbox')
 
         '''
@@ -186,6 +203,7 @@ def create_message():
             if not message.is_draft:
                 abort(400, 'not a draft')
 
+            form.message_id_hidden.data = message.get_id()
             form.text_area.data = message.get_text()
             form.delivery_date.data = message.get_delivery_date()
             #form.image_file.data = message.get_attachement()  # TODO: doesn't work
