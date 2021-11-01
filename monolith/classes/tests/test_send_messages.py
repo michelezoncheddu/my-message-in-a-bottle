@@ -20,8 +20,8 @@ class Test(unittest.TestCase):
         }
 
         self.recipient = {
-            'email': 'admin',
-            'password': 'admin'
+            'email': 'r@r',
+            'password': 'recipient'
         }      
 
 
@@ -69,21 +69,11 @@ class Test(unittest.TestCase):
             #'image_file': (io.BytesIO(b"some random data"), filename)
         }
 
-        # Set filter language on : recipient
-        tested_app.post('/login', data=json.dumps(self.recipient), content_type='application/json')
-        data = {'dir': '/profile',
-                'submit': 'toggleFilter',
-                'action': 'toggleFilter',
-                }
-        reply = tested_app.post('/profile')
-        self.assertEqual(reply.status_code, 200)
-
-
         # Check POST create_message
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
-        
+
         self.message = {
             'text_area': 'text',
             'delivery_date': '31/12/2022',
@@ -93,48 +83,25 @@ class Test(unittest.TestCase):
             #'image_file': (io.BytesIO(b"some random data"), filename)
         }
 
-        # Send message with bad language
-        reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-        
-        self.message = {
-            'text_area': 'asshole',
-            'delivery_date': '31/12/2022',
-            'users_list':'1',
-            'submit_button2':'Send'
-            #'image_file':(open(filename, 'rb'),filename)
-            #'image_file': (io.BytesIO(b"some random data"), filename)
-        }
-
-
         # Check POST create_message
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # Read message censored
-        reply = tested_app.post('/message/', data=json.dumps(self.recipient), content_type='application/json')
-        self.assertEqual(reply.status_code, 200)
-
-        # Set filter language off : recipient
-        data = {'dir': '/profile',
-                'submit': 'toggleFilter',
-                'action': 'toggleFilter',
-                }
-        reply = tested_app.post('/profile')
-        self.assertEqual(reply.status_code, 200)
-
     def test_message_read(self):
-          tested_app = app.test_client()
-          tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
-          reply = tested_app.get('/message/2')
-          self.assertEqual(reply.status_code, 200)
+        tested_app = app.test_client()
+
+        # Read message
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.get('/message/2')
+        self.assertEqual(reply.status_code, 200)
+        
 
     def test_message_read_draft(self):
-          tested_app = app.test_client()
-          tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
-          reply = tested_app.get('/messages/draft')
-          self.assertEqual(reply.status_code, 200)
+        tested_app = app.test_client()
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.get('/messages/draft')
+        self.assertEqual(reply.status_code, 200)
 
         
 
