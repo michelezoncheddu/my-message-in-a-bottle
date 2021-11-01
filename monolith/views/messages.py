@@ -2,6 +2,9 @@ from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
 from sqlalchemy import or_, and_
 
+from profanity_filter import ProfanityFilter
+import re
+
 from .users import get_users
 
 from ..access import Access
@@ -14,6 +17,9 @@ from monolith.forms import MessageForm
 
 messages = Blueprint('messages', __name__)
 
+"""# profanity filter ('en' only)
+pf = ProfanityFilter()"""
+
 ATTACHMENTS_PATH = 'monolith/static'
 
 # utility function for checking if recipient has sender on blacklist
@@ -25,6 +31,10 @@ def is_blocked(recipient):
         return True
     else:
         return False
+
+"""# utility function for checking if recipient has language filter:
+def has_language_filter(recipient):
+    return (db.session.query(User).filter(User.id == recipient).first()).has_language_filter"""
 
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
@@ -136,16 +146,25 @@ def create_message():
             # Send.
             else:
                 for recipient in form.users_list.data:
+                    # TODO: delegate this to celery
                     # if not blocked : send
                     if (not is_blocked(recipient)):
                         new_message = Message()
-                        new_message.text = form.text_area.data
+                        """# remove <p> ... </p>
+                        new_message.text = re.search("<p>(.*)</p>", form.text_area.data).group(1)"""
                         new_message.delivery_date = form.delivery_date.data
                         #new_message.attachment = filename
                         new_message.is_draft = False
                         new_message.is_delivered = True  # TODO: change after Celery.
                         new_message.sender_id = user_id
                         new_message.recipient_id = recipient
+
+                        """# TODO: delegate this to celery
+                           # TODO: sender sees the censored messages --> need to uncouple with recipient message
+                        # if bad language on : filter
+                        if (has_language_filter(recipient)):
+                            new_message.text = pf.censor(new_message.text)"""
+
                         db.session.add(new_message) 
                         db.session.commit()
                 return redirect('/mailbox')

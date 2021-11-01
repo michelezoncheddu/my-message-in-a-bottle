@@ -83,7 +83,6 @@ def profile():
                 filename = 'static/profile/' + filename
                 _user.set_profile_pic(filename)
                 db.session.commit()
-                return render_template('profile.html', user=_user)
             else:
                 return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
         # change profile info
@@ -93,7 +92,12 @@ def profile():
             current_user.email = request.form.get('email')
             current_user.location = request.form.get('location')
             db.session.commit()
-            return render_template('profile.html', user=_user)
+        # toggle language filter
+        elif (action == "toggleFilter"):
+            current_user.has_language_filter = not current_user.has_language_filter
+            db.session.commit()
+            
+        return render_template('profile.html', user=_user)
 
 @users.route('/users', methods=['POST', 'GET'])
 @login_required

@@ -20,6 +20,7 @@ class User(db.Model):
     date_of_birth = db.Column(db.DateTime)
     location = db.Column(db.Unicode(128))
     # booleans
+    has_language_filter = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False)

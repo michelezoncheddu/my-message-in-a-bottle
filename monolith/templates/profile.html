@@ -31,10 +31,17 @@
         <strong>Location</strong> <input type="text" id="location" name="location" value= "{{ user.location }}" readonly>
     </div>
     <br>
-    <input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()">
+
+    <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()">
     <a>
         <input type="submit" id="action" name="action" value="Save">
-    </a>
+    </a></div>
+    <br><br>
+    {% if user.has_language_filter %}
+        <button type="submit" id="action" name="action" value="toggleFilter">Language Filter: on</button>
+    {% else %}
+        <button type="submit" id="action" name="action" value="toggleFilter">Language Filter: off</button>
+    {% endif %}
 </form>
 
 {% endblock %}
