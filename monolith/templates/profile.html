@@ -9,13 +9,29 @@
     <img src="{{ user.get_profile_pic() }}" width="200" />
 
     <h2>Profile Information</h2>
-    <div>
-        <strong>First Name</strong> <input type="text" id="firstname" name="firstname" value= "{{ user.firstname }}" readonly>
-        <strong>Surname</strong> <input type="text" id="lastname" name="lastname" value= "{{ user.lastname }}" readonly>
+    <div style="margin-bottom:10">
+        <div>
+            <strong>First Name</strong>
+        </div> 
+        <input type="text" id="firstname" name="firstname" value= "{{ user.firstname }}" readonly>
     </div>
-    <div>
-        <strong>Email</strong> <input type="text" id="email" name="email" value= "{{ user.email }}" readonly>
-        <strong>Location</strong> <input type="text" id="location" name="location" value= "{{ user.location }}" readonly>
+    <div style="margin-bottom:10">
+        <div>
+            <strong>Surname</strong> 
+        </div>
+        <input type="text" id="lastname" name="lastname" value= "{{ user.lastname }}" readonly>
+    </div>
+    <div style="margin-bottom:10">
+        <div>
+            <strong>Email</strong> 
+        </div>
+        <input type="text" id="email" name="email" value= "{{ user.email }}" readonly>
+    </div>
+    <div style="margin-bottom:10">
+        <div>
+            <strong>Location</strong>
+        </div>
+        <input type="text" id="location" name="location" value= "{{ user.location }}" readonly>
     </div>
     <br>
 
