@@ -1,19 +1,6 @@
 {% extends "template.html" %}
 {% block content %}
 
-<!-- TODO: put in utils.js (tried but did not work)-->
-<head>
-    <script>
-        function toggleEdit() {
-            mylist = document.getElementById('firstname').readOnly = false
-            mylist = document.getElementById('lastname').readOnly = false
-            mylist = document.getElementById('email').readOnly = false
-            mylist = document.getElementById('location').readOnly = false
-        }
-    </script>
-</head>
-
-
 <form action="/profile" method="POST" enctype="multipart/form-data">
     <p>
         <input type="file" id="file" name="file"/>
