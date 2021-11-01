@@ -2,8 +2,9 @@ import wtforms as f
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired, InputRequired
 from wtforms.fields.html5 import DateTimeLocalField
-from wtforms import SubmitField, DateField, SelectMultipleField
+from wtforms import SubmitField, DateField, SelectMultipleField, IntegerField
 from flask_wtf.file import FileField, FileAllowed
+from wtforms.widgets import HiddenInput
 
 
 class LoginForm(FlaskForm):
@@ -28,7 +29,8 @@ class UserDelForm(FlaskForm):
 
 
 class MessageForm(FlaskForm):
-    text_area = f.TextAreaField('Insert a New Message',id='text')
+    message_id_hidden = IntegerField(widget=HiddenInput(), default=-1)
+    text_area = f.TextAreaField('Insert message text',id='text')
     delivery_date = DateTimeLocalField('Delivery Date', validators=[InputRequired()], format='%Y-%m-%dT%H:%M')
     #image_file = FileField('Image', validators=[FileAllowed(['jpg','png'])])
     users_list = SelectMultipleField('Select recipients', id='users_list')

@@ -2,6 +2,9 @@ from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
 from sqlalchemy import or_, and_
 
+from better_profanity import profanity
+import re
+
 from .users import get_users
 
 from ..access import Access
@@ -14,6 +17,9 @@ from monolith.forms import MessageForm
 
 messages = Blueprint('messages', __name__)
 
+# profanity filter ('en' only)
+profanity.load_censor_words()
+
 ATTACHMENTS_PATH = 'monolith/static'
 
 # utility function for checking if recipient has sender on blacklist
@@ -25,6 +31,16 @@ def is_blocked(recipient):
         return True
     else:
         return False
+
+# utility function for censoring bad language in received messages
+def filter_language(_message):
+    censored_message = {}
+
+    # censorship
+    _message.text = profanity.censor(_message.text)
+    censored_message.update({'recipient_id': _message.recipient_id, 'delivery_date': _message.delivery_date, 'text': _message.text})
+
+    return censored_message
 
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
@@ -56,8 +72,8 @@ def mailbox():
     )
     
     # Retrieve recieved messages of user <id>
-    recieved_messages = db.session.query(Message).filter(
-        Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value),Message.is_delivered==True
+    received_messages = db.session.query(Message).filter(
+        Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value)
     )
     
     # Retrieve draft messages of user <id>
@@ -66,7 +82,7 @@ def mailbox():
     )
     
     return render_template('mailbox.html', sent_messages=sent_messages,
-                                           recieved_messages=recieved_messages,
+                                           recieved_messages=received_messages,
                                            draft_messages=draft_messages
     )
 
@@ -79,8 +95,13 @@ def message(message_id):
     user_id = current_user.get_id()
     is_sender_or_recipient(_message, user_id)
 
+    _message_aux = _message
+    # if language filter on
+    if (current_user.has_language_filter):
+        _message_aux = filter_language(_message)
+
     if request.method == 'GET':
-        return render_template('message.html', message=_message)
+        return render_template('message.html', message=_message_aux)
     
     # DELETE for the point of view of the current user.
     if _message.sender_id == user_id:
@@ -118,36 +139,54 @@ def create_message():
             
             # Save draft.
             if form.submit_button.data:
-                '''
-                    TODO: a new message is required only if the draft is not
-                          a modification of a previous draft.
-                          In that case, just the old draft from the DB needs to be modifed.
-                '''
-                new_message = Message()
-                new_message.text = form.text_area.data
-                new_message.delivery_date = form.delivery_date.data
-                new_message.sender_id = user_id
-                #new_message.attachment = filename
-                new_message.recipient_id = 0  # TODO: put the first recipient in the list.
-                db.session.add(new_message) 
-                db.session.commit() 
-                return redirect('messages/draft')
+                
+                if form.message_id_hidden.data>0:
+                    message = retrieve_message(form.message_id_hidden.data)
+                    message.text = form.text_area.data
+                    message.delivery_date = form.delivery_date.data
+                    message.sender_id = user_id
+                    message.recipient_id = 0  # TODO: put the first recipient in the list.
+                    db.session.commit() 
+                    
+                else:
+                    new_message = Message()
+                    new_message.text = form.text_area.data
+                    new_message.delivery_date = form.delivery_date.data
+                    new_message.sender_id = user_id
+                    new_message.recipient_id = 0  # TODO: put the first recipient in the list.
+                    db.session.add(new_message) 
+                    db.session.commit() 
+
+                return redirect('/mailbox')
 
             # Send.
             else:
                 for recipient in form.users_list.data:
+                    # TODO: delegate this to celery
                     # if not blocked : send
                     if (not is_blocked(recipient)):
-                        new_message = Message()
-                        new_message.text = form.text_area.data
-                        new_message.delivery_date = form.delivery_date.data
-                        #new_message.attachment = filename
-                        new_message.is_draft = False
-                        new_message.is_delivered = False  # TODO: change after Celery.
-                        new_message.sender_id = user_id
-                        new_message.recipient_id = recipient
-                        db.session.add(new_message) 
-                        db.session.commit()
+                        # send new message from draft to first recipient
+                        if form.message_id_hidden.data>0:
+                            message = retrieve_message(form.message_id_hidden.data)
+                            message.is_draft = False
+                            message.text = form.text_area.data
+                            message.delivery_date = form.delivery_date.data
+                            message.is_delivered = True  # TODO: change after Celery.
+                            message.sender_id = user_id
+                            message.recipient_id = recipient
+                            form.message_id_hidden.data=-1
+                            db.session.commit()
+                        else:
+                            # send new message [from draft] to [other] recipients 
+                            new_message = Message()
+                            new_message.text = form.text_area.data
+                            new_message.delivery_date = form.delivery_date.data
+                            new_message.is_draft = False
+                            new_message.is_delivered = True  # TODO: change after Celery.
+                            new_message.sender_id = user_id
+                            new_message.recipient_id = recipient
+                            db.session.add(new_message) 
+                            db.session.commit()
                 return redirect('/mailbox')
 
         '''
@@ -186,6 +225,7 @@ def create_message():
             if not message.is_draft:
                 abort(400, 'not a draft')
 
+            form.message_id_hidden.data = message.get_id()
             form.text_area.data = message.get_text()
             form.delivery_date.data = message.get_delivery_date()
             #form.image_file.data = message.get_attachement()  # TODO: doesn't work

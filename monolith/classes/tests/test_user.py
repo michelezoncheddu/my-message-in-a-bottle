@@ -137,7 +137,10 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 401)
 
         # change profile pic : no selected file
-        data = {'dir': '/profile', 'submit': 'Upload'}
+        data = {'dir': '/profile',
+                'submit': 'Upload',
+                'action': 'Upload'
+                }
         reply = tested_app.post('/profile', data=data)
         body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 400)
@@ -147,6 +150,7 @@ class Test(unittest.TestCase):
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
         data = {'dir': '/profile',
                 'submit': 'Upload',
+                'action': 'Upload',
                 'file': (open(filename, 'rb'), filename)
                 }
         reply = tested_app.post('/profile', data=data)
@@ -158,6 +162,7 @@ class Test(unittest.TestCase):
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
         data = {'dir': '/profile',
                 'submit': 'Upload',
+                'action': 'Upload',
                 'file': (open(filename, 'rb'), filename)
                 }
         reply = tested_app.post('/profile', data=data)
@@ -273,7 +278,9 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 200)
 
         # change profile pic : no selected file
-        data = {'dir': '/profile', 'submit': 'Upload'}
+        data = {'dir': '/profile',
+                'submit': 'Upload',
+                'action': 'Upload'}
         reply = tested_app.post('/profile', data=data)
         body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 400)
@@ -283,6 +290,7 @@ class Test(unittest.TestCase):
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
         data = {'dir': '/profile',
                 'submit': 'Upload',
+                'action': 'Upload',
                 'file': (open(filename, 'rb'), filename)
                 }
         reply = tested_app.post('/profile', data=data)
@@ -294,6 +302,7 @@ class Test(unittest.TestCase):
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
         data = {'dir': '/profile',
                 'submit': 'Upload',
+                'action': 'Upload',
                 'file': (open(filename, 'rb'), filename)
                 }
         reply = tested_app.post('/profile', data=data)

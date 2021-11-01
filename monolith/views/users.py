@@ -65,25 +65,39 @@ def get_users():
 @login_required
 def profile():
     _user = current_user
+
     if (request.method == 'GET'):
         return render_template('profile.html', user=_user)
-    # change profile picture
     elif (request.method == 'POST'):
-        # image not present : error
-        if ('file' not in request.files):
-            return {'msg': 'No selected file'}, 400
-        file = request.files['file']
-        # image present : get file
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            save_image(file, PROFILE_PIC_PATH) # store
-            filename = 'static/profile/' + filename
-            _user.set_profile_pic(filename)
+        action= request.form['action']
+        # change profile picture
+        if (action == "Upload"):
+            # image not present : error
+            if ('file' not in request.files):
+                return {'msg': 'No selected file'}, 400
+            file = request.files['file']
+            # image present : get file
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                save_image(file, PROFILE_PIC_PATH) # store
+                filename = 'static/profile/' + filename
+                _user.set_profile_pic(filename)
+                db.session.commit()
+            else:
+                return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
+        # change profile info
+        elif (action == "Save"):
+            current_user.firstname = request.form.get('firstname')
+            current_user.lastname = request.form.get('lastname')
+            current_user.email = request.form.get('email')
+            current_user.location = request.form.get('location')
             db.session.commit()
-            return render_template('profile.html', user=_user)
-        else:
-            return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
-
+        # toggle language filter
+        elif (action == "toggleFilter"):
+            current_user.has_language_filter = not current_user.has_language_filter
+            db.session.commit()
+            
+        return render_template('profile.html', user=_user)
 
 @users.route('/users', methods=['POST', 'GET'])
 @login_required
