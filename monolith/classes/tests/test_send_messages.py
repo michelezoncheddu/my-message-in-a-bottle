@@ -55,42 +55,71 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/create_message')
         self.assertEqual(reply.status_code, 200)
         # Check if the html returned page is the create message page
-        self.assertIn(b'Insert message text', reply.data)
+        self.assertIn(b'essage', reply.data)
+
+        # Login with the user
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+
+        #TODO: GET /create_message?draft_id=1
+        reply = tested_app.get('/create_message?draft_id=1')
+        #TODO: GET /create_message?forw_id=1
+        reply = tested_app.get('/create_message?forw_id=1')
+        #TODO: GET /create_message?reply_id=1
+        reply = tested_app.get('/create_message?reply_id=1')
 
 
     def test_message_post(self): 
         tested_app = app.test_client()
         filename=os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
-        #filename='monolith/static/profile/Schermata.png'
-        #filename="fake.jpg"
         self.message = {
             'text_area': 'text',
-            'delivery_date': '31/12/2022',
-            #'users_list':"['1']",
-            'submit_button':'Save',
-            #'image_file':(open(filename, 'rb'),filename)
-            #'image_file': (io.BytesIO(b"some random data"), filename)
+            'delivery_date': '2022-10-10T08:00',
+            'submit_button':'Save'
         }
 
-        # Check POST create_message
+        # Check POST create_message SAVE
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
+        self.assertEqual(reply.status_code, 302)
+
+        self.message = {
+            'message_id_hidden':1,
+            'text_area': 'text',
+            'delivery_date': '2022-10-10T08:00',
+            'submit_button':'Save'
+        }
+
+        # Check POST create_message SAVE+HIDDEN
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
         self.message = {
             'text_area': 'text',
-            'delivery_date': '31/12/2022',
+            'delivery_date': '2022-10-10T08:00',
             'users_list':'1',
             'submit_button2':'Send'
-            #'image_file':(open(filename, 'rb'),filename)
-            #'image_file': (io.BytesIO(b"some random data"), filename)
         }
 
-        # Check POST create_message
+        # Check POST create_message SEND
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
-        
+
+        self.message = {
+            'message_id_hidden':1,
+            'text_area': 'text',
+            'delivery_date': '2022-10-10T08:00',
+            'users_list':'1',
+            'submit_button2':'Send'
+        }
+
+        # Check POST create_message SEND+HIDDEN
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
+        self.assertEqual(reply.status_code, 302)
+
+
 
     def test_message_read(self):
         tested_app = app.test_client()
@@ -98,6 +127,7 @@ class Test(unittest.TestCase):
         # Read message
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.get('/message/2')
+        
         self.assertEqual(reply.status_code, 200)
 
         # Check bad language message
