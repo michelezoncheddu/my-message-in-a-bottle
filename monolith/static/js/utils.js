@@ -5,3 +5,7 @@ function DeleteMessage(id) {
     xhttp.open("DELETE", "/message/" + id, true)
     xhttp.send()
 }
+
+function test2() {
+  document.getElementById('test').removeAttribute('readonly');
+}
