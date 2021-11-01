@@ -34,11 +34,17 @@ def is_blocked(recipient):
 
 # utility function for censoring bad language in received messages
 def filter_language(received_messages):
+    text: str
+
     for m in received_messages:
         # clear text
-        m = re.search("<p>(.*)</p>", m).group(1)
+        text = re.search("<p>(.*)</p>", m.text)
+        if (text is not None):
+            m.text = text.group(1)
         # censorship
-        pf.censor(m)
+        m.text = pf.censor(m.text)
+
+    db.session.commit()
     return received_messages
 
 def retrieve_message(message_id):
@@ -71,12 +77,12 @@ def mailbox():
     )
     
     # Retrieve recieved messages of user <id>
-    recieved_messages = db.session.query(Message).filter(
+    received_messages = db.session.query(Message).filter(
         Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value)
     )
-    """# if language filter on
+    # if language filter on
     if (current_user.has_language_filter):
-        received_messages = filter_language(recieved_messages)"""
+        received_messages = filter_language(received_messages)
     
     # Retrieve draft messages of user <id>
     draft_messages = db.session.query(Message).filter(
@@ -84,7 +90,7 @@ def mailbox():
     )
     
     return render_template('mailbox.html', sent_messages=sent_messages,
-                                           recieved_messages=recieved_messages,
+                                           recieved_messages=received_messages,
                                            draft_messages=draft_messages
     )
 
