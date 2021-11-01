@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
 from sqlalchemy import or_, and_
 
-from profanity_filter import ProfanityFilter
+from better_profanity import profanity
 import re
 
 from .users import get_users
@@ -18,7 +18,7 @@ from monolith.forms import MessageForm
 messages = Blueprint('messages', __name__)
 
 # profanity filter ('en' only)
-pf = ProfanityFilter()
+profanity.load_censor_words()
 
 ATTACHMENTS_PATH = 'monolith/static'
 
@@ -42,7 +42,7 @@ def filter_language(received_messages):
         if (text is not None):
             m.text = text.group(1)
         # censorship
-        m.text = pf.censor(m.text)
+        m.text = profanity.censor(m.text)
 
     db.session.commit()
     return received_messages
