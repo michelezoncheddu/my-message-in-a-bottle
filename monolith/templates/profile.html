@@ -2,21 +2,33 @@
 {% block content %}
 
 <form action="/profile" method="POST" enctype="multipart/form-data">
-        <p>
-            <input type="file" id="file" name="file"/>
-            <input type="submit" value="Upload"/><br>
-        </p>
-</form>
+    <p>
+        <input type="file" id="file" name="file"/>
+        <button type="submit" name="action" value="Upload">Upload</button>
+    </p>
+    <img src="{{ user.get_profile_pic() }}" width="200" />
 
-<img src="{{ user.get_profile_pic() }}" width="200" />
-<h2>Profile Information</h2>
-<div><strong>First Name</strong><input type="text" value= "{{ user.firstname }}" readonly>
-    <strong>Surname</strong><input type="text" value= "{{ user.lastname }}" readonly></div></div>
-<div><strong>Email</strong><input type="text" value= "{{ user.email }}" readonly>
-    <strong>Location</strong><input type="text" value= "{{ user.location }}" readonly></div></div>
-<br>
-<a href="/"> 
-    <button>Home</button>
-</a>
+    <h2>Profile Information</h2>
+    <div>
+        <strong>First Name</strong> <input type="text" id="firstname" name="firstname" value= "{{ user.firstname }}" readonly>
+        <strong>Surname</strong> <input type="text" id="lastname" name="lastname" value= "{{ user.lastname }}" readonly>
+    </div>
+    <div>
+        <strong>Email</strong> <input type="text" id="email" name="email" value= "{{ user.email }}" readonly>
+        <strong>Location</strong> <input type="text" id="location" name="location" value= "{{ user.location }}" readonly>
+    </div>
+    <br>
+
+    <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()">
+    <a>
+        <input type="submit" id="action" name="action" value="Save">
+    </a></div>
+    <br><br>
+    {% if user.has_language_filter %}
+        <button type="submit" id="action" name="action" value="toggleFilter">Language Filter: on</button>
+    {% else %}
+        <button type="submit" id="action" name="action" value="toggleFilter">Language Filter: off</button>
+    {% endif %}
+</form>
 
 {% endblock %}
