@@ -1,9 +1,13 @@
 from celery import Celery
 
-from monolith.database import User, db
+from datetime import datetime
+
+from monolith.database import User, db, Message
 
 BACKEND = BROKER = 'redis://localhost:6379'
-celery = Celery(__name__, backend=BACKEND, broker=BROKER)
+
+#celery = Celery(__name__, backend=BACKEND, broker=BROKER)
+celery = Celery(__name__, broker=BROKER,backend=BACKEND)
 
 _APP = None
 
@@ -18,6 +22,21 @@ def do_task():
         db.init_app(app)
     else:
         app = _APP
+    print("I am checking your stuff")
+ 
+    current_time = datetime.now()
+    message=None
+    with app.app_context():
+        message=db.session.query(Message).filter(Message.is_delivered == False).first()
+        if message is not None:
+            message.is_delivered=True
+            print("MESSAGGIO SPEDITO")
+        #message_g=message
+            db.session.commit() 
+    return 'delivered'
 
-    return []
 
+@celery.on_after_configure.connect
+def setup_periodic_tasks(sender, **kwargs):
+    # Calls test('hello') every 10 seconds.
+    sender.add_periodic_task(300.0, do_task.s(), name='add every 10')
