@@ -168,7 +168,6 @@ def create_message():
                     # TODO: delegate this to celery
                     # if not blocked : send
                     if (not is_blocked(recipient)):
-<<<<<<< HEAD
                         # send new message from draft to first recipient
                         if form.message_id_hidden.data>0:
                             message = retrieve_message(form.message_id_hidden.data)
@@ -191,19 +190,6 @@ def create_message():
                             new_message.recipient_id = recipient
                             db.session.add(new_message) 
                             db.session.commit()
-=======
-                        new_message = Message()
-                        new_message.text = form.text_area.data
-                        new_message.delivery_date = form.delivery_date.data
-                        #new_message.attachment = filename
-                        new_message.is_draft = False
-                        new_message.is_delivered = True  # TODO: change after Celery.
-                        new_message.sender_id = user_id
-                        new_message.recipient_id = recipient
-
-                        db.session.add(new_message) 
-                        db.session.commit()
->>>>>>> 96e9f59bc010a778a2760d151eb59256398de5bc
                 return redirect('/mailbox')
 
         '''
