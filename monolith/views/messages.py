@@ -171,7 +171,6 @@ def create_message():
                             message.is_draft = False
                             message.text = form.text_area.data
                             message.delivery_date = form.delivery_date.data
-                            message.is_delivered = True  # TODO: change after Celery.
                             message.sender_id = user_id
                             message.recipient_id = recipient
                             form.message_id_hidden.data=-1
@@ -182,7 +181,6 @@ def create_message():
                             new_message.text = form.text_area.data
                             new_message.delivery_date = form.delivery_date.data
                             new_message.is_draft = False
-                            new_message.is_delivered = True  # TODO: change after Celery.
                             new_message.sender_id = user_id
                             new_message.recipient_id = recipient
                             db.session.add(new_message) 
@@ -248,7 +246,7 @@ def create_message():
                 abort(404, 'you cannot reply to a draft')
 
             form.text_area.data = 'Reply: '
-            form.users_list.data = [str(message.get_sender())]
+            form.users_list.choices = [(message.get_sender(), message.get_sender())]
         
         return render_template('create_message.html', form=form)
 
