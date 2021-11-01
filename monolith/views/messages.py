@@ -33,19 +33,14 @@ def is_blocked(recipient):
         return False
 
 # utility function for censoring bad language in received messages
-def filter_language(received_messages):
-    text: str
+def filter_language(_message):
+    censored_message = {}
 
-    for m in received_messages:
-        # clear text
-        text = re.search("<p>(.*)</p>", m.text)
-        if (text is not None):
-            m.text = text.group(1)
-        # censorship
-        m.text = profanity.censor(m.text)
+    # censorship
+    _message.text = profanity.censor(_message.text)
+    censored_message.update({'recipient_id': _message.recipient_id, 'delivery_date': _message.delivery_date, 'text': _message.text})
 
-    db.session.commit()
-    return received_messages
+    return censored_message
 
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
@@ -80,9 +75,6 @@ def mailbox():
     received_messages = db.session.query(Message).filter(
         Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value)
     )
-    # if language filter on
-    if (current_user.has_language_filter):
-        received_messages = filter_language(received_messages)
     
     # Retrieve draft messages of user <id>
     draft_messages = db.session.query(Message).filter(
@@ -103,8 +95,13 @@ def message(message_id):
     user_id = current_user.get_id()
     is_sender_or_recipient(_message, user_id)
 
+    _message_aux = _message
+    # if language filter on
+    if (current_user.has_language_filter):
+        _message_aux = filter_language(_message)
+
     if request.method == 'GET':
-        return render_template('message.html', message=_message)
+        return render_template('message.html', message=_message_aux)
     
     # DELETE for the point of view of the current user.
     if _message.sender_id == user_id:
@@ -168,7 +165,6 @@ def create_message():
                     # TODO: delegate this to celery
                     # if not blocked : send
                     if (not is_blocked(recipient)):
-<<<<<<< HEAD
                         # send new message from draft to first recipient
                         if form.message_id_hidden.data>0:
                             message = retrieve_message(form.message_id_hidden.data)
@@ -191,19 +187,6 @@ def create_message():
                             new_message.recipient_id = recipient
                             db.session.add(new_message) 
                             db.session.commit()
-=======
-                        new_message = Message()
-                        new_message.text = form.text_area.data
-                        new_message.delivery_date = form.delivery_date.data
-                        #new_message.attachment = filename
-                        new_message.is_draft = False
-                        new_message.is_delivered = True  # TODO: change after Celery.
-                        new_message.sender_id = user_id
-                        new_message.recipient_id = recipient
-
-                        db.session.add(new_message) 
-                        db.session.commit()
->>>>>>> 96e9f59bc010a778a2760d151eb59256398de5bc
                 return redirect('/mailbox')
 
         '''
