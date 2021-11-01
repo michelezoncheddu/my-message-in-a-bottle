@@ -76,7 +76,7 @@ class Test(unittest.TestCase):
                 'action': 'toggleFilter',
                 }
         reply = tested_app.post('/profile')
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 401)
 
 
         # Check POST create_message
@@ -114,7 +114,7 @@ class Test(unittest.TestCase):
 
         # Read message censored
         reply = tested_app.post('/message/', data=json.dumps(self.recipient), content_type='application/json')
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 404)
 
         # Set filter language off : recipient
         data = {'dir': '/profile',
@@ -122,7 +122,7 @@ class Test(unittest.TestCase):
                 'action': 'toggleFilter',
                 }
         reply = tested_app.post('/profile')
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 400)
 
     def test_message_read(self):
           tested_app = app.test_client()
