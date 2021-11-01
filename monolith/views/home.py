@@ -14,6 +14,4 @@ def index():
             welcome = "Logged In!"
     else:
         welcome = None
-        session['draft_id']=None
-        session['chosen_recipient']=[]
     return render_template("index.html", welcome=welcome)
