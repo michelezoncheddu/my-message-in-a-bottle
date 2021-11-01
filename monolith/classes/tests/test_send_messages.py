@@ -93,7 +93,7 @@ class Test(unittest.TestCase):
         
 
     def test_message_read(self):
-         tested_app = app.test_client()
+        tested_app = app.test_client()
           
         # Read message
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
