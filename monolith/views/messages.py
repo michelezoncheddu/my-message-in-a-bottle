@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
 from sqlalchemy import or_, and_
-
+import bleach
 from better_profanity import profanity
 import re
 
@@ -16,6 +16,13 @@ from monolith.forms import MessageForm
 
 
 messages = Blueprint('messages', __name__)
+
+allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'img', 'video', 'div', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
+allowed_attrs = {'*': ['class','style','color'],
+                        'a': ['href', 'rel'],
+                        'img': ['src', 'alt','data-filename','style']}
 
 # profanity filter ('en' only)
 profanity.load_censor_words()
@@ -142,7 +149,7 @@ def create_message():
                 
                 if form.message_id_hidden.data>0:
                     message = retrieve_message(form.message_id_hidden.data)
-                    message.text = form.text_area.data
+                    message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
                     message.delivery_date = form.delivery_date.data
                     message.sender_id = user_id
                     message.recipient_id = 0  # TODO: put the first recipient in the list.
@@ -150,7 +157,7 @@ def create_message():
                     
                 else:
                     new_message = Message()
-                    new_message.text = form.text_area.data
+                    new_message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
                     new_message.delivery_date = form.delivery_date.data
                     new_message.sender_id = user_id
                     new_message.recipient_id = 0  # TODO: put the first recipient in the list.
@@ -169,7 +176,7 @@ def create_message():
                         if form.message_id_hidden.data>0:
                             message = retrieve_message(form.message_id_hidden.data)
                             message.is_draft = False
-                            message.text = form.text_area.data
+                            message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
                             message.delivery_date = form.delivery_date.data
                             message.sender_id = user_id
                             message.recipient_id = recipient
@@ -178,7 +185,7 @@ def create_message():
                         else:
                             # send new message [from draft] to [other] recipients 
                             new_message = Message()
-                            new_message.text = form.text_area.data
+                            new_message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
                             new_message.delivery_date = form.delivery_date.data
                             new_message.is_draft = False
                             new_message.sender_id = user_id
