@@ -146,61 +146,68 @@ def create_message():
             if file:
                 filename = form.image_file.data.filename
                 file = form.image_file.data
-                filename = save_image(file, ATTACHMENTS_PATH)'''
+                filename = save_image(file, ATTACHMENTS_PATH)
+            '''
+
+            clean_text = bleach.clean(form.text_area.data, tags=allowed_tags, strip=True,
+                attributes=allowed_attrs, protocols=['data'], styles='background-color'
+            )
             
             # Save draft.
             if form.submit_button.data:
-                
-                if form.message_id_hidden.data>0:
+                # Update old draft.
+                if form.message_id_hidden.data > 0:
                     message = retrieve_message(form.message_id_hidden.data)
-                    message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
+                    message.text = clean_text
                     message.delivery_date = form.delivery_date.data
                     message.sender_id = user_id
                     message.recipient_id = 0  # TODO: put the first recipient in the list.
                     db.session.commit() 
-                    
+
+                # Create new draft.
                 else:
                     new_message = Message()
-                    new_message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
+                    new_message.text = clean_text
                     new_message.delivery_date = form.delivery_date.data
                     new_message.sender_id = user_id
                     new_message.recipient_id = 0  # TODO: put the first recipient in the list.
                     db.session.add(new_message) 
-                    db.session.commit() 
-
-                return redirect('/mailbox')
+                    db.session.commit()
 
             # Send.
             else:
                 for recipient in form.users_list.data:
                     # TODO: delegate this to celery
-                    # if not blocked : send
-                    if (not is_blocked(recipient)):
-                        # send new message from draft to first recipient
-                        if form.message_id_hidden.data>0:
-                            message = retrieve_message(form.message_id_hidden.data)
-                            message.is_draft = False
-                            message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
-                            message.delivery_date = form.delivery_date.data
-                            message.sender_id = user_id
-                            message.recipient_id = recipient
-                            form.message_id_hidden.data=-1
-                            db.session.commit()
-                        else:
-                            # send new message [from draft] to [other] recipients 
-                            new_message = Message()
-                            new_message.text = bleach.clean(form.text_area.data,tags=allowed_tags,strip=True,attributes=allowed_attrs,protocols=['data'],styles='background-color')
-                            new_message.delivery_date = form.delivery_date.data
-                            new_message.is_draft = False
-                            new_message.sender_id = user_id
-                            new_message.recipient_id = recipient
-                            db.session.add(new_message) 
-                            db.session.commit()
-                return redirect('/mailbox')
+
+                    if is_blocked(recipient):
+                        continue
+
+                    # send new message from draft to first recipient
+                    if form.message_id_hidden.data > 0:
+                        message = retrieve_message(form.message_id_hidden.data)
+                        message.is_draft = False
+                        message.text = clean_text
+                        message.delivery_date = form.delivery_date.data
+                        message.sender_id = user_id
+                        message.recipient_id = recipient
+                        form.message_id_hidden.data = -1
+                        db.session.commit()
+                    else:
+                        # send new message [from draft] to [other] recipients 
+                        new_message = Message()
+                        new_message.text = clean_text
+                        new_message.delivery_date = form.delivery_date.data
+                        new_message.is_draft = False
+                        new_message.sender_id = user_id
+                        new_message.recipient_id = recipient
+                        db.session.add(new_message) 
+                        db.session.commit()
+            
+            return redirect('/mailbox')
 
         else: 
-            error = "Delivery date must be in the future!"
-            return render_template('/create_message.html',form=form,error = error)
+            error = 'Delivery date must be in the future!'
+            return render_template('/create_message.html', form=form, error=error)
     
     # GET
     else:
