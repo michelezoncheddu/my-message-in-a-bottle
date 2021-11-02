@@ -28,12 +28,12 @@ class UserForm(FlaskForm):
         result = super(UserForm, self).validate()
         curr_date = datetime.today().date() 
 
-        # check password requirements
-        if not allowed_password(self.password.data):
-            return [False, "password must be of length between 5 and 25 and contain at least one upper case, one number and one special characters!"]
         # check email format is valid
         if not allowed_email(self.email.data):
             return [False, "invalid email format"]
+        # check password requirements
+        if not allowed_password(self.password.data):
+            return [False, "password must be of length between 5 and 25 and contain at least one upper case, one number and one special character!"]
         # check birth date is in the past
         if self.dateofbirth.data > datetime.today().date():
             return [False, "date of birth must be in the past"]
