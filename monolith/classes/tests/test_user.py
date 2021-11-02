@@ -19,45 +19,45 @@ class Test(unittest.TestCase):
         # admin user
         self.admin = {
             'email': 'admin@admin',
-            'password': 'admin'
+            'password': 'Admin1@'
         }
         # common user
         self.common_user = {
             'email': 's@s',
-            'password': 'sender'
+            'password': 'Sender1@'
         }
         # dummy user for /unregister
         self.create_tounregister_user = {
             'email': 'tounregister@tounregister',
             'firstname': 'tounregister',
             'lastname': 'tounregister',
-            'password': 'tounregister',
+            'password': 'Tounregister1@',
             'dateofbirth': '9/10/2020',
             'location': 'Pisa'
         }
         self.tounregister_user = {
             'email': 'tounregister@tounregister',
-            'password': 'tounregister'
+            'password': 'Tounregister1@'
         }
         # dummy user for delete user
         self.create_todelete_user = {
             'email': 'todelete@todelete',
             'firstname': 'todelete',
             'lastname': 'todelete',
-            'password': 'todelete',
+            'password': 'Todelete1@',
             'dateofbirth': '9/10/2020',
             'location': 'Pisa'
         }
         self.todelete_user = {
             'email': 'todelete@todelete',
-            'password': 'todelete'
+            'password': 'Todelete1@'
         }
         # dummy user for testing reject reported user
         self.create_toreject_user = {
             'email': 'toreject@toreject',
             'firstname': 'toreject',
             'lastname': 'toreject',
-            'password': 'toreject',
+            'password': 'Toreject1@',
             'dateofbirth': '9/10/2020',
             'location': 'Pisa'
         }
@@ -66,26 +66,26 @@ class Test(unittest.TestCase):
             'email': 'toban1@toban1',
             'firstname': 'toban1',
             'lastname': 'toban1',
-            'password': 'toban1',
+            'password': 'Toban1@',
             'dateofbirth': '9/10/2020',
             'location': 'Pisa'
         }
         self.toban1_user = {
             'email': 'toban1@toban1',
-            'password': 'toban1'
+            'password': 'Toban1@'
         }
         # dummy user for testing ban 2
         self.create_toban2_user = {
             'email': 'toban2@toban2',
             'firstname': 'toban2',
             'lastname': 'toban2',
-            'password': 'toban2',
+            'password': 'Toban2@',
             'dateofbirth': '9/10/2020',
             'location': 'Pisa'
         }
         self.toban2_user = {
             'email': 'toban2@toban2',
-            'password': 'toban2'
+            'password': 'Toban2@'
         }
 
 
@@ -415,14 +415,14 @@ class Test(unittest.TestCase):
         # unregister with wrong password
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
-                'password': 'incorrectpw'}
+                'password': 'Incorrectpw1@'}
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
         # unregister
         data = {'dir': '/unregister',
                 'submit': 'Confirm', 
-                'password': 'tounregister'}
+                'password': 'Tounregister1@'}
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 302)
 

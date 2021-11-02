@@ -8,7 +8,7 @@ from .users import get_users
 
 from ..access import Access
 from ..auth import login_required
-from ..image import save_image
+from ..utils import save_image
 
 from monolith.database import User, Message, BlackList, db
 from monolith.forms import MessageForm

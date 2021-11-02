@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from ..image import allowed_file, save_image
+from ..utils import allowed_file, save_image
 
 from werkzeug.utils import secure_filename
 from monolith.auth import login_required, admin_required
@@ -163,7 +163,8 @@ def create_user():
     form = UserForm()
 
     if request.method == 'POST':
-        if form.validate_on_submit():
+        result = form.validate_on_submit()
+        if result[0]:
             new_user = User()
             form.populate_obj(new_user)
             new_user.set_password(form.password.data)
@@ -171,6 +172,9 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             return redirect('/')
+        else:
+            error = result[1]
+            return render_template('create_user.html', form=form, error=error)
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
 

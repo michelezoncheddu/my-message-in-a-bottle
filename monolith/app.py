@@ -45,12 +45,12 @@ def create_app():
             example.firstname = 'admin'
             example.lastname = 'admin'
             example.email = 'admin@admin'
-            example.dateofbirth = datetime(2020, 10, 5)
+            example.date_of_birth = datetime(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
             example.is_admin = True
             example.is_banned = False
-            example.set_password('admin')
+            example.set_password('Admin1@')
             db.session.add(example)
             db.session.commit()
 
@@ -58,12 +58,12 @@ def create_app():
             example.firstname = 'sender'
             example.lastname = 'sender'
             example.email = 's@s'
-            example.dateofbirth = datetime(2020, 10, 5)
+            example.date_of_birth = datetime(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
             example.is_admin = False
             example.is_banned = False
-            example.set_password('sender')
+            example.set_password('Sender1@')
             db.session.add(example)
             db.session.commit()
 
@@ -71,12 +71,12 @@ def create_app():
             example.firstname = 'recipient'
             example.lastname = 'recipient'
             example.email = 'r@r'
-            example.dateofbirth = datetime(2020, 10, 5)
+            example.date_of_birth = datetime(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
             example.is_admin = False
             example.is_banned = False
-            example.set_password('recipient')
+            example.set_password('Recipient1@')
             db.session.add(example)
             db.session.commit()
 
