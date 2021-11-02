@@ -3,7 +3,6 @@ from flask_login import current_user
 from sqlalchemy import or_, and_
 import bleach
 from better_profanity import profanity
-import re
 
 from .users import get_users
 
@@ -23,6 +22,7 @@ allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
 allowed_attrs = {'*': ['class','style','color'],
                         'a': ['href', 'rel'],
                         'img': ['src', 'alt','data-filename','style']}
+
 
 # profanity filter ('en' only)
 profanity.load_censor_words()
@@ -264,3 +264,5 @@ def create_message():
 def messages_draft():
     messages_draft = Message.query.filter_by(is_draft = True)
     return render_template('mailbox.html', messages=messages_draft)
+
+    

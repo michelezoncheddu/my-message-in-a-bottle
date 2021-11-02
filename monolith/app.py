@@ -5,6 +5,14 @@ from datetime import datetime
 from monolith.auth import login_manager
 from monolith.database import User, Message, db
 from monolith.views import blueprints
+import bleach
+
+allowed_tags_sum = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                        'h1', 'h2', 'h3', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
+allowed_attrs_sum = {'*': ['class','style','color'],
+                        'a': ['href', 'rel'],
+                        'img': ['src', 'alt','data-filename','style']}
 
 
 def create_app():
@@ -14,6 +22,11 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../mmiab.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['CKEDITOR_SERVE_LOCAL'] = True
+
+    def jBleach(value):
+        return bleach.clean(value,tags=allowed_tags_sum,attributes=allowed_attrs_sum,strip=True)
+
+    app.jinja_env.filters["jBleach"] = jBleach  
 
     for bp in blueprints:
         app.register_blueprint(bp)
