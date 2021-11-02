@@ -21,7 +21,9 @@
         <strong>Location</strong> <input type="text" id="location" name="location" value= "{{ user.location }}" readonly style="margin-left: 12;">
     </div>
     <br>
-
+    {% if error %}
+        <p style="color:red"><strong>Error: {{ error }}</p>
+    {% endif %}
     <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">
     <a>
         <input type="submit" id="action" name="action" value="Save" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">

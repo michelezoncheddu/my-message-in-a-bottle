@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request
 
-from ..utils import allowed_file, allowed_password, allowed_email, allowed_birth_date, save_image
+from ..utils import allowed_file, allowed_email, allowed_birth_date, save_image
 
 from werkzeug.utils import secure_filename
 from monolith.auth import login_required, admin_required
@@ -86,12 +86,15 @@ def profile():
                 return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
         # change profile info
         elif (action == "Save"):
-            if 1:
+            if allowed_email(request.form.get('email')):
                 current_user.firstname = request.form.get('firstname')
                 current_user.lastname = request.form.get('lastname')
                 current_user.email = request.form.get('email')
                 current_user.location = request.form.get('location')
                 db.session.commit()
+            else:
+                error = "new email format is invalid, try again!"
+                return render_template('profile.html', user=_user, error=error)
         # toggle language filter
         elif (action == "toggleFilter"):
             current_user.has_language_filter = not current_user.has_language_filter

@@ -130,6 +130,14 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)
 
+        # /profile save button
+        data = {'dir': '/profile',
+                'submit': 'Save',
+                'action': 'Save'
+                }
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 200)
+
         # /users
         reply = tested_app.get('/users')
         self.assertEqual(reply.status_code, 200)
