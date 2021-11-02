@@ -24,21 +24,20 @@ def do_task():
         app = _APP
     print("I am checking your stuff")
  
-    current_time = datetime.now()
     message=None
     with app.app_context():
-        message=db.session.query(Message).filter(Message.is_delivered == False).first()
-        if message is not None:
+        _message=db.session.query(Message).filter(Message.is_delivered == False, 
+                                                 Message.delivery_date <= datetime.now())
+        for message in _message:                                    
             message.is_delivered=True
-            print("MESSAGGIO SPEDITO")
-        #message_g=message
+            print("Message sent")
             db.session.commit() 
-        notify.delay(1)    
+            notify.delay(message.get_recipient())    
     return 'delivered'
 
 @celery.task
 def notify(id):    
-    print('Notifica inviata a utente'+str(id))
+    print('Send notification to: '+str(id))
     return 'done'
 
 

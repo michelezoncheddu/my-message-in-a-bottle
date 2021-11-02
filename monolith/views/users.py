@@ -25,7 +25,6 @@ def moderate_action(email, action):
     if (_user is None):
         raise RuntimeError('Reported user not found in DB, this should not happen!')
     
-
     # ban
     if (action == 'Ban'):
         _user.set_banned(True)
@@ -48,7 +47,7 @@ def moderate_action(email, action):
         db.session.commit()
     # unblock
     elif (action == 'Unblock'):
-        db.session.query(BlackList).filter(BlackList.id_user == current_user.id,BlackList.id_blocked == _user.id).delete()
+        db.session.query(BlackList).filter(BlackList.id_user == current_user.id, BlackList.id_blocked == _user.id).delete()
         db.session.commit()
     # report
     elif (action == 'Report' and not _user.is_reported):
@@ -58,7 +57,7 @@ def moderate_action(email, action):
 
 @login_required
 def get_users():
-    return db.session.query(User)
+    return db.session.query(User).filter(User.is_active)
     
 
 @users.route('/profile', methods=['GET', 'POST'])
@@ -98,6 +97,7 @@ def profile():
             db.session.commit()
             
         return render_template('profile.html', user=_user)
+
 
 @users.route('/users', methods=['POST', 'GET'])
 @login_required
