@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
         parsed = bs(reply.data, 'html.parser')
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
-        assert(len(sent_messages) == 1)
+        assert(len(sent_messages) == 0)
 
         # Get list of recieved messages.
         parent = parsed.find(id='recieved').find('ul')
@@ -94,7 +94,7 @@ class Test(unittest.TestCase):
         parsed = bs(reply.data, 'html.parser')
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
-        assert(len(sent_messages) == 1)
+        assert(len(sent_messages) == 0)
 
         # Edit an alredy sent message
         reply = tested_app.get('/create_message?draft_id=1')
