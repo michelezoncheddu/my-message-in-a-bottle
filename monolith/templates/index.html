@@ -1,10 +1,10 @@
 {% extends "template.html" %}
 {% block content %}
 
-<h1>My Mesage in a Bottle</h1>
+<h1>My Message in a Bottle</h1>
 
 {% if current_user.is_authenticated %}
-  Hi {{ current_user.firstname }}! <a href="/logout">Logout</a><br>
+  Hi {{ current_user.firstname }}!<br>
   If you wish to unregister from our platform, <a href="/unregister">Unregister</a>
     <h2>{{ welcome }}</h2>
     {% if current_user.is_admin %}
