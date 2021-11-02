@@ -9,7 +9,7 @@ import bleach
 
 allowed_tags_sum = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
                         'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
+                        'h1', 'h2', 'h3', 'iframe', 'span', 'hr', 'src', 'class','font','u']
 allowed_attrs_sum = {'*': ['class','style','color'],
                         'a': ['href', 'rel'],
                         'img': ['src', 'alt','data-filename','style']}

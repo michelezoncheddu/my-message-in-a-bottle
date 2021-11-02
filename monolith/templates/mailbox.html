@@ -29,7 +29,7 @@
     <ul>
       {% for message in draft_messages: %}
           <li>
-            {{message.text}}
+            {{message.text|jBleach|safe}}
             <a href="/create_message?draft_id={{message.id}}">Edit</a> 
             <a href="/message/{{message.id}}">View</a> 
           </li>
