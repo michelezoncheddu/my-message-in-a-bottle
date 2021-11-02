@@ -2,7 +2,10 @@ import os
 from typing import AnyStr
 from werkzeug.utils import secure_filename
 
+from datetime import datetime
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+SPECIAL_CHARACTERS = '@#$%&*-_/'
 ALLOWED_EMAILS = {'@test.com',
                   '@hotmail.com', 
                   '@hotmail.it', 
@@ -39,7 +42,7 @@ def allowed_password(password):
     elif not any(el.isdigit() for el in password):
         return False
     # check if special characters
-    elif not any(el.isalnum() for el in password):
+    elif not any(el in SPECIAL_CHARACTERS for el in password):
         return False
 
     return True
@@ -51,5 +54,12 @@ def allowed_email(email):
             return True
             
     return False
+
+# utility for checking validity of birth date
+def allowed_birth_date(birth_date):
+    if birth_date > datetime.today().date():
+        return False
+
+    return True
 
 

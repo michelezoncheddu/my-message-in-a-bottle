@@ -7,8 +7,11 @@ from bs4 import BeautifulSoup as bs
 from werkzeug.utils import redirect
 
 from monolith.app import app
-
 from monolith.forms import UserForm
+
+from datetime import datetime, timedelta
+
+from ...utils import allowed_email, allowed_password, allowed_birth_date
 
 
 class Test(unittest.TestCase):
@@ -427,3 +430,43 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 302)
 
         print("UNREGISTER USER: OK")
+
+
+    # validator of user info tests
+    @pytest.mark.run(order=4)
+    def test_info_validator(self):
+        tested_app = app.test_client()
+
+        # email invalid
+        invalid_email = "invalidemail"
+        self.assertEqual(False, allowed_email(invalid_email))
+        # email valid
+        valid_email = "valid@hotmail.com"
+        self.assertEqual(True, allowed_email(valid_email))
+
+        # password invalid
+        invalid_pw1 = "aaaa"                            # too short
+        invalid_pw2 = "aaaaaaaaaaaaaaaaaaaaaaaaaa"      # too long
+        invalid_pw3 = "password"                        # no upper case
+        invalid_pw4 = "Password"                        # no numbers
+        invalid_pw5 = "Password1"                       # no special characters
+        self.assertEqual(False, allowed_password(invalid_pw1))
+        self.assertEqual(False, allowed_password(invalid_pw2))
+        self.assertEqual(False, allowed_password(invalid_pw3))
+        self.assertEqual(False, allowed_password(invalid_pw4))
+        self.assertEqual(False, allowed_password(invalid_pw5))
+        # password valid
+        valid_pw = "Password1@"
+        self.assertEqual(True, allowed_password(valid_pw))
+
+        # birth invalid
+        birth_invalid = datetime.today().date() + timedelta(days = 1)
+        self.assertEqual(False, allowed_birth_date(birth_invalid))
+        # birth valid
+        birth_valid = datetime.today().date() - timedelta(days = 1)
+        self.assertEqual(True, allowed_birth_date(birth_valid))
+
+        print("INFO VALIDATOR: OK")
+
+
+

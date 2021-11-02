@@ -7,7 +7,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import HiddenInput
 from datetime import datetime
 
-from .utils import allowed_password, allowed_email
+from .utils import allowed_password, allowed_email, allowed_birth_date
 
 class LoginForm(FlaskForm):
     email = f.StringField('Email', validators=[DataRequired()])
@@ -35,7 +35,7 @@ class UserForm(FlaskForm):
         if not allowed_password(self.password.data):
             return [False, "password must be of length between 5 and 25 and contain at least one upper case, one number and one special character!"]
         # check birth date is in the past
-        if self.dateofbirth.data > datetime.today().date():
+        if not allowed_birth_date(self.dateofbirth.data):
             return [False, "date of birth must be in the past"]
 
         return [result, ""]
