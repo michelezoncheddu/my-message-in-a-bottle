@@ -145,6 +145,7 @@ def create_message():
                 filename = save_image(file, ATTACHMENTS_PATH)'''
             
             # Save draft.
+            print(form.submit_button.data)
             if form.submit_button.data:
                 
                 if form.message_id_hidden.data>0:
