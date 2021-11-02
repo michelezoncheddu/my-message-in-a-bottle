@@ -44,7 +44,7 @@ def create_app():
             example = User()
             example.firstname = 'admin'
             example.lastname = 'admin'
-            example.email = 'admin@admin'
+            example.email = 'admin@test.com'
             example.date_of_birth = datetime(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
@@ -57,7 +57,7 @@ def create_app():
             example = User()
             example.firstname = 'sender'
             example.lastname = 'sender'
-            example.email = 's@s'
+            example.email = 's@test.com'
             example.date_of_birth = datetime(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
@@ -70,7 +70,7 @@ def create_app():
             example = User()
             example.firstname = 'recipient'
             example.lastname = 'recipient'
-            example.email = 'r@r'
+            example.email = 'r@test.com'
             example.date_of_birth = datetime(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'

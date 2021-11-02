@@ -18,17 +18,17 @@ class Test(unittest.TestCase):
 
         # admin user
         self.admin = {
-            'email': 'admin@admin',
+            'email': 'admin@test.com',
             'password': 'Admin1@'
         }
         # common user
         self.common_user = {
-            'email': 's@s',
+            'email': 's@test.com',
             'password': 'Sender1@'
         }
         # dummy user for /unregister
         self.create_tounregister_user = {
-            'email': 'tounregister@tounregister',
+            'email': 'tounregister@test.com',
             'firstname': 'tounregister',
             'lastname': 'tounregister',
             'password': 'Tounregister1@',
@@ -36,12 +36,12 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
         self.tounregister_user = {
-            'email': 'tounregister@tounregister',
+            'email': 'tounregister@test.com',
             'password': 'Tounregister1@'
         }
         # dummy user for delete user
         self.create_todelete_user = {
-            'email': 'todelete@todelete',
+            'email': 'todelete@test.com',
             'firstname': 'todelete',
             'lastname': 'todelete',
             'password': 'Todelete1@',
@@ -49,12 +49,12 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
         self.todelete_user = {
-            'email': 'todelete@todelete',
+            'email': 'todelete@test.com',
             'password': 'Todelete1@'
         }
         # dummy user for testing reject reported user
         self.create_toreject_user = {
-            'email': 'toreject@toreject',
+            'email': 'toreject@test.com',
             'firstname': 'toreject',
             'lastname': 'toreject',
             'password': 'Toreject1@',
@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
         }
         # dummy user for testing ban 1
         self.create_toban1_user = {
-            'email': 'toban1@toban1',
+            'email': 'toban1@test.com',
             'firstname': 'toban1',
             'lastname': 'toban1',
             'password': 'Toban1@',
@@ -71,12 +71,12 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
         self.toban1_user = {
-            'email': 'toban1@toban1',
+            'email': 'toban1@test.com',
             'password': 'Toban1@'
         }
         # dummy user for testing ban 2
         self.create_toban2_user = {
-            'email': 'toban2@toban2',
+            'email': 'toban2@test.com',
             'firstname': 'toban2',
             'lastname': 'toban2',
             'password': 'Toban2@',
@@ -84,7 +84,7 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
         self.toban2_user = {
-            'email': 'toban2@toban2',
+            'email': 'toban2@test.com',
             'password': 'Toban2@'
         }
 
@@ -171,7 +171,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Report', 
                 'action': 'Report',
-                'email': 'toreject@toreject'}
+                'email': 'toreject@test.com'}
         reply = tested_app.post('/users', data=data)
         body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 200)
@@ -181,7 +181,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Report', 
                 'action': 'Report',
-                'email': 'toban1@toban1'}
+                'email': 'toban1@test.com'}
         reply = tested_app.post('/users', data=data)
         body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 200)
@@ -191,7 +191,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Block', 
                 'action': 'Block',
-                'email': 'toreject@toreject'}
+                'email': 'toreject@test.com'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -199,7 +199,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Block', 
                 'action': 'Block',
-                'email': 'toban1@toban1'}
+                'email': 'toban1@test.com'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -207,7 +207,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Unblock', 
                 'action': 'Unblock',
-                'email': 'toreject@toreject'}
+                'email': 'toreject@test.com'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -218,7 +218,7 @@ class Test(unittest.TestCase):
         # unblock on /blacklist
         data = {'dir': '/blacklist',
                 'submit': 'Unblock', 
-                'unblock': 'toban1@toban1'
+                'unblock': 'toban1@test.com'
                 }
         reply = tested_app.post('/blacklist', data=data)
         self.assertEqual(reply.status_code, 200)
@@ -311,7 +311,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Block', 
                 'action': 'Block',
-                'email': 'toreject@toreject'}
+                'email': 'toreject@test.com'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -319,7 +319,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Block', 
                 'action': 'Block',
-                'email': 'toban1@toban1'}
+                'email': 'toban1@test.com'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -327,7 +327,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Unblock', 
                 'action': 'Unblock',
-                'email': 'toreject@toreject'}
+                'email': 'toreject@test.com'}
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -338,7 +338,7 @@ class Test(unittest.TestCase):
         # unblock on /blacklist
         data = {'dir': '/blacklist',
                 'submit': 'Unblock', 
-                'unblock': 'toban1@toban1'
+                'unblock': 'toban1@test.com'
                 }
         reply = tested_app.post('/blacklist', data=data)
         self.assertEqual(reply.status_code, 200)
@@ -347,7 +347,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/reported_users',
                 'submit': 'Reject', 
                 'action': "Reject",
-                'email': 'toreject@toreject'
+                'email': 'toreject@test.com'
                 }
         reply = tested_app.post('/reported_users', data=data)
         self.assertEqual(reply.status_code, 200)
@@ -356,7 +356,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/users',
                 'submit': 'Ban', 
                 'action': 'Ban',
-                'email': 'toban2@toban2'
+                'email': 'toban2@test.com'
                 }
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
@@ -365,7 +365,7 @@ class Test(unittest.TestCase):
         data = {'dir': '/reported_users',
                 'submit': 'Ban', 
                 'action': "Ban",
-                'email': 'toban1@toban1'
+                'email': 'toban1@test.com'
                 }
         reply = tested_app.post('/reported_users', data=data)
         self.assertEqual(reply.status_code, 200)

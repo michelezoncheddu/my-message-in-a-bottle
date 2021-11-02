@@ -10,20 +10,20 @@ class Test(unittest.TestCase):
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
         self.login_user = {
-            'email': 'admin@admin',
+            'email': 'admin@test.com',
             'password': 'admin'
         }
 
         self.login_user_fake = {
-            'email': 'fake@fake.com',
-            'password': 'fake'
+            'email': 'fake@test.com',
+            'password': 'Fake1@'
         }
 
         self.create_user = {
-            'email': 'test@tet.com',
+            'email': 'test@test.com',
             'firstname': 'testname',
             'lastname': 'testlastname',
-            'password': 'testpassword',
+            'password': 'Testpassword1@',
             'dateofbirth': '9/10/2020',
             'location': 'Pisa'
         }

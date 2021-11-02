@@ -12,18 +12,18 @@ class Test(unittest.TestCase):
         super(Test, self).__init__(*args, **kw)
 
         self.admin = {
-            'email': 'admin@admin',
-            'password': 'admin'
+            'email': 'admin@test.com',
+            'password': 'Admin1@'
         }
 
         self.sender = {
-            'email': 's@s',
-            'password': 'sender'
+            'email': 's@test.com',
+            'password': 'Sender1@'
         }
 
         self.recipient = {
-            'email': 'r@r',
-            'password': 'recipient'
+            'email': 'r@test.com',
+            'password': 'Recipient1@'
         }
         
 

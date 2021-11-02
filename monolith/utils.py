@@ -3,7 +3,8 @@ from typing import AnyStr
 from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-ALLOWED_EMAILS = {'@hotmail.com', 
+ALLOWED_EMAILS = {'@test.com',
+                  '@hotmail.com', 
                   '@hotmail.it', 
                   '@outlook.com', 
                   '@outlook.it', 
