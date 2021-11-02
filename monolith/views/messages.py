@@ -75,12 +75,15 @@ def mailbox():
     
     # Retrieve sent messages of user <id>
     sent_messages = db.session.query(Message).filter(
-        Message.sender_id==id, Message.access.op('&')(Access.SENDER.value), ~Message.is_draft
+        Message.sender_id==id, Message.access.op('&')(Access.SENDER.value), 
+        ~Message.is_draft,
+        Message.is_delivered
     )
     
     # Retrieve recieved messages of user <id>
     received_messages = db.session.query(Message).filter(
-        Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value)
+        Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value),
+        Message.is_delivered
     )
     
     # Retrieve draft messages of user <id>
