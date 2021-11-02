@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, abort
+from flask import Blueprint, redirect, render_template, request, abort, flash
 from flask_login import current_user
 from sqlalchemy import or_, and_
 import bleach
@@ -130,6 +130,7 @@ def create_message():
     user_id = current_user.get_id()
 
     if request.method == 'POST':
+        error = None
         # Save the choices of recipients.
         form.users_list.choices = form.users_list.data
         
@@ -194,11 +195,9 @@ def create_message():
                             db.session.commit()
                 return redirect('/mailbox')
 
-        '''
-            This is the case of invalid form.
-            TODO: stay on the same form without losing input and show an error message.
-        '''
-        return redirect('/create_message')
+        else: 
+            error = "Delivery date must be in the future!"
+            return render_template('/create_message.html',form=form,error = error)
     
     # GET
     else:

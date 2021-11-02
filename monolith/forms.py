@@ -5,7 +5,7 @@ from wtforms.fields.html5 import DateTimeLocalField
 from wtforms import SubmitField, DateField, SelectMultipleField, IntegerField
 from flask_wtf.file import FileField, FileAllowed
 from wtforms.widgets import HiddenInput
-
+from datetime import datetime
 
 class LoginForm(FlaskForm):
     email = f.StringField('Email', validators=[DataRequired()])
@@ -36,6 +36,14 @@ class MessageForm(FlaskForm):
     submit_button= SubmitField('Save')
     submit_button2= SubmitField('Send')
     display = ['text_area', 'delivery_date', 'users_list']
+
+    #check that the delivery date chosen isn't before current time
+    def validate_on_submit(self):
+        result = super(MessageForm, self).validate()
+        if (self.delivery_date.data<datetime.now()):
+            return False
+        else:
+            return result
 
 
 class SearchRecipientForm(FlaskForm):
