@@ -18,7 +18,7 @@ messages = Blueprint('messages', __name__)
 
 allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
                         'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'img', 'video', 'div', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
+                        'h1', 'h2', 'h3', 'img', 'video','p', 'div', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
 allowed_attrs = {'*': ['class','style','color'],
                         'a': ['href', 'rel'],
                         'img': ['src', 'alt','data-filename','style']}
@@ -206,9 +206,13 @@ def create_message():
             return redirect('/mailbox')
 
         else: 
-            error = 'Delivery date must be in the future!'
-            return render_template('/create_message.html', form=form, error=error)
-    
+            error = '''<h3>Wrong data provided!</h3><br/>
+             <input type="button" onclick="history.back();" value="Back"/><br/><br/>
+             Rules:<br/>
+             1. Delivery date must be in the future!<br/>
+             2. Recipient field can\'t be empty!'''
+            #return render_template('/create_message.html', form=form, error=error)
+            return render_template('/error.html', form=form, error=error)
     # GET
     else:
         form.users_list.choices = [

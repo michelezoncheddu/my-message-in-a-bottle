@@ -1,6 +1,6 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Email, InputRequired, Length
+from wtforms.validators import DataRequired, Email, InputRequired, Length,ValidationError
 from wtforms.fields.html5 import DateTimeLocalField
 from wtforms import SubmitField, DateField, SelectMultipleField, IntegerField
 from flask_wtf.file import FileField, FileAllowed
@@ -62,7 +62,9 @@ class MessageForm(FlaskForm):
         result = super(MessageForm, self).validate()
         if (self.delivery_date.data<datetime.now()):
             return False
-        else:
+        elif (self.submit_button2.data) and (self.users_list.data == []):
+            return False
+        else:        
             return result
 
 
@@ -74,3 +76,6 @@ class SearchRecipientForm(FlaskForm):
 class AddRecipientForm(FlaskForm):
     search_recipient = f.SelectMultipleField('none')
     display = ['add_recipient']
+
+
+
