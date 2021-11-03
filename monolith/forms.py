@@ -60,7 +60,7 @@ class MessageForm(FlaskForm):
     #check that the delivery date chosen isn't before current time
     def validate_on_submit(self):
         result = super(MessageForm, self).validate()
-        if (self.delivery_date.data<datetime.now()):
+        if self.delivery_date.data < datetime.now():
             return False
         elif (self.submit_button2.data) and (self.users_list.data == []):
             return False
@@ -76,6 +76,3 @@ class SearchRecipientForm(FlaskForm):
 class AddRecipientForm(FlaskForm):
     search_recipient = f.SelectMultipleField('none')
     display = ['add_recipient']
-
-
-
