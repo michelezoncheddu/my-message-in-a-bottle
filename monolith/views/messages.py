@@ -1,6 +1,5 @@
-from flask import Blueprint, redirect, render_template, request, abort, flash
+from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
-from sqlalchemy import or_, and_
 import bleach
 from better_profanity import profanity
 
@@ -8,7 +7,7 @@ from .users import get_users
 
 from ..access import Access
 from ..auth import login_required
-from ..utils import save_image
+from ..utils import get_argument, save_image
 
 from monolith.database import User, Message, BlackList, db
 from monolith.forms import MessageForm
@@ -75,14 +74,16 @@ def mailbox():
     
     # Retrieve sent messages of user <id>
     sent_messages = db.session.query(Message).filter(
-        Message.sender_id==id, Message.access.op('&')(Access.SENDER.value), 
+        Message.sender_id==id,
+        Message.access.op('&')(Access.SENDER.value), 
         ~Message.is_draft,
         Message.is_delivered
     )
     
     # Retrieve recieved messages of user <id>
     received_messages = db.session.query(Message).filter(
-        Message.recipient_id==id, Message.access.op('&')(Access.RECIPIENT.value),
+        Message.recipient_id==id,
+        Message.access.op('&')(Access.RECIPIENT.value),
         Message.is_delivered
     )
     
@@ -107,7 +108,7 @@ def message(message_id):
 
     _message_aux = _message
     # if language filter on
-    if (current_user.has_language_filter):
+    if current_user.has_language_filter:
         _message_aux = filter_language(_message)
 
     if request.method == 'GET':
@@ -121,11 +122,7 @@ def message(message_id):
     db.session.commit()
     return {'msg': 'message deleted'}, 200
 
-'''
-    Examples of usage:
-    - (GET) localhost:5000/create_message
-    - (GET) localhost:5000/create_message?draft_id=2
-'''
+
 @messages.route('/create_message', methods=['GET', 'POST'])
 @login_required
 def create_message():
@@ -219,22 +216,9 @@ def create_message():
             (user.get_id(), user.get_email()) for user in get_users()
         ]
 
-        draft_id, forw_id, reply_id = None, None, None
-        # TODO: check if the argument exist, so to avoid try-except.
-        try:
-            draft_id = int(request.args.get('draft_id'))
-        except:
-            pass  # This is safe, draft_id will be ignored.
-        
-        try:
-            forw_id = int(request.args.get('forw_id'))
-        except:
-            pass  # This is safe, forw_id will be ignored.
-        
-        try:
-            reply_id = int(request.args.get('reply_id'))
-        except:
-            pass  # This is safe, recipient_id will be ignored.
+        draft_id = get_argument(request, 'draft_id', int)
+        forw_id = get_argument(request, 'forw_id', int)
+        reply_id = get_argument(request, 'reply_id', int)
 
         if draft_id is not None:
             message = retrieve_message(draft_id)
@@ -255,9 +239,9 @@ def create_message():
             if message.is_draft:
                 abort(400, 'you cannot forward a draft')
 
-            form.text_area.data = 'Forwarded: ' + message.get_text()
+            form.text_area.data = f'Forwarded: {message.get_text()}'
             #form.image_file.data = message.get_attachement()  # TODO: doesn't work
-        
+
         elif reply_id is not None:
             message = retrieve_message(reply_id)
             is_sender_or_recipient(message, user_id)
@@ -277,5 +261,3 @@ def create_message():
 def messages_draft():
     messages_draft = Message.query.filter_by(is_draft = True)
     return render_template('mailbox.html', messages=messages_draft)
-
-    

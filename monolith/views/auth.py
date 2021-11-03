@@ -15,8 +15,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email, password = form.data['email'], form.data['password']
-        q = db.session.query(User).filter(User.email == email)
-        user = q.first()
+        user = db.session.query(User).filter(User.email==email, User.is_active).first()
         if user is not None and user.authenticate(password):
             if not user.is_banned:
                 login_user(user)
@@ -27,7 +26,7 @@ def login():
     return render_template('login.html', form=form)
 
 
-@auth.route("/logout")
+@auth.route('/logout')
 def logout():
     logout_user()
     return redirect('/')
@@ -42,12 +41,11 @@ def unregister():
         password = current_user.get_password_hash()
         inserted_password = request.form['password']
         # unregistration confirmed
-        if (check_password_hash(password, inserted_password)):
-            unregister_user = User.query.filter_by(firstname=current_user.get_firstname()).first()
-            db.session.delete(unregister_user)
+        if check_password_hash(password, inserted_password):
+            unregister_user = User.query.filter_by(email=current_user.get_email()).first()
+            unregister_user.is_active = False
             db.session.commit()
             return redirect('/')
         # try again (password does not match)
         else:
-            error = "Wrong password, try again"
             return {'msg': 'Password does not match, try again'}, 400
