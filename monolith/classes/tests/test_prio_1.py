@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
             'firstname': 'testname',
             'lastname': 'testlastname',
             'password': 'Testpassword1@',
-            'date_of_birth': '9/10/2020',
+            'date_of_birth': '2020-10-09',
             'location': 'Pisa'
         }
 

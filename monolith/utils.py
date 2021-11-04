@@ -64,6 +64,7 @@ def allowed_email(email):
 # utility for checking validity of birth date
 def allowed_birth_date(birth_date):
     if birth_date > date.today():
+        print("OK")
         return False
 
     return True

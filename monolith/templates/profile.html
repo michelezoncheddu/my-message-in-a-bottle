@@ -18,7 +18,12 @@
     <div style="margin-bottom:10">
         <strong>Email</strong> 
         <input type="text" id="email" name="email" value= "{{ user.email }}" readonly style="margin-left: 49; margin-right: 60;">
-        <strong>Location</strong> <input type="text" id="location" name="location" value= "{{ user.location }}" readonly style="margin-left: 12;">
+        <strong>Location</strong> 
+        <input type="text" id="location" name="location" value= "{{ user.location }}" readonly style="margin-left: 12;">
+    </div>
+    <div style="margin-bottom:10">
+        <strong>Birth</strong> 
+        <input type="text" id="birth" name="birth" value= "{{ user.date_of_birth }}" readonly style="margin-left: 49; margin-right: 60;">
     </div>
     <br>
     {% if error %}

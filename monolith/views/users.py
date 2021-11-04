@@ -86,10 +86,11 @@ def profile():
                 return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
         # change profile info
         elif action == "Save":
-            if allowed_email(request.form.get('email')):
+            if allowed_email(request.form.get('email')) and allowed_birth_date(request.form.get('birth')):
                 current_user.firstname = request.form.get('firstname')
                 current_user.lastname = request.form.get('lastname')
                 current_user.email = request.form.get('email')
+                current_user.date_of_birth = request.form.get('birth')
                 current_user.location = request.form.get('location')
                 db.session.commit()
             else:
