@@ -179,8 +179,6 @@ def create_message():
             # Send.
             else:
                 for recipient in form.users_list.data:
-                    # TODO: delegate this to celery
-
                     if is_blocked(recipient):
                         continue
 

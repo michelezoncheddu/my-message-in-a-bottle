@@ -1,5 +1,4 @@
 from celery import Celery
-import os, time
 
 from datetime import datetime
 
@@ -11,22 +10,23 @@ BACKEND = BROKER = 'redis://localhost:6379/0'
 
 celery = Celery(__name__, broker=BROKER, backend=BACKEND)
 
-os.environ['TZ'] = 'Europe/Rome'
-time.tzset()
 _APP = None
 
 
-@celery.task
-def do_task():
+def lazy_init():
     global _APP
-    # lazy init
     if _APP is None:
         from monolith.app import create_app
         app = create_app()
         db.init_app(app)
     else:
         app = _APP
+    return app
 
+
+@celery.task
+def do_task():
+    app = lazy_init()
     print("I am checking your stuff")
     with app.app_context():
         messages = db.session.query(Message).filter(
@@ -46,11 +46,13 @@ def do_task():
 
 @celery.task
 def notify(id, message):
-    user = User.query.filter_by(id=id).first()
-    if not (user is not None and user.is_active):
-        return
-    
-    send_email(user.email, message)
+    app = lazy_init()
+    with app.app_context():
+        user = User.query.filter_by(id=id).first()
+        if not (user is not None and user.is_active):
+            return
+        
+        send_email(user.email, message)
     return 'done'
 
 
