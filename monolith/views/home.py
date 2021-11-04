@@ -11,7 +11,7 @@ def index():
         if current_user.is_admin:
             welcome = "Logged In as Admin!"
         else:
-            welcome = "Logged In!"
+            welcome = ""
     else:
         welcome = None
     return render_template("index.html", welcome=welcome)

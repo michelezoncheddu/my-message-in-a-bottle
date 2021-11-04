@@ -266,7 +266,7 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 200)
 
 
-        # create todelete account
+        """# create todelete account
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_todelete_user),
                     content_type='application/json', follow_redirects=True)
@@ -280,7 +280,7 @@ class Test(unittest.TestCase):
                 'submit': 'Submit', 
                 'firstname': 'todelete'}
         reply = tested_app.post('/delete_user', data=data)
-        self.assertEqual(reply.status_code, 302)
+        self.assertEqual(reply.status_code, 302)"""
 
 
         # /reported_users

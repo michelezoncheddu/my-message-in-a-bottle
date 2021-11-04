@@ -1,4 +1,5 @@
 from celery import Celery
+import os, time
 
 from datetime import datetime
 
@@ -6,11 +7,12 @@ from monolith.database import User, db, Message
 
 from .utils import send_email
 
-
-BACKEND = BROKER = 'redis://localhost:6379'
+BACKEND = BROKER = 'redis://localhost:6379/0'
 
 celery = Celery(__name__, broker=BROKER, backend=BACKEND)
 
+os.environ['TZ'] = 'Europe/Rome'
+time.tzset()
 _APP = None
 
 

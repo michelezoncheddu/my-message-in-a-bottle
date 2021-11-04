@@ -2,36 +2,29 @@
 {% block content %}
 
 <h1>My Message in a Bottle</h1>
-
+<br>
 {% if current_user.is_authenticated %}
   Hi {{ current_user.firstname }}!<br>
-  If you wish to unregister from our platform, <a href="/unregister">Unregister</a>
-    <h2>{{ welcome }}</h2>
+  <br>
+    {{ welcome }}
     {% if current_user.is_admin %}
     <div><a href="/reported_users">
       <button id='admin_button' name='admin_button'><strong>Reported Users</strong></button>
     </a></div>
     {% endif %}
-    <br><br>
-    <a href="/profile"> 
-      <button>Profile</button>
-    </a>
+    
     <a href="/users"> 
-      <button>User List</button>
+      <button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">User List</button>
     </a>
     <a href="/blacklist"> 
-      <button>Black List</button>
+      <button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Black List</button>
     </a>
-    <br><br>
-    <div><a href="/mailbox"> 
-      <button>Mailbox</button>
-    </a>
-    <a href="/create_message"> 
-      <button>Write a message</button>
-    </a></div>
+    <br><br><br><br>
+    If you wish to unregister from our platform, <a href="/unregister">Unregister</a>
 {% else %}
-  Hi Anonymous, <a href="/login">Log in</a><br>
-  If you don't have an account you can create one, <a href="/create_user">Signup</a>
+  Hi Anonymous <br><br>
+  <a href="/login"><button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Sign in</button></a>
+  <a href="/create_user"><button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Sign up</button></a>
 {% endif %}
 
 {% endblock %}
