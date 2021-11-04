@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
             'firstname': 'tounregister',
             'lastname': 'tounregister',
             'password': 'Tounregister1@',
-            'dateofbirth': '9/10/2020',
+            'date_of_birth': '9/10/2020',
             'location': 'Pisa'
         }
         self.tounregister_user = {
@@ -48,7 +48,7 @@ class Test(unittest.TestCase):
             'firstname': 'todelete',
             'lastname': 'todelete',
             'password': 'Todelete1@',
-            'dateofbirth': '9/10/2020',
+            'date_of_birth': '9/10/2020',
             'location': 'Pisa'
         }
         self.todelete_user = {
@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
             'firstname': 'toreject',
             'lastname': 'toreject',
             'password': 'Toreject1@',
-            'dateofbirth': '9/10/2020',
+            'date_of_birth': '9/10/2020',
             'location': 'Pisa'
         }
         # dummy user for testing ban 1
@@ -70,7 +70,7 @@ class Test(unittest.TestCase):
             'firstname': 'toban1',
             'lastname': 'toban1',
             'password': 'Toban1@',
-            'dateofbirth': '9/10/2020',
+            'date_of_birth': '9/10/2020',
             'location': 'Pisa'
         }
         self.toban1_user = {
@@ -83,7 +83,7 @@ class Test(unittest.TestCase):
             'firstname': 'toban2',
             'lastname': 'toban2',
             'password': 'Toban2@',
-            'dateofbirth': '9/10/2020',
+            'date_of_birth': '9/10/2020',
             'location': 'Pisa'
         }
         self.toban2_user = {

@@ -165,7 +165,6 @@ def reported_users():
 @users.route('/create_user', methods=['POST', 'GET'])
 def create_user():
     form = UserForm()
-
     if request.method == 'POST':
         result = form.validate_on_submit()
         if result[0]:

@@ -4,6 +4,7 @@ function DeleteMessage(id) {
     var xhttp = new XMLHttpRequest()
     xhttp.open("DELETE", "/message/" + id, true)
     xhttp.send()
+    window.location.href = "/mailbox"
 }
 
 // Enable edit on readonly text

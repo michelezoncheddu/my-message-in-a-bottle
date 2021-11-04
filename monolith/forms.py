@@ -1,9 +1,8 @@
 import wtforms as f
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Email, InputRequired, Length,ValidationError
-from wtforms.fields.html5 import DateTimeLocalField
-from wtforms import SubmitField, DateField, SelectMultipleField, IntegerField
-from flask_wtf.file import FileField, FileAllowed
+from wtforms.validators import DataRequired
+from wtforms.fields.html5 import DateTimeLocalField, DateField
+from wtforms import SubmitField, SelectMultipleField, IntegerField
 from wtforms.widgets import HiddenInput
 from datetime import datetime
 
@@ -20,9 +19,9 @@ class UserForm(FlaskForm):
     firstname = f.StringField('First Name', validators=[DataRequired()])
     lastname = f.StringField('Last Name', validators=[DataRequired()])
     password = f.PasswordField('Password', validators=[DataRequired()])
-    dateofbirth = DateField('Date of Birth', format='%d/%m/%Y')
+    date_of_birth = DateField('Date of Birth')
     location = f.StringField('Location', validators=[DataRequired()])
-    display = ['email', 'firstname', 'lastname', 'password', 'dateofbirth', 'location']
+    display = ['email', 'firstname', 'lastname', 'password', 'date_of_birth', 'location']
 
     def validate_on_submit(self):
         result = super(UserForm, self).validate()
@@ -35,7 +34,7 @@ class UserForm(FlaskForm):
         if not allowed_password(self.password.data):
             return [False, "password must be of length between 5 and 25 and contain at least one upper case, one number and one special character!"]
         # check birth date is in the past
-        if not allowed_birth_date(self.dateofbirth.data):
+        if not allowed_birth_date(self.date_of_birth.data):
             return [False, "date of birth must be in the past"]
 
         return [result, ""]
@@ -50,22 +49,19 @@ class UserDelForm(FlaskForm):
 
 class MessageForm(FlaskForm):
     message_id_hidden = IntegerField(widget=HiddenInput(), default=-1)
-    text_area = f.TextAreaField('Write your message here!',id='text')
-    delivery_date = DateTimeLocalField('Delivery Date', validators=[InputRequired()], format='%Y-%m-%dT%H:%M')
+    text_area = f.TextAreaField('Write your message here!', id='text')
+    delivery_date = DateTimeLocalField('Delivery Date', validators=[DataRequired()], format='%Y-%m-%dT%H:%M')
     users_list = SelectMultipleField('Select recipients', id='users_list')
-    submit_button= SubmitField('Save')
-    submit_button2= SubmitField('Send')
+    submit_button = SubmitField('Save')
+    submit_button2 = SubmitField('Send')
     display = ['text_area', 'delivery_date', 'users_list']
 
-    #check that the delivery date chosen isn't before current time
+    # check that the delivery date chosen isn't before current time
     def validate_on_submit(self):
-        result = super(MessageForm, self).validate()
-        if self.delivery_date.data < datetime.now():
+        if self.delivery_date.data is None or self.delivery_date.data < datetime.now():
             return False
-        elif (self.submit_button2.data) and (self.users_list.data == []):
+        if (self.submit_button2.data) and (self.users_list.data == []):
             return False
-        else:        
-            return result
 
 
 class SearchRecipientForm(FlaskForm):

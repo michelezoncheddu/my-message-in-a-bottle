@@ -2,7 +2,7 @@ import os, time
 
 from flask import Flask
 
-from datetime import datetime
+from datetime import date, datetime
 
 from monolith.auth import login_manager
 from monolith.database import User, Message, db
@@ -50,7 +50,7 @@ def create_app():
             example.firstname = 'admin'
             example.lastname = 'admin'
             example.email = 'admin@test.com'
-            example.date_of_birth = datetime(2020, 10, 5)
+            example.date_of_birth = date(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
             example.is_admin = True
@@ -63,7 +63,7 @@ def create_app():
             example.firstname = 'sender'
             example.lastname = 'sender'
             example.email = 's@test.com'
-            example.date_of_birth = datetime(2020, 10, 5)
+            example.date_of_birth = date(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
             example.is_admin = False
@@ -76,7 +76,7 @@ def create_app():
             example.firstname = 'recipient'
             example.lastname = 'recipient'
             example.email = 'r@test.com'
-            example.date_of_birth = datetime(2020, 10, 5)
+            example.date_of_birth = date(2020, 10, 5)
             example.location = 'Pisa'
             example.profile_pic = 'static/profile/default.png'
             example.is_admin = False
