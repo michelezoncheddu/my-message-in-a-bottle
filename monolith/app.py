@@ -1,3 +1,5 @@
+import os, time
+
 from flask import Flask
 
 from datetime import datetime
@@ -13,6 +15,9 @@ allowed_tags_sum = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
 allowed_attrs_sum = {'*': ['class','style','color'],
                         'a': ['href', 'rel'],
                         'img': ['src', 'alt','data-filename','style']}
+
+os.environ['TZ'] = 'Europe/Rome'
+time.tzset()
 
 
 def create_app():
