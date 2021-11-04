@@ -38,6 +38,12 @@ class Test(unittest.TestCase):
         tested_app = app.test_client()
         #self.draft={'draft_id':'2'}
 
+        # Test with user not logged in.
+        reply = tested_app.get('/create_message?draft_id=2')
+
+        
+        self.assertEqual(reply.status_code, 401)
+
         # Login with the user
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
 
@@ -47,12 +53,11 @@ class Test(unittest.TestCase):
 
         # Test with user not logged in.
         self.assertEqual(reply.status_code, 200)
-        reply = tested_app.get('/create_message?draft_id=1')
+        
 
-        # Test with user not logged in.
-        self.assertEqual(reply.status_code, 401)
         
         reply = tested_app.get('/create_message')
+        
         self.assertEqual(reply.status_code, 200)
         # Check if the html returned page is the create message page
         self.assertIn(b'essage', reply.data)
@@ -60,12 +65,12 @@ class Test(unittest.TestCase):
         # Login with the user
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
 
-        #TODO: GET /create_message?draft_id=1
-        reply = tested_app.get('/create_message?draft_id=1')
-        #TODO: GET /create_message?forw_id=1
-        reply = tested_app.get('/create_message?forw_id=1')
-        #TODO: GET /create_message?reply_id=1
-        reply = tested_app.get('/create_message?reply_id=1')
+        #TODO: GET /create_message?draft_id=2
+        reply = tested_app.get('/create_message?draft_id=2')
+        #TODO: GET /create_message?forw_id=2
+        reply = tested_app.get('/create_message?forw_id=2')
+        #TODO: GET /create_message?reply_id=2
+        reply = tested_app.get('/create_message?reply_id=2')
 
 
     def test_message_post(self): 

@@ -355,4 +355,4 @@ flake8-report/
 unicode_characters/
 wordlist/
 
-runCelery.sh
+.token.txt

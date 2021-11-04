@@ -1,7 +1,7 @@
 from celery import Celery
 import os, time
 
-from datetime import datetime,timezone
+from datetime import datetime
 
 from monolith.database import User, db, Message
 
