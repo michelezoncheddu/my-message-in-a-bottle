@@ -62,6 +62,8 @@ class MessageForm(FlaskForm):
             return False
         if (self.submit_button2.data) and (self.users_list.data == []):
             return False
+        
+        return True
 
 
 class SearchRecipientForm(FlaskForm):
