@@ -94,6 +94,7 @@ class BlackList(db.Model):
     def __init__(self, *args, **kw):
         super(BlackList, self).__init__(*args, **kw)
 
+
 class Message(db.Model):
 
     __tablename__ = 'messages'
@@ -107,6 +108,7 @@ class Message(db.Model):
     last_update_date = db.Column(db.DateTime)
     access = db.Column(db.Integer, default=Access.ALL.value)  # Access rights.
     is_delivered = db.Column(db.Boolean, default=False)
+    is_read = db.Column(db.Boolean, default=False)
     attachment = db.Column(db.String, default=None)
 
     def __init__(self, *args, **kw):

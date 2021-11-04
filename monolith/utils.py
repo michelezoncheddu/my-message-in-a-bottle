@@ -1,4 +1,5 @@
-import os
+import os, smtplib, ssl
+
 from werkzeug.utils import secure_filename
 
 from datetime import datetime
@@ -76,3 +77,23 @@ def get_argument(request, arg, type):
         return request.args.get(arg, type=type)
     except:
         return None
+
+
+def send_email(email, message):
+    password = None
+    with open('token.txt') as f:
+        password = f.readline()
+
+    smtp_server = 'smtp-relay.sendinblue.com'
+    port = 465
+    sender_email = 'm.zoncheddu@studenti.unipi.it'
+    receiver_email = email
+    message = f'''\
+    Subject: MyMessageInABottle - Notification
+
+    {message}'''
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)

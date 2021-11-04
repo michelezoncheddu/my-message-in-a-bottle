@@ -7,6 +7,7 @@ from .users import get_users
 
 from ..access import Access
 from ..auth import login_required
+from ..background import notify
 from ..utils import get_argument, save_image
 
 from monolith.database import User, Message, BlackList, db
@@ -112,6 +113,10 @@ def message(message_id):
         _message_aux = filter_language(_message)
 
     if request.method == 'GET':
+        if not _message.is_read:
+            notify.delay(_message.get_sender(), 'Your message has been read!')
+            _message.is_read = True
+            db.session.commit()
         return render_template('message.html', message=_message_aux)
     
     # DELETE for the point of view of the current user.
