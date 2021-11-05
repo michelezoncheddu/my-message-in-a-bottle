@@ -5,6 +5,7 @@ from celery import Celery
 from datetime import datetime
 
 from monolith.database import User, db, Message
+#from access import Access
 
 from .utils import send_email
 
@@ -55,7 +56,7 @@ def notify(id, message):
     with app.app_context():
         user = User.query.filter_by(id=id).first()
         if not (user is not None and user.is_active):
-            return
+            return 'notDone'
         
         send_email(user.email, message)
     return 'done'
@@ -66,7 +67,6 @@ def lottery():
     app = lazy_init()
     with app.app_context():
         import random
-        from sqlalchemy import func
         rowCount = int(User.query.count())
         randomNum=random.randrange(0,rowCount)
         randomUser = User.query.filter_by(id=randomNum).first()
@@ -78,7 +78,7 @@ def lottery():
         notify.delay(randomUser.id,message)
         #randomUser.bonus+=1
         #db.session.commit()
-        return 'Estratto: '+str(randomUser.id)  
+        return 'Estratto'
 
 
 @celery.on_after_configure.connect
