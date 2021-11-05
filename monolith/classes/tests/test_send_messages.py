@@ -136,7 +136,7 @@ class Test(unittest.TestCase):
         # Check POST create_message SEND with wrong date
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 409)
 
         self.message = {
             'text_area': 'text',
@@ -147,7 +147,7 @@ class Test(unittest.TestCase):
         # Check POST create_message SEND without recipient
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 409)
         
         self.message = {
             'text_area': 'text',
@@ -158,7 +158,7 @@ class Test(unittest.TestCase):
         # Check POST create_message SAVE with wrong date
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 409)
 
 
 
@@ -177,13 +177,6 @@ class Test(unittest.TestCase):
         Message.delivery_date = '10/10/2022'
         Message.text = 'Asshole'
         self.assertEqual({'recipient_id': '1', 'delivery_date': '10/10/2022', 'text': '****'}, filter_language(tocensor_message))
-
-
-    def test_message_read_draft(self):
-        tested_app = app.test_client()
-        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
-        reply = tested_app.get('/messages/draft')
-        self.assertEqual(reply.status_code, 200)
 
         
 

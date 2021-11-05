@@ -17,6 +17,6 @@ class Test(unittest.TestCase):
         self.assertEqual(reply, 'done')
 
     def test_lottery(self):
-        bg.lottery()   
+        bg.do_lottery()   
         #self.assertEqual(reply, 'Estratto')    
 

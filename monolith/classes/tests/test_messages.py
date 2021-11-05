@@ -49,7 +49,7 @@ class Test(unittest.TestCase):
         parsed = bs(reply.data, 'html.parser')
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
-        assert(len(sent_messages) == 0)
+        assert(len(sent_messages) == 1)
 
         # Get list of received messages.
         parent = parsed.find(id='received').find('ul')
@@ -72,7 +72,7 @@ class Test(unittest.TestCase):
 
         # Existent message of other users.
         reply = tested_app.get('/message/1')
-        self.assertEqual(reply.status_code, 401)
+        self.assertEqual(reply.status_code, 403)
         
         tested_app = app.test_client()
     
@@ -93,11 +93,11 @@ class Test(unittest.TestCase):
         parsed = bs(reply.data, 'html.parser')
         parent = parsed.find(id='sent').find('ul')
         sent_messages = parent.find_all('li')
-        assert(len(sent_messages) == 0)
+        assert(len(sent_messages) == 1)
 
         # Edit an alredy sent message
         reply = tested_app.get('/create_message?draft_id=1')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 403)
 
         # Edit a draft
         reply = tested_app.get('/create_message?draft_id=2')
@@ -105,11 +105,11 @@ class Test(unittest.TestCase):
 
         # Forward a draft
         reply = tested_app.get('/create_message?forw_id=2')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 403)
 
         # Reply to a draft
         reply = tested_app.get('/create_message?reply_id=2')
-        self.assertEqual(reply.status_code, 400)
+        self.assertEqual(reply.status_code, 403)
         
         # Forward message
         reply = tested_app.get('/create_message?forw_id=1')
@@ -125,7 +125,7 @@ class Test(unittest.TestCase):
 
         # Delete unexistent message.
         reply = tested_app.delete('/message/1')
-        self.assertEqual(reply.status_code, 401)
+        self.assertEqual(reply.status_code, 403)
 
         # Delete message of other users.
         reply = tested_app.delete('/message/4')
