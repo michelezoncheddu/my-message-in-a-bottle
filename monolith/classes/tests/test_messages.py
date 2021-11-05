@@ -60,7 +60,6 @@ class Test(unittest.TestCase):
         #for i, message in enumerate(sent_messages):
         #   assert(message.text.strip() == f'{i+1} message from 1 to 1 n.{i+1} 1 1')
 
-
     def test_message(self):
         tested_app = app.test_client()
     

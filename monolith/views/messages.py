@@ -1,6 +1,6 @@
+import bleach
 from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
-import bleach
 from better_profanity import profanity
 
 from .users import get_users
@@ -17,11 +17,12 @@ from monolith.forms import MessageForm
 messages = Blueprint('messages', __name__)
 
 allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'img', 'video','p', 'div', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
+                'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
+                'h1', 'h2', 'h3', 'img', 'video','p', 'div', 'iframe', 'br', 'span', 'hr', 'src', 'class','font','u']
+
 allowed_attrs = {'*': ['class','style','color'],
-                        'a': ['href', 'rel'],
-                        'img': ['src', 'alt','data-filename','style']}
+                 'a': ['href', 'rel'],
+                 'img': ['src', 'alt','data-filename','style']}
 
 
 # profanity filter ('en' only)
@@ -90,7 +91,9 @@ def mailbox():
     
     # Retrieve draft messages of user <id>
     draft_messages = db.session.query(Message).filter(
-        Message.sender_id==id, Message.is_draft
+        Message.sender_id==id,
+        Message.access.op('&')(Access.SENDER.value),
+        Message.is_draft
     )
     
     return render_template('mailbox.html', sent_messages=sent_messages,
@@ -113,7 +116,7 @@ def message(message_id):
         _message_aux = filter_language(_message)
 
     if request.method == 'GET':
-        if not _message.is_read:
+        if _message.get_recipient() != user_id and not _message.is_draft and not _message.is_read:
             notify.delay(_message.get_sender(), 'Your message has been read!')
             _message.is_read = True
             db.session.commit()
@@ -139,19 +142,7 @@ def create_message():
         error = None
         # Save the choices of recipients.
         form.users_list.choices = form.users_list.data
-        
         if form.validate_on_submit():
-            '''
-            filename = ''
-            file = form.image_file.data
-            if 'image_file' not in request.files:
-                filename = ''
-            if file:
-                filename = form.image_file.data.filename
-                file = form.image_file.data
-                filename = save_image(file, ATTACHMENTS_PATH)
-            '''
-
             clean_text = bleach.clean(form.text_area.data, tags=allowed_tags, strip=True,
                 attributes=allowed_attrs, protocols=['data'], styles='background-color'
             )

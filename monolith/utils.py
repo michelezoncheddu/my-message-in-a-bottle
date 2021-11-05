@@ -2,7 +2,7 @@ import os, smtplib, ssl
 
 from werkzeug.utils import secure_filename
 
-from datetime import datetime
+from datetime import date
 
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
@@ -63,7 +63,7 @@ def allowed_email(email):
 
 # utility for checking validity of birth date
 def allowed_birth_date(birth_date):
-    if birth_date > datetime.today().date():
+    if birth_date > date.today():
         return False
 
     return True
