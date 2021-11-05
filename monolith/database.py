@@ -19,6 +19,7 @@ class User(db.Model):
     password = db.Column(db.Unicode(128))
     date_of_birth = db.Column(db.Date)
     location = db.Column(db.Unicode(128))
+    bonus = db.Column(db.Integer, default=0)
     # booleans
     has_language_filter = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
