@@ -100,6 +100,7 @@ def create_app():
             example.delivery_date = now
             example.last_update_date = now
             example.is_draft = False
+            example.is_delivered = True
             db.session.add(example)
             
             example = Message()

@@ -1,4 +1,5 @@
 import bleach
+import json
 from flask import Blueprint, redirect, render_template, request, abort
 from flask_login import current_user
 from better_profanity import profanity
@@ -154,7 +155,6 @@ def message(message_id):
 def create_message():
     form = MessageForm()
     user_id = current_user.get_id()
-    print('PROVA')
 
     if request.method == 'POST':
         error = None
@@ -279,9 +279,41 @@ def create_message():
         return render_template('create_message.html', form=form)
 
 
-# List of draft messages.
-@messages.route('/messages/draft')
+@messages.route('/calendar')
 @login_required
-def messages_draft():
-    messages_draft = Message.query.filter_by(is_draft = True)
-    return render_template('mailbox.html', messages=messages_draft)
+def calendar():
+    id = current_user.get_id()
+    
+    sent_messages = db.session.query(Message).filter(
+        Message.sender_id==id,
+        Message.access.op('&')(Access.SENDER.value), 
+        ~Message.is_draft,
+        Message.is_delivered
+    )
+    
+    received_messages = db.session.query(Message).filter(
+        Message.recipient_id==id,
+        Message.access.op('&')(Access.RECIPIENT.value),
+        Message.is_delivered
+    )
+
+    sent_messages = [
+        {
+            'time': str(message.delivery_date),
+            'cls': 'bg-orange-alt',
+            'desc': message.recipient_id
+        } for message in sent_messages
+    ]
+
+    received_messages = [
+        {
+            'time': str(message.delivery_date),
+            'cls': 'bg-sky-blue-alt',
+            'desc': message.sender_id
+        } for message in received_messages
+    ]
+    
+    return render_template(
+        'calendar.html',
+        data=json.dumps(sent_messages + received_messages),
+    )
