@@ -220,7 +220,11 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if not message.is_draft:
-                abort(400, 'not a draft')
+                error = '''<h3>Wrong data provided!</h3><br/>
+                        <input type="button" onclick="history.back();" value="Back"/><br/><br/>
+                        Error: The message is not a draft!'''
+                 
+                return render_template('/error.html', form=form, error=error),400
 
             form.message_id_hidden.data = message.get_id()
             form.text_area.data = message.get_text()
@@ -232,7 +236,11 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if message.is_draft:
-                abort(400, 'you cannot forward a draft')
+                error = '''<h3>Wrong data provided!</h3><br/>
+                        <input type="button" onclick="history.back();" value="Back"/><br/><br/>
+                        Error: you can't forward a draft! '''
+                 
+                return render_template('/error.html', form=form, error=error),400
 
             form.text_area.data = f'Forwarded: {message.get_text()}'
             #form.image_file.data = message.get_attachement()  # TODO: doesn't work
@@ -242,7 +250,11 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if message.is_draft:
-                abort(404, 'you cannot reply to a draft')
+                error = '''<h3>Wrong data provided!</h3><br/>
+                        <input type="button" onclick="history.back();" value="Back"/><br/><br/>
+                        Error: you cannot reply to a draft! '''
+                 
+                return render_template('/error.html', form=form, error=error),400
 
             form.text_area.data = 'Reply: '
             form.users_list.choices = [(message.get_sender(), message.get_sender())]
