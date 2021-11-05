@@ -138,7 +138,7 @@ def message(message_id):
             notify.delay(_message.get_sender(), 'Your message has been read!')
             _message.is_read = True
             db.session.commit()
-        return render_template('message.html', message=_message_aux)
+        return render_template('message.html', message=_message_aux, user=current_user)
     
     # DELETE for the point of view of the current user.
     if _message.sender_id == user_id:
