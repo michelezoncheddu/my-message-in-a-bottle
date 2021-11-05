@@ -68,6 +68,24 @@ def is_sender_or_recipient(message, user_id):
         abort(401, 'unauthorized')
 
 
+@messages.route('/schedule')
+@login_required
+def schedule():
+    # Retrieve user <id>
+    id = current_user.get_id()
+
+    # Retrieve scheduled messages of user <id> that will be sent in the future
+    scheduled_messages = db.session.query(Message).filter(
+        Message.sender_id==id,
+        Message.access.op('&')(Access.SENDER.value),
+        ~Message.is_draft,
+        ~Message.is_delivered
+    )
+
+    return render_template('schedule.html', scheduled_messages=scheduled_messages)
+
+
+
 @messages.route('/mailbox')
 @login_required
 def mailbox():

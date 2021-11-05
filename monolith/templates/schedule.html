@@ -1,0 +1,17 @@
+{% extends "template.html" %}
+{% block content %}
+
+<div>
+  <div id='scheduled'>
+    <h2>Scheduled messages</h2>
+    <ul>
+      {% for message in scheduled_messages: %}
+        <li>
+          <a href="/message/{{message.id}}">To</a> {{message.recipient_id}} {{message.text|jBleach|safe}}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
