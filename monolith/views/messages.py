@@ -64,10 +64,13 @@ def is_sender_or_recipient(message, user_id):
 
     if (not (is_sender or is_recipient)
         or (is_sender and not message.access & Access.SENDER.value)
-        or (is_recipient and not message.access & Access.RECIPIENT.value)
-    ):
-        abort(401, 'unauthorized')
-
+        or (is_recipient and (not message.access & Access.RECIPIENT.value
+                              or message.is_draft
+                              or not message.is_delivered)
+           )
+       ):
+        abort(403, 'Forbidden')
+    
 
 @messages.route('/schedule')
 @login_required
@@ -84,7 +87,6 @@ def schedule():
     )
 
     return render_template('schedule.html', scheduled_messages=scheduled_messages)
-
 
 
 @messages.route('/mailbox')
@@ -141,6 +143,14 @@ def message(message_id):
             db.session.commit()
         return render_template('message.html', message=_message_aux, user=current_user)
     
+    # Delete scheduled message using bonus
+    if not _message.is_draft and not _message.is_delivered and current_user.bonus > 0:
+        user = db.session.query(User).filter(User.id==user_id).first()
+        user.bonus -= 1
+        _message.access -= Access.SENDER.value
+        db.session.commit()
+        return render_template('/schedule')
+
     # DELETE for the point of view of the current user.
     if _message.sender_id == user_id:
         _message.access -= Access.SENDER.value
@@ -216,13 +226,13 @@ def create_message():
             return redirect('/mailbox')
 
         else: 
-            error = '''<h3>Wrong data provided!</h3><br/>
-             <input type="button" onclick="history.back();" value="Back"/><br/><br/>
-             Rules:<br/>
-             1. Delivery date must be in the future!<br/>
-             2. Recipient field can\'t be empty!'''
-            #return render_template('/create_message.html', form=form, error=error)
-            return render_template('/error.html', form=form, error=error),400
+            error = ''' 
+                Rules:<br/>  
+                    1. Delivery date must be in the future!<br/>
+                    2. Recipient field can\'t be empty!
+                    '''
+            # Conflict
+            return render_template('/error.html', error=error), 409
     # GET
     else:
         form.users_list.choices = [
@@ -238,11 +248,9 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if not message.is_draft:
-                error = '''<h3>Wrong data provided!</h3><br/>
-                        <input type="button" onclick="history.back();" value="Back"/><br/><br/>
-                        Error: The message is not a draft!'''
-                 
-                return render_template('/error.html', form=form, error=error),400
+                error = 'Error: The message is not a draft!'
+                # Forbidden
+                return render_template('/error.html', error=error),403
 
             form.message_id_hidden.data = message.get_id()
             form.text_area.data = message.get_text()
@@ -253,12 +261,12 @@ def create_message():
             message = retrieve_message(forw_id)
             is_sender_or_recipient(message, user_id)
 
-            if message.is_draft:
-                error = '''<h3>Wrong data provided!</h3><br/>
-                        <input type="button" onclick="history.back();" value="Back"/><br/><br/>
-                        Error: you can't forward a draft! '''
-                 
-                return render_template('/error.html', form=form, error=error),400
+            # draft or scheduled message
+            if message.is_draft or not message.is_delivered:
+                error = 'Error: you can\'t forward this message!'
+                
+                # Forbidden
+                return render_template('/error.html', error=error), 403
 
             form.text_area.data = f'Forwarded: {message.get_text()}'
             #form.image_file.data = message.get_attachement()  # TODO: doesn't work
@@ -267,12 +275,11 @@ def create_message():
             message = retrieve_message(reply_id)
             is_sender_or_recipient(message, user_id)
 
-            if message.is_draft:
-                error = '''<h3>Wrong data provided!</h3><br/>
-                        <input type="button" onclick="history.back();" value="Back"/><br/><br/>
-                        Error: you cannot reply to a draft! '''
-                 
-                return render_template('/error.html', form=form, error=error),400
+            if message.is_draft or not message.is_delivered:
+                error = 'Error: you can\'t reply this message!'
+                
+                # Forbidden
+                return render_template('/error.html', error=error), 403
 
             form.text_area.data = 'Reply: '
             form.users_list.choices = [(message.get_sender(), message.get_sender())]

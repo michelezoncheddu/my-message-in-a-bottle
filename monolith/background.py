@@ -5,7 +5,6 @@ from celery import Celery
 from datetime import datetime
 
 from monolith.database import User, db, Message
-#from access import Access
 
 from .access import Access
 from .utils import send_email
