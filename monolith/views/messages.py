@@ -103,7 +103,7 @@ def mailbox():
         Message.is_delivered
     )
     
-    # Retrieve recieved messages of user <id>
+    # Retrieve received messages of user <id>
     received_messages = db.session.query(Message).filter(
         Message.recipient_id==id,
         Message.access.op('&')(Access.RECIPIENT.value),
@@ -118,7 +118,7 @@ def mailbox():
     )
     
     return render_template('mailbox.html', sent_messages=sent_messages,
-                                           recieved_messages=received_messages,
+                                           received_messages=received_messages,
                                            draft_messages=draft_messages
     )
 
@@ -137,11 +137,12 @@ def message(message_id):
         _message_aux = filter_language(_message)
 
     if request.method == 'GET':
-        if _message.get_recipient() != user_id and not _message.is_draft and not _message.is_read:
+        if _message.get_recipient() == user_id and not _message.is_draft \
+           and not _message.is_read and _message.is_delivered:
             notify.delay(_message.get_sender(), 'Your message has been read!')
             _message.is_read = True
             db.session.commit()
-        return render_template('message.html', message=_message_aux)
+        return render_template('message.html', user=current_user, message=_message_aux)
     
     # Delete scheduled message using bonus
     if not _message.is_draft and not _message.is_delivered and current_user.bonus > 0:
@@ -282,7 +283,7 @@ def create_message():
                 return render_template('/error.html', error=error), 403
 
             form.text_area.data = 'Reply: '
-            form.users_list.choices = [(message.get_sender(), message.get_sender())]
+            form.users_list.choices = [(message.get_sender(), message.get_sender())]  # TODO: write email of sender
         
         return render_template('create_message.html', form=form)
 
@@ -309,7 +310,8 @@ def calendar():
         {
             'time': str(message.delivery_date),
             'cls': 'bg-orange-alt',
-            'desc': message.recipient_id
+            'desc': message.recipient_id,
+            'msg_id': message.id
         } for message in sent_messages
     ]
 
@@ -317,7 +319,8 @@ def calendar():
         {
             'time': str(message.delivery_date),
             'cls': 'bg-sky-blue-alt',
-            'desc': message.sender_id
+            'desc': message.sender_id,
+            'msg_id': message.id
         } for message in received_messages
     ]
     

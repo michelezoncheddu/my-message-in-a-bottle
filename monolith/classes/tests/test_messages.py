@@ -51,8 +51,8 @@ class Test(unittest.TestCase):
         sent_messages = parent.find_all('li')
         assert(len(sent_messages) == 0)
 
-        # Get list of recieved messages.
-        parent = parsed.find(id='recieved').find('ul')
+        # Get list of received messages.
+        parent = parsed.find(id='received').find('ul')
         received_messages = parent.find_all('li')
         assert(len(received_messages) == 0)
 

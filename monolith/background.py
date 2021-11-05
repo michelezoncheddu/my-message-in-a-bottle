@@ -38,11 +38,12 @@ def do_task():
     with app.app_context():
         messages = db.session.query(Message).filter(
             Message.is_delivered == False,
+            Message.is_draft == False,
             Message.delivery_date <= datetime.now(),
             Message.access.op('&')(Access.SENDER.value)
         )
 
-        for message in messages:                                    
+        for message in messages:
             message.is_delivered = True
             print("Message sent")
             db.session.commit()

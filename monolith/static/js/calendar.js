@@ -38,7 +38,7 @@ const Calendar = (id) => ({
                 let evTime = moment(ev.time);
                 if (evTime.year() == y && evTime.month() == m && evTime.date() == d) {
                     let frgEvent = document.createRange().createContextualFragment(`
-                        <div time="${ev.time}" class="event ${ev.cls}">${evTime.format('HH:mm')} ${ev.desc}</div>
+                        <div time="${ev.time}" class="event ${ev.cls}">${evTime.format('HH:mm')} <a href="/message/${ev.msg_id}">${ev.desc}</a> </div>
                     `);
                     divEvents.appendChild(frgEvent);
                     let divEvent = divEvents.querySelector(`.event[time='${ev.time}']`);
@@ -121,10 +121,4 @@ const Calendar = (id) => ({
         this.el.appendChild(frgCal);
         this.renderEvents();
     }
-});
-
-document.addEventListener("DOMContentLoaded", async () => {
-    const cal = Calendar('calendar');
-    cal.bindData(mockData);
-    cal.render();
 });
