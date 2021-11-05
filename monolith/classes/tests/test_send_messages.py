@@ -124,6 +124,42 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
+        #ERRORS
+                
+        self.message = {
+            'text_area': 'text',
+            'delivery_date': '2021-10-10T08:00',
+            'users_list':'1',
+            'submit_button2':'Send'
+        }
+
+        # Check POST create_message SEND with wrong date
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
+        self.assertEqual(reply.status_code, 400)
+
+        self.message = {
+            'text_area': 'text',
+            'delivery_date': '2022-10-10T08:00',
+            'submit_button2':'Send'
+        }
+
+        # Check POST create_message SEND without recipient
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
+        self.assertEqual(reply.status_code, 400)
+        
+        self.message = {
+            'text_area': 'text',
+            'delivery_date': '2021-10-10T08:00',
+            'submit_button':'Save'
+        }
+
+        # Check POST create_message SAVE with wrong date
+        tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
+        reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
+        self.assertEqual(reply.status_code, 400)
+
 
 
     def test_message_read(self):

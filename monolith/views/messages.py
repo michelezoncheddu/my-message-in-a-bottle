@@ -204,7 +204,7 @@ def create_message():
              1. Delivery date must be in the future!<br/>
              2. Recipient field can\'t be empty!'''
             #return render_template('/create_message.html', form=form, error=error)
-            return render_template('/error.html', form=form, error=error)
+            return render_template('/error.html', form=form, error=error),400
     # GET
     else:
         form.users_list.choices = [
