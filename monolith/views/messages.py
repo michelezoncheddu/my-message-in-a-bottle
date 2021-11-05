@@ -138,7 +138,7 @@ def message(message_id):
             notify.delay(_message.get_sender(), 'Your message has been read!')
             _message.is_read = True
             db.session.commit()
-        return render_template('message.html', message=_message_aux, user=current_user)
+        return render_template('message.html', message=_message_aux)
     
     # DELETE for the point of view of the current user.
     if _message.sender_id == user_id:
@@ -241,7 +241,6 @@ def create_message():
                 error = '''<h3>Wrong data provided!</h3><br/>
                         <input type="button" onclick="history.back();" value="Back"/><br/><br/>
                         Error: The message is not a draft!'''
-                 
                 return render_template('/error.html', form=form, error=error),400
 
             form.message_id_hidden.data = message.get_id()
