@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template,session
+from flask import Blueprint, render_template
 
 from monolith.auth import current_user
 
@@ -15,8 +15,3 @@ def index():
     else:
         welcome = None
     return render_template("index.html", welcome=welcome)
-
-
-@home.route('/calendar')
-def calendar():
-    return render_template('calendar.html')

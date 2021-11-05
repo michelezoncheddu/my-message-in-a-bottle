@@ -1,68 +1,9 @@
-const mockData = [
-    {
-        time: '2021-06-13T21:00:00 Z',
-        cls: 'bg-orange-alt',
-        desc: 'Jack, Stephen'
-    },
-    {
-        time: '2021-06-13T22:00:00 Z',
-        cls: 'bg-green-alt',
-        desc: 'Nathan, Luke'
-    },
-    {
-        time: '2021-06-18T21:00:00 Z',
-        cls: 'bg-red-alt',
-        desc: 'Nathan, Stephen' 
-    },
-    {
-        time: '2021-06-18T22:00:00 Z',
-        cls: 'bg-cyan-alt',
-        desc: 'Peter, Luke'
-    },
-    {
-        time: '2021-06-18T23:00:00 Z',
-        cls: 'bg-purple-alt',
-        desc: 'Lora, Sandy'
-    },
-    {
-        time: '2021-06-19T20:00:00 Z',
-        cls: 'bg-sky-blue-alt',
-        desc: 'Nathan, Luke'
-    },
-    {
-        time: '2021-06-19T19:00:00 Z',
-        cls: 'bg-orange-alt',
-        desc: 'Peter, Luke'
-    },
-    {
-        time: '2021-05-22T21:00:00 Z',
-        cls: 'bg-sky-blue-alt',
-        desc: 'Peter, Lora'
-    },
-    {
-        time: '2021-11-02T19:00:00 Z',
-        cls: 'bg-sky-blue-alt',
-        desc: 'Peter, Luke'
-    },
-    {
-        time: '2021-11-02T19:00:00 Z',
-        cls: 'bg-sky-blue-alt',
-        desc: 'Peter, Luke'
-    },
-    ,
-    {
-        time: '2021-11-02T19:00:00 Z',
-        cls: 'bg-sky-blue-alt',
-        desc: 'Bottle from AAAAAA'
-    }
-];
-
-
 const StopEventPropagation = (e)=> {
     if (!e) return;
     e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
 };
+
 const Calendar = (id) => ({ 
     id: id,
     data: [],
@@ -72,14 +13,10 @@ const Calendar = (id) => ({
     onDateClick(e) {
         StopEventPropagation(e);
         const el = e.srcElement;
-        console.log('click'); 
-        console.log(el);
     },
     onEventClick(e) {
         StopEventPropagation(e);
         const el = e.srcElement;
-        console.log('click'); 
-        console.log(el); 
     },
     bindData(events) {
         this.data = events.sort((a,b) => {
@@ -101,7 +38,7 @@ const Calendar = (id) => ({
                 let evTime = moment(ev.time);
                 if (evTime.year() == y && evTime.month() == m && evTime.date() == d) {
                     let frgEvent = document.createRange().createContextualFragment(`
-                        <div time="${ev.time}" class="event ${ev.cls}">${evTime.format('h:mma')} ${ev.desc}</div>
+                        <div time="${ev.time}" class="event ${ev.cls}">${evTime.format('HH:mm')} ${ev.desc}</div>
                     `);
                     divEvents.appendChild(frgEvent);
                     let divEvent = divEvents.querySelector(`.event[time='${ev.time}']`);
@@ -186,11 +123,8 @@ const Calendar = (id) => ({
     }
 });
 
-
-document.addEventListener("DOMContentLoaded", async ()=>{
+document.addEventListener("DOMContentLoaded", async () => {
     const cal = Calendar('calendar');
-    //const spr = Spinner('calendar'); 
-    //await spr.renderSpinner().delay(0);
     cal.bindData(mockData);
     cal.render();
 });
