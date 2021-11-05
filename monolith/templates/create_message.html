@@ -1,6 +1,15 @@
 {% extends "template.html" %}
 {% block content %}
 
+<!-- include summernote css/js -->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+
+<!-- include selectize css/js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.13.3/css/selectize.css" rel="stylesheet">
+
+
 <form action="" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
   {{ form.hidden_tag() }}
   <dl>

@@ -1,0 +1,7 @@
+#calendar {
+    align-self: center;
+
+    background-color:#fafafa;
+    min-height: 700px;
+    min-width: 375px;
+}

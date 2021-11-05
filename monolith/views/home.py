@@ -15,3 +15,8 @@ def index():
     else:
         welcome = None
     return render_template("index.html", welcome=welcome)
+
+
+@home.route('/calendar')
+def calendar():
+    return render_template('calendar.html')
