@@ -76,6 +76,8 @@ def lottery():
         message="""Complimenti, hai vinto la lotteria di questo mese!
             Collegati per ritirare il premio"""    
         notify.delay(randomUser.id,message)
+        #randomUser.bonus+=1
+        #db.session.commit()
         return 'Estratto: '+str(randomUser.id)  
 
 
