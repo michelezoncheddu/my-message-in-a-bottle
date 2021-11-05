@@ -5,6 +5,7 @@ from celery import Celery
 from datetime import datetime
 
 from monolith.database import User, db, Message
+#from access import Access
 
 from .access import Access
 from .utils import send_email
@@ -58,7 +59,7 @@ def notify(id, message):
     with app.app_context():
         user = User.query.filter_by(id=id).first()
         if not (user is not None and user.is_active):
-            return
+            return 'notDone'
         
         send_email(user.email, message)
     return 'done'
@@ -66,10 +67,27 @@ def notify(id, message):
 
 @celery.task
 def lottery():
-    pass
+    app = lazy_init()
+    with app.app_context():
+        import random
+        rowCount = int(User.query.count())
+        randomNum=random.randrange(0,rowCount)
+        randomUser = User.query.filter_by(id=randomNum).first()
+        if not (randomUser is not None and randomUser.is_active):
+            lottery.delay()
+            return 'Non Estratto: ripeto estrazione'
+        message="""Complimenti, hai vinto la lotteria di questo mese!
+            Collegati per ritirare il premio"""    
+        notify.delay(randomUser.id,message)
+        #randomUser.bonus+=1
+        #db.session.commit()
+        return 'Estratto'
 
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(10.0, do_task.s(), name='add every 10')
-    sender.add_periodic_task(60*60*24*30, lottery.s(), name='lottery extraction')
+    #REALE
+    # sender.add_periodic_task(60*60*24*30, lottery.s(), name='lottery extraction')
+    #TEST
+    sender.add_periodic_task(30, lottery.s(), name='lottery extraction')
