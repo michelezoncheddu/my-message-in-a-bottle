@@ -133,6 +133,7 @@ def message(message_id):
 def create_message():
     form = MessageForm()
     user_id = current_user.get_id()
+    print('PROVA')
 
     if request.method == 'POST':
         error = None

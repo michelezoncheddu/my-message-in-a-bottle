@@ -1,3 +1,5 @@
+import os, time
+
 from celery import Celery
 
 from datetime import datetime
@@ -9,6 +11,9 @@ from .utils import send_email
 BACKEND = BROKER = 'redis://localhost:6379/0'
 
 celery = Celery(__name__, broker=BROKER, backend=BACKEND)
+
+os.environ['TZ'] = 'Europe/Rome'
+time.tzset()
 
 _APP = None
 
