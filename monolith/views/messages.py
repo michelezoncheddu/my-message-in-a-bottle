@@ -141,7 +141,7 @@ def message(message_id):
             notify.delay(_message.get_sender(), 'Your message has been read!')
             _message.is_read = True
             db.session.commit()
-        return render_template('message.html', message=_message_aux, user=current_user)
+        return render_template('message.html', message=_message_aux)
     
     # Delete scheduled message using bonus
     if not _message.is_draft and not _message.is_delivered and current_user.bonus > 0:

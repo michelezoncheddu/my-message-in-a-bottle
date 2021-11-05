@@ -65,21 +65,23 @@ def notify(id, message):
 
 
 @celery.task
-def lottery():
+def do_lottery():
     app = lazy_init()
     with app.app_context():
         import random
         rowCount = int(User.query.count())
-        randomNum=random.randrange(0,rowCount)
+        print(rowCount)
+        randomNum=int(random.randint(0,rowCount+1))
         randomUser = User.query.filter_by(id=randomNum).first()
         if not (randomUser is not None and randomUser.is_active):
-            lottery.delay()
+            do_lottery.delay()
             return 'Non Estratto: ripeto estrazione'
         message="""Complimenti, hai vinto la lotteria di questo mese!
             Collegati per ritirare il premio"""    
         notify.delay(randomUser.id,message)
-        #randomUser.bonus+=1
-        #db.session.commit()
+        randomUser.bonus+=1
+        db.session.commit()
+        print(randomUser.id)
         return 'Estratto'
 
 
@@ -89,4 +91,4 @@ def setup_periodic_tasks(sender, **kwargs):
     #REALE
     # sender.add_periodic_task(60*60*24*30, lottery.s(), name='lottery extraction')
     #TEST
-    sender.add_periodic_task(30, lottery.s(), name='lottery extraction')
+    sender.add_periodic_task(10, do_lottery.s(), name='lottery extraction')
