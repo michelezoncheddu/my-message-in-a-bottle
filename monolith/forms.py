@@ -6,6 +6,7 @@ from wtforms import SubmitField, SelectMultipleField, IntegerField
 from wtforms.widgets import HiddenInput
 from datetime import datetime
 
+from monolith.database import User, db
 from .utils import allowed_password, allowed_email, allowed_birth_date
 
 class LoginForm(FlaskForm):
@@ -13,6 +14,18 @@ class LoginForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired()])
     display = ['email', 'password']
 
+    def validate_on_submit(self):
+        result = super(LoginForm, self).validate()
+        email, password = self.email.data, self.password.data
+        user = db.session.query(User).filter(User.email==email, User.is_active == True).first()
+        # check that user exists in the db and that the password is valid
+        if user is None or not user.authenticate(password):
+            return [False, "invalid credentials"]
+        # check if user is banned
+        elif user.is_banned == True:
+            return [False, "your account has been permanently banned!"]
+        else: 
+            return [result, ""]
 
 class UserForm(FlaskForm):
     email = f.StringField('Email', validators=[DataRequired()])

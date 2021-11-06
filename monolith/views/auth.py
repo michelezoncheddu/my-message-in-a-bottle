@@ -13,17 +13,18 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        email, password = form.data['email'], form.data['password']
-        user = db.session.query(User).filter(User.email==email, User.is_active).first()
-        if user is not None and user.authenticate(password):
-            if not user.is_banned:
-                login_user(user)
-                return redirect('/')
-            else:
-                return {'msg': 'Your account has been permanently banned!'}, 403
-
-    return render_template('login.html', form=form)
+    if request.method == 'POST':
+        result = form.validate_on_submit()
+        if result[0]:
+            email= form.data['email']
+            user = db.session.query(User).filter(User.email==email, User.is_active == True).first()
+            login_user(user)
+            return redirect('/')
+        else: 
+            error = result[1]
+            return render_template('login.html', form=form, error=error)
+    elif request.method == 'GET':
+        return render_template('login.html', form=form)
 
 
 @auth.route('/logout')
@@ -45,6 +46,8 @@ def unregister():
             unregister_user = User.query.filter_by(email=current_user.get_email()).first()
             unregister_user.is_active = False
             db.session.commit()
+            # unregistered user gets redirected to main page as anonymous
+            logout_user()
             return redirect('/')
         # try again (password does not match)
         else:

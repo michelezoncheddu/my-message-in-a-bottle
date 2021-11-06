@@ -1,7 +1,7 @@
 {% extends "template.html" %}
 {% block content %}
 
-<ul style="width:20%; float:left;">
+<ul style="width:30%; float:left;">
   <h1>User List</h1>
   {% for user in users: %}
   {% if not user.is_admin and not user.is_banned and not (user == current_user) %}
@@ -21,7 +21,7 @@
       {% endif %}
       {% endfor %}
     </ul>
-    <ul style="width:20%; float:left;">
+    <ul style="width:30%; float:left;">
   <h1>Admin List</h1>
   {% for user in users: %}
     {% if user.is_admin %}
@@ -31,7 +31,7 @@
     {% endif %}
     {% endfor %}
   </ul>
-<ul style="width:20%; float:left;">
+<ul style="width:30%; float:left;">
   <h1>Banned Users</h1>
   {% for user in users: %}
   {% if current_user.is_admin and user.is_banned %}

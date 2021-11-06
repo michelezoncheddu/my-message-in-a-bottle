@@ -165,13 +165,14 @@ def message(message_id):
 @login_required
 def create_message():
     form = MessageForm()
+    result = form.validate_on_submit()
     user_id = current_user.get_id()
 
     if request.method == 'POST':
         error = None
         # Save the choices of recipients.
         form.users_list.choices = form.users_list.data
-        if form.validate_on_submit():
+        if result[0]:
             clean_text = bleach.clean(form.text_area.data, tags=allowed_tags, strip=True,
                 attributes=allowed_attrs, protocols=['data'], styles='background-color'
             )
@@ -227,13 +228,10 @@ def create_message():
             return redirect('/mailbox')
 
         else: 
-            error = ''' 
-                Rules:<br/>  
-                    1. Delivery date must be in the future!<br/>
-                    2. Recipient field can\'t be empty!
-                    '''
+            error = result[1]
+
             # Conflict
-            return render_template('/error.html', error=error), 409
+            return render_template('/create_message.html', form = form, error=error)
     # GET
     else:
         form.users_list.choices = [

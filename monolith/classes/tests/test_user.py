@@ -386,16 +386,14 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 302)
 
         # try login as banned 1
-        reply = tested_app.post('/login', data=json.dumps(self.toban1_user), content_type='application/json')
-        body = json.loads(str(reply.data, 'utf8'))
-        self.assertEqual(reply.status_code, 403)
-        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
+        reply = tested_app.post('/login', data=json.dumps(self.toban1_user), 
+                        content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
 
         # try login as banned 2
-        reply = tested_app.post('/login', data=json.dumps(self.toban2_user), content_type='application/json')
-        body = json.loads(str(reply.data, 'utf8'))
-        self.assertEqual(reply.status_code, 403)
-        self.assertEqual(body, {'msg': 'Your account has been permanently banned!'})
+        reply = tested_app.post('/login', data=json.dumps(self.toban2_user), 
+                        content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 200)
 
         print("ADMIN USER: OK")
 

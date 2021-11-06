@@ -178,7 +178,7 @@ def create_user():
             new_user.set_profile_pic(DEFAULT_PROFILE_PIC)
             db.session.add(new_user)
             db.session.commit()
-            return redirect('/')
+            return redirect('/login')
         else:
             error = result[1]
             return render_template('create_user.html', form=form, error=error)

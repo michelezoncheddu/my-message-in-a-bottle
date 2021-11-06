@@ -4,17 +4,19 @@
 <form action="" method="POST">
   {{ form.hidden_tag() }}
   <dl>
-    {% for field in form.display %}
-    <dt>{{ form[field].label }}</dt>
-    <dd>{{ form[field]() }}</dd>
-      {% if form[field].errors %}
-        {% for e in form[field].errors %}
-          <p class="help-block">{{ e }}</p>
-        {% endfor %}
+  {% for field in form.display %}
+  <dt>{{ form[field].label }}</dt>
+  <dd>{{ form[field]() }}</dd>
+  {% if form[field].errors %}
+      {% for e in form[field].errors %}
+      <p class="help-block">{{ e }}</p>
+      {% endfor %}
       {% endif %}
-    {% endfor %}
+  {% endfor %}
   </dl>
-  <p>
+  {% if error %}
+    <p style="color:red"><strong>Error: {{ error }}</strong></p>
+  {% endif %}
   <input type=submit value="Login" style="background-color: #343a40; border-radius: 7px; color: white; padding: 10 15;text-decoration: none; margin-right: 10;">
 </form>
 
