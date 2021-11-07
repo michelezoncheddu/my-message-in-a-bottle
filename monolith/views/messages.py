@@ -160,7 +160,17 @@ def message(message_id):
     db.session.commit()
     return {'msg': 'message deleted'}, 200
 
+''' 
+    Manage the creation, reply, and the forward of messages and drafts
 
+    GET: Creates the form for editing/writing a message.
+         If <draft_id> is specified, the corresponding draft is loaded.
+         If <forw_id> is specified, the corresponding message is loaded.
+         If <reply_id> is specified, the corresponding recipient is loaded.   
+    POST: Takes the input from the form, creates a new Message object and save it on DB:
+          As draft if the <save button> is clicked, as message to send otherwise.
+
+'''
 @messages.route('/create_message', methods=['GET', 'POST'])
 @login_required
 def create_message():
@@ -177,7 +187,7 @@ def create_message():
             )
             
             # Save draft.
-            if form.submit_button.data:
+            if form.save_button.data:
                 # Update old draft.
                 if form.message_id_hidden.data > 0:
                     message = retrieve_message(form.message_id_hidden.data)
@@ -225,7 +235,7 @@ def create_message():
                         db.session.commit()
             
             return redirect('/mailbox')
-
+        
         else: 
             error = ''' 
                 Rules:<br/>  

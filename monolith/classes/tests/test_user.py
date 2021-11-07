@@ -388,12 +388,12 @@ class Test(unittest.TestCase):
         # try login as banned 1
         reply = tested_app.post('/login', data=json.dumps(self.toban1_user), 
                         content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 409)
 
         # try login as banned 2
         reply = tested_app.post('/login', data=json.dumps(self.toban2_user), 
                         content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 409)
 
         print("ADMIN USER: OK")
 

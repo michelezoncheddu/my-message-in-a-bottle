@@ -65,15 +65,15 @@ class MessageForm(FlaskForm):
     text_area = f.TextAreaField('Write your message here!', id='text')
     delivery_date = DateTimeLocalField('Delivery Date', validators=[DataRequired()], format='%Y-%m-%dT%H:%M')
     users_list = SelectMultipleField('Select recipients', id='users_list')
-    submit_button = SubmitField('Save')
-    submit_button2 = SubmitField('Send')
+    save_button = SubmitField('Save')
+    send_button = SubmitField('Send')
     display = ['text_area', 'delivery_date', 'users_list']
 
     # check that the delivery date chosen isn't before current time
     def validate_on_submit(self):
         if self.delivery_date.data is None or self.delivery_date.data < datetime.now():
             return False
-        if (self.submit_button2.data) and (self.users_list.data == []):
+        if (self.send_button.data) and (self.users_list.data == []):
             return False
         
         return True

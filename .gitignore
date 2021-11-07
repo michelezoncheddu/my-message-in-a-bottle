@@ -355,7 +355,5 @@ flake8-report/
 unicode_characters/
 wordlist/
 
-token.txt
-
 docker-compose.yml
 

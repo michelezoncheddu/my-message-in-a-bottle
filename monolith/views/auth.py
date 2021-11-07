@@ -22,7 +22,7 @@ def login():
             return redirect('/')
         else: 
             error = result[1]
-            return render_template('login.html', form=form, error=error)
+            return render_template('login.html', form=form, error=error),409
     elif request.method == 'GET':
         return render_template('login.html', form=form)
 

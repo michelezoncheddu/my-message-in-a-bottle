@@ -86,7 +86,7 @@ def send_email(email, message):
 
     smtp_server = 'smtp-relay.sendinblue.com'
     port = 465
-    sender_email = 'm.zoncheddu@studenti.unipi.it'
+    sender_email = 'emanuele.albertosi@gmail.com'
     receiver_email = email
     message = f'''\
     Subject: MyMessageInABottle - Notification
@@ -94,6 +94,7 @@ def send_email(email, message):
     {message}'''
 
     context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+    with smtplib.SMTP_SSL(smtp_server, port,context=context) as server:
+        #server.starttls(context=context)
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message)
