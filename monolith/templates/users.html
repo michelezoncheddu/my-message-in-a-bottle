@@ -10,11 +10,11 @@
       <br>
       <form action="/users" method="POST">
         {% if user.id not in blocked_users %}
-        <button type="submit" id="action" name="action" value="Block">Block</button>
+        <button type="submit" id="action" name="action" value="Block" class="my_button">Block</button>
         {% else %}
-        <button type="submit" id="action" name="action" value="Unblock">Unblock</button>
+        <button type="submit" id="action" name="action" value="Unblock" class="my_button">Unblock</button>
         {% endif %}
-        <button type="submit" id="action" name="action" value="{{ action }}">{{ action }}</button>
+        <button type="submit" id="action" name="action" value="{{ action }}" class="my_button">{{ action }}</button>
         <input type="hidden" id="email" name="email" value="{{ user.email }}">
       </form>
       </li>
@@ -38,7 +38,7 @@
       <li>
         <p style="color:red">{{user.id}} {{user.firstname}} {{user.lastname}} ({{user.email}})</p>
       <form action="/users" method="POST">
-        <button type="submit" id="action" name="action" value="Unban">Unban</button>
+        <button type="submit" id="action" name="action" value="Unban" class="my_button">Unban</button>
         <input type="hidden" id="email" name="email" value="{{ user.email }}">
       </form>
       </li>

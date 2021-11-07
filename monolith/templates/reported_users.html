@@ -8,8 +8,8 @@
     <li>
       {{user.id}} {{user.firstname}} {{user.lastname}} {{user.email}} ({{user.email}})
       <form action="/reported_users" method="POST">
-        <button type="submit" name="action" value="Reject">Reject</button>
-        <button type="submit" name="action" value="Ban">Ban</button>
+        <button type="submit" name="action" value="Reject" class="my_button">Reject</button>
+        <button type="submit" name="action" value="Ban" class="my_button">Ban</button>
         <input type="hidden" id="email" name="email" value="{{ user.email }}">
       </form>
     </li>

@@ -74,7 +74,7 @@ class Test(unittest.TestCase):
 
         # Existent message of other users.
         reply = tested_app.get('/message/1')
-        self.assertEqual(reply.status_code, 403)
+        self.assertEqual(reply.status_code, 200)
         
         tested_app = app.test_client()
     

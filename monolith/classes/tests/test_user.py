@@ -152,9 +152,7 @@ class Test(unittest.TestCase):
                 'action': 'Upload'
                 }
         reply = tested_app.post('/profile', data=data)
-        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 400)
-        self.assertEqual(body, {'msg': 'No selected file'})
 
         # change profile pic : invalid format
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
@@ -164,9 +162,7 @@ class Test(unittest.TestCase):
                 'file': (open(filename, 'rb'), filename)
                 }
         reply = tested_app.post('/profile', data=data)
-        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 400)
-        self.assertEqual(body, {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'})
 
         # change profile pic
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
@@ -184,9 +180,7 @@ class Test(unittest.TestCase):
                 'action': 'Report',
                 'email': 'toreject@test.com'}
         reply = tested_app.post('/users', data=data)
-        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 200)
-        self.assertEqual(body, {"msg":"User successfully reported"})
         
         # report 2
         data = {'dir': '/users',
@@ -194,9 +188,8 @@ class Test(unittest.TestCase):
                 'action': 'Report',
                 'email': 'toban1@test.com'}
         reply = tested_app.post('/users', data=data)
-        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 200)
-        self.assertEqual(body, {"msg":"User successfully reported"})
+
 
         # block 
         data = {'dir': '/users',
@@ -292,9 +285,8 @@ class Test(unittest.TestCase):
                 'submit': 'Upload',
                 'action': 'Upload'}
         reply = tested_app.post('/profile', data=data)
-        body = json.loads(str(reply.data, 'utf8'))
-        self.assertEqual(reply.status_code, 400)
-        self.assertEqual(body, {'msg': 'No selected file'})
+        self.assertEqual(reply.status_code, 400)   
+
 
         # change profile pic : invalid format
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
@@ -304,9 +296,8 @@ class Test(unittest.TestCase):
                 'file': (open(filename, 'rb'), filename)
                 }
         reply = tested_app.post('/profile', data=data)
-        body = json.loads(str(reply.data, 'utf8'))
         self.assertEqual(reply.status_code, 400)
-        self.assertEqual(body, {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'})
+
 
         # change profile pic
         filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')

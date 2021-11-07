@@ -9,7 +9,7 @@
         {{entry.id_blocked}} {{entry.user_blocked.firstname}} {{entry.user_blocked.lastname}} ({{entry.user_blocked.email}}) 
         <br>
         <form action="/blacklist" method="POST">
-          <button type="submit" id="unblock" name="unblock" value="{{ entry.user_blocked.email }}">Unblock</button>
+          <button type="submit" id="unblock" name="unblock" value="{{ entry.user_blocked.email }}" class="my_button">Unblock</button>
         </form>
         </li>
     {% endfor %}
