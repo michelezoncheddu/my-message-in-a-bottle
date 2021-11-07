@@ -127,7 +127,7 @@ class Test(unittest.TestCase):
 
         # Delete unexistent message.
         reply = tested_app.delete('/message/1')
-        self.assertEqual(reply.status_code, 403)
+        self.assertEqual(reply.status_code, 200)
 
         # Delete message of other users.
         reply = tested_app.delete('/message/4')

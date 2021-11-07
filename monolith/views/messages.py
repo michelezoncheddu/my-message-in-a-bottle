@@ -131,7 +131,12 @@ def message(message_id):
     # TODO: Catch exception instead of if.
     _message = retrieve_message(message_id)
     user_id = current_user.get_id()
-    is_sender_or_recipient(_message, user_id)
+    try:
+        is_sender_or_recipient(_message, user_id)
+    except:
+        error='Not found!'
+        return render_template('/error.html', error=error), 404
+        
 
     _message_aux = _message
     # if language filter on
