@@ -73,7 +73,8 @@ def profile():
         if action == "Upload":
             # image not present : error
             if 'file' not in request.files:
-                return {'msg': 'No selected file'}, 400
+                error='No selected file'
+                return render_template('/error.html', error=error), 400
             file = request.files['file']
             # image present : get file
             if file and allowed_file(file.filename):
@@ -83,7 +84,8 @@ def profile():
                 _user.set_profile_pic(filename)
                 db.session.commit()
             else:
-                return {'msg': 'Invalid file format: <png>, <jpg> and <jpeg> allowed'}, 400
+                error='Invalid file format: .png, .jpg. and .jpeg. allowed'
+                return render_template('/error.html', error=error), 400
         # change profile info
         elif action == "Save":
             if allowed_email(request.form.get('email')):
@@ -126,7 +128,8 @@ def _users():
         email = request.form.get('email')
         moderate_action(email, action_todo) # apply action
         if action_todo == "Report":
-            return {'msg': 'User successfully reported'}, 200
+            message='User successfully reported'
+            return render_template('/error.html', error=message), 200
         else:
             _blocked_users = [r.id_blocked for r in db.session.query(BlackList.id_blocked).filter(BlackList.id_user == current_user.id)]
             return render_template('users.html', users=_users, blocked_users=_blocked_users, action=action_template)
@@ -170,7 +173,8 @@ def create_user():
         if result[0]:
             user = db.session.query(User).filter(User.email==form.email.data, User.is_active).first()
             if user is not None:
-                return {'msg': 'this email is already registered'}, 409
+                error='This email is already registered'
+                return render_template('/error.html', error=error), 409
 
             new_user = User()
             form.populate_obj(new_user)

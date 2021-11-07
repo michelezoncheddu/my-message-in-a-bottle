@@ -53,8 +53,9 @@ def filter_language(_message):
 
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
+    error='<h3>Wrong data provided!</h3><br/>Message not found'
     if _message is None:
-        abort(404, 'message not found')
+        return render_template('/error.html', error=error), 404
     return _message
 
 
@@ -69,7 +70,8 @@ def is_sender_or_recipient(message, user_id):
                               or not message.is_delivered)
            )
        ):
-        abort(403, 'Forbidden')
+       error='<h3>Wrong data provided!</h3><br/>Forbidden'
+       return render_template('/error.html', error=error), 403
     
 
 @messages.route('/schedule')
@@ -158,7 +160,8 @@ def message(message_id):
     if _message.recipient_id == user_id:
         _message.access -= Access.RECIPIENT.value
     db.session.commit()
-    return {'msg': 'message deleted'}, 200
+    message='<h3>Message deleted!</h3><br/>'
+    return render_template('/error.html', error=message), 200
 
 ''' 
     Manage the creation, reply, and the forward of messages and drafts
@@ -235,9 +238,10 @@ def create_message():
                         db.session.commit()
             
             return redirect('/mailbox')
-        
+
         else: 
             error = ''' 
+                <h3>Wrong data provided!</h3><br/>
                 Rules:<br/>  
                     1. Delivery date must be in the future!<br/>
                     2. Recipient field can\'t be empty!
@@ -259,7 +263,7 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if not message.is_draft:
-                error = 'Error: The message is not a draft!'
+                error = '<h3>Error!</h3><br/> The message is not a draft!'
                 # Forbidden
                 return render_template('/error.html', error=error),403
 
@@ -274,7 +278,7 @@ def create_message():
 
             # draft or scheduled message
             if message.is_draft or not message.is_delivered:
-                error = 'Error: you can\'t forward this message!'
+                error = '<h3>Error!</h3><br/> you can\'t forward this message!'
                 
                 # Forbidden
                 return render_template('/error.html', error=error), 403
@@ -287,7 +291,7 @@ def create_message():
             is_sender_or_recipient(message, user_id)
 
             if message.is_draft or not message.is_delivered:
-                error = 'Error: you can\'t reply this message!'
+                error = '<h3>Error!</h3><br/> you can\'t reply this message!'
                 
                 # Forbidden
                 return render_template('/error.html', error=error), 403
