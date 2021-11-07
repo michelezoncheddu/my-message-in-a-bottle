@@ -14,8 +14,8 @@ BACKEND = BROKER = 'redis://localhost:6379/0'
 
 celery = Celery(__name__, broker=BROKER, backend=BACKEND)
 
-os.environ['TZ'] = 'Europe/Rome'
-time.tzset()
+#os.environ['TZ'] = 'Europe/Rome'
+#time.tzset()
 
 _APP = None
 
@@ -88,8 +88,8 @@ def do_lottery():
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(10.0, do_task.s(), name='add every 10')
+    sender.add_periodic_task(10, do_task.s(), name='add every 10')
     #REALE
-    # sender.add_periodic_task(60*60*24*30, lottery.s(), name='lottery extraction')
+    #sender.add_periodic_task(60*60*24*30, lottery.s(), name='lottery extraction')
     #TEST
     sender.add_periodic_task(100, do_lottery.s(), name='lottery extraction')
