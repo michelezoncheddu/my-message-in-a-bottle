@@ -10,22 +10,22 @@
     <br><br>
     {% if current_user.is_admin %}
     <div><a href="/reported_users">
-      <button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;" id='admin_button' name='admin_button'><strong>Reported Users</strong></button>
+      <button class="my_button" id='admin_button' name='admin_button'><strong>Reported Users</strong></button>
     </a></div>
     {% endif %}
     <br>
     <a href="/users"> 
-      <button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">User List</button>
+      <button class="my_button">User List</button>
     </a>
     <a href="/blacklist"> 
-      <button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Black List</button>
+      <button class="my_button">Black List</button>
     </a>
     <br><br><br><br>
     If you wish to unregister from our platform, <a href="/unregister">Unregister</a>
 {% else %}
   Hi Anonymous <br><br>
-  <a href="/login"><button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Sign in</button></a>
-  <a href="/create_user"><button style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Sign up</button></a>
+  <a href="/login"><button class="my_button">Sign in</button></a>
+  <a href="/create_user"><button class="my_button">Sign up</button></a>
 {% endif %}
 
 {% endblock %}

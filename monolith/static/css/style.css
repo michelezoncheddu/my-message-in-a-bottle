@@ -3,3 +3,12 @@
     min-height: 700px;
     min-width: 375px;
 }
+
+.my_button {
+    background-color: #343a40;
+    border-radius: 7px;
+    color: white;
+    padding: 5 15;
+    text-decoration: none;
+    margin-right: 10;
+}

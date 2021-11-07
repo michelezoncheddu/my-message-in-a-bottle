@@ -4,7 +4,7 @@
 <form action="/profile" method="POST" enctype="multipart/form-data">
     <p>
         <input type="file" id="file" name="file"/>
-        <button type="submit" name="action" value="Upload" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Upload</button>
+        <button type="submit" name="action" value="Upload" class="my_button">Upload</button>
     </p>
     <img src="{{ user.get_profile_pic() }}" width="200" />
 
@@ -25,15 +25,15 @@
     {% if error %}
         <p style="color:red"><strong>Error: {{ error }}</p>
     {% endif %}
-    <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">
+    <div><input type="button" id="action" name="action" value="Edit" onclick="toggleEdit()" class="my_button">
     <a>
-        <input type="submit" id="action" name="action" value="Save" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">
+        <input type="submit" id="action" name="action" value="Save" class="my_button">
     </a></div>
     <br><br>
     {% if user.has_language_filter %}
-        <button type="submit" id="action" name="action" value="toggleFilter" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Language Filter: on</button>
+        <button type="submit" id="action" name="action" value="toggleFilter" class="my_button">Language Filter: on</button>
     {% else %}
-        <button type="submit" id="action" name="action" value="toggleFilter" style="background-color: #343a40; border-radius: 7px; color: white; padding: 5 15;text-decoration: none; margin-right: 10;">Language Filter: off</button>
+        <button type="submit" id="action" name="action" value="toggleFilter" class="my_button">Language Filter: off</button>
     {% endif %}
 </form>
 

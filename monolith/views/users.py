@@ -184,21 +184,3 @@ def create_user():
             return render_template('create_user.html', form=form, error=error)
     elif request.method == 'GET':
         return render_template('create_user.html', form=form)
-
-
-'''@users.route('/delete_user', methods=['POST','GET'])
-@login_required
-@admin_required
-def delete_user():
-    form = UserDelForm()
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            del_user = User.query.filter_by(firstname=form.firstname.data).first()
-            db.session.delete(del_user)
-            db.session.commit()
-
-            return redirect('/users')
-    elif request.method == 'GET':
-        return render_template('delete_user.html', form=form)
-'''
