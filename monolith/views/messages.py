@@ -138,7 +138,7 @@ def message(message_id):
 
     if request.method == 'GET':
         if _message.get_recipient() == user_id and not _message.is_draft and not _message.is_read and _message.is_delivered:
-           print(str(_message.get_sender()),flush=True)
+           #print("INVIO LETTURA MESSAGGIO: "+str(_message.get_sender()),flush=True)
            notify.delay(_message.get_sender(), 'Your message has been read!')
            _message.is_read = True
            db.session.commit()

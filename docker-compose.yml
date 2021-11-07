@@ -3,7 +3,7 @@ services:
   monolith:
     build: .
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - .:/code
     links:
@@ -40,7 +40,25 @@ services:
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND_URL=redis://redis:6379/0
-      - C_FORCE_ROOT=true          
+      - C_FORCE_ROOT=true
+  celery-flower:
+    image: celery
+    build: .
+    volumes:
+      - .:/code
+    command: celery -A monolith.background flower --port=5555
+    ports:
+      - "5556:5555"
+    depends_on:
+      - redis
+      - celery-beat
+      - celery-work
+    links:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND_URL=redis://redis:6379/0
+      - C_FORCE_ROOT=true                     
     
 
  

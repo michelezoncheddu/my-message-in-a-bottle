@@ -62,7 +62,7 @@ def notify(id, message):
             return 'notDone'
         
         send_email(user.email, message)
-    return 'done'
+        return 'Email sent'
 
 
 @celery.task

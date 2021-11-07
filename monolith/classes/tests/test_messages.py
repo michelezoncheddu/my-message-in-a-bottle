@@ -137,6 +137,8 @@ class Test(unittest.TestCase):
         # Delete message of other users.
         reply = tested_app.delete('/message/1')
         self.assertEqual(reply.status_code, 200)
+
+        
         
 
 
