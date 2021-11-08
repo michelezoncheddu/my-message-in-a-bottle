@@ -202,7 +202,7 @@ def create_message():
                     message.text = clean_text
                     message.delivery_date = form.delivery_date.data
                     message.sender_id = user_id
-                    message.recipient_id = 0  # TODO: put the first recipient in the list.
+                    message.recipient_id = 0
                     db.session.commit() 
 
                 # Create new draft.
@@ -211,7 +211,7 @@ def create_message():
                     new_message.text = clean_text
                     new_message.delivery_date = form.delivery_date.data
                     new_message.sender_id = user_id
-                    new_message.recipient_id = 0  # TODO: put the first recipient in the list.
+                    new_message.recipient_id = 0
                     db.session.add(new_message) 
                     db.session.commit()
 
@@ -258,6 +258,7 @@ def create_message():
         form.users_list.choices = [
             (user.get_id(), user.get_email()) for user in get_users()
         ]
+        selected = None
 
         draft_id = get_argument(request, 'draft_id', int)
         forw_id = get_argument(request, 'forw_id', int)
@@ -302,9 +303,9 @@ def create_message():
                 return render_template('/error.html', error=error), 403
 
             form.text_area.data = 'Reply: '
-            form.users_list.choices = [(message.get_sender(), message.get_sender())]  # TODO: write email of sender
+            selected = message.get_sender()  # TODO: write email of sender
         
-        return render_template('create_message.html', form=form)
+        return render_template('create_message.html', form=form, selected=selected)
 
 
 @messages.route('/calendar')
@@ -329,7 +330,7 @@ def calendar():
         {
             'time': str(message.delivery_date),
             'cls': 'bg-orange-alt',
-            'desc': message.recipient_id,
+            'desc': f'To {message.recipient.firstname} {message.recipient.lastname}',
             'msg_id': message.id
         } for message in sent_messages
     ]
@@ -338,7 +339,7 @@ def calendar():
         {
             'time': str(message.delivery_date),
             'cls': 'bg-sky-blue-alt',
-            'desc': message.sender_id,
+            'desc': f'From {message.sender.firstname} {message.sender.lastname}',
             'msg_id': message.id
         } for message in received_messages
     ]

@@ -4,8 +4,8 @@
 <h1>Message</h1>
   Text: {{message['text']|safe}} <br> 
   On: {{message['delivery_date']}} <br>
-  From: {{message['sender_id']}} <br>
-  To: {{message['recipient_id']}} <br><br>
+  From: {{message.sender.firstname}} {{message.sender.lastname}} <br>
+  To: {{message.recipient.firstname}} {{message.recipient.lastname}}<br><br>
   {% if (not message.is_draft and not message.is_delivered and user.bonus > 0) or 
          message.is_draft or message.is_delivered %}
     <button type="submit" onclick="DeleteMessage('{{message.id}}')" class="my_button">Delete</button>

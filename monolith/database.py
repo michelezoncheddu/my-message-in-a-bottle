@@ -112,6 +112,10 @@ class Message(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     attachment = db.Column(db.String, default=None)
 
+    sender = relationship('User', foreign_keys='Message.sender_id')
+    recipient = relationship('User', foreign_keys='Message.recipient_id')
+
+
     def __init__(self, *args, **kw):
         super(Message, self).__init__(*args, **kw)
 
