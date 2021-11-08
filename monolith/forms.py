@@ -10,13 +10,17 @@ from monolith.database import User, db
 from .utils import allowed_password, allowed_email, allowed_birth_date
 
 class LoginForm(FlaskForm):
+    ''' Login form for the user. '''
     email = f.StringField('Email', validators=[DataRequired()])
     password = f.PasswordField('Password', validators=[DataRequired()])
     display = ['email', 'password']
 
+    ''' Input check: user exists, valid password and banned user. '''
     def validate_on_submit(self):
         result = super(LoginForm, self).validate()
+        # retrieve information from form
         email, password = self.email.data, self.password.data
+        # retrieve users identified by email
         user = db.session.query(User).filter(User.email==email, User.is_active == True).first()
         # check that user exists in the db and that the password is valid
         if user is None or not user.authenticate(password):
@@ -28,6 +32,7 @@ class LoginForm(FlaskForm):
             return [result, ""]
 
 class UserForm(FlaskForm):
+    ''' Registration form for the user. '''
     email = f.StringField('Email', validators=[DataRequired()])
     firstname = f.StringField('First Name', validators=[DataRequired()])
     lastname = f.StringField('Last Name', validators=[DataRequired()])
@@ -36,10 +41,10 @@ class UserForm(FlaskForm):
     location = f.StringField('Location', validators=[DataRequired()])
     display = ['email', 'firstname', 'lastname', 'password', 'date_of_birth', 'location']
 
+    ''' Input check: email format, valid password and valid birth date. '''
     def validate_on_submit(self):
         result = super(UserForm, self).validate()
-        curr_date = datetime.today().date() 
-
+        
         # check email format is valid
         if not allowed_email(self.email.data):
             return [False, "invalid email format"]
@@ -52,15 +57,9 @@ class UserForm(FlaskForm):
 
         return [result, ""]
 
-        """return self.is_submitted() and self.validate()"""
-
-
-class UserDelForm(FlaskForm):
-    firstname = f.StringField('First Name', validators=[DataRequired()])
-    display = ['firstname']
-
 
 class MessageForm(FlaskForm):
+    ''' Message form during writing of message. '''
     message_id_hidden = IntegerField(widget=HiddenInput(), default=-1)
     text_area = f.TextAreaField('Write your message here!', id='text')
     delivery_date = DateTimeLocalField('Delivery Date', validators=[DataRequired()], format='%Y-%m-%dT%H:%M')
@@ -69,7 +68,7 @@ class MessageForm(FlaskForm):
     send_button = SubmitField('Send')
     display = ['text_area', 'delivery_date', 'users_list']
 
-    # check that the delivery date chosen isn't before current time
+    ''' Input check: the delivery date chosen isn't before current time. '''
     def validate_on_submit(self):
         if self.delivery_date.data is None or self.delivery_date.data < datetime.now():
             return False
@@ -77,13 +76,3 @@ class MessageForm(FlaskForm):
             return False
         
         return True
-
-
-class SearchRecipientForm(FlaskForm):
-    search_recipient = f.StringField('Search Recipient')
-    display = ['search_recipient']
-
-
-class AddRecipientForm(FlaskForm):
-    search_recipient = f.SelectMultipleField('none')
-    display = ['add_recipient']

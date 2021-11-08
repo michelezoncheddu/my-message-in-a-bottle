@@ -1,11 +1,11 @@
 from flask import Blueprint, redirect, render_template, request
 
-from ..utils import allowed_file, allowed_email, allowed_birth_date, save_image
+from ..utils import allowed_file, allowed_email, save_image
 
 from werkzeug.utils import secure_filename
 from monolith.auth import login_required, admin_required
 from monolith.database import User, BlackList, db
-from monolith.forms import UserForm,UserDelForm
+from monolith.forms import UserForm
 
 from flask_login import current_user
 
