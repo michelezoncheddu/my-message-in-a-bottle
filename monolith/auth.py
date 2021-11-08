@@ -6,15 +6,24 @@ from monolith.database import User
 
 login_manager = LoginManager()
 
+''' 
+    Manage the authorizations of admin users (decorator)
+
+'''
 def admin_required(func):
     @functools.wraps(func)
     def _admin_required(*args, **kw):
         # Checks if the user is an admin
         if not current_user.is_admin:  # TODO: compare with hasattr(id)
+            #return error if not admin
             return login_manager.unauthorized()
         return func(*args, **kw)
     return _admin_required
 
+''' 
+    Manage the authorizations of normal users (decorator)
+
+'''
 
 def login_required(func):
     @functools.wraps(func)
@@ -25,7 +34,9 @@ def login_required(func):
         return func(*args, **kw)
     return _login_required
 
-
+''' 
+    Loads user credential
+'''
 @login_manager.user_loader
 def load_user(user_id):
     user = User.query.get(user_id)
