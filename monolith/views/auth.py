@@ -51,4 +51,5 @@ def unregister():
             return redirect('/')
         # try again (password does not match)
         else:
-            return {'msg': 'Password does not match, try again'}, 400
+            error='Password does not match, try again'
+            return render_template('/error.html', error=error), 400
