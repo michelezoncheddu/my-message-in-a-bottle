@@ -29,7 +29,14 @@ allowed_attrs = {'*': ['class','style','color'],
 # profanity filter ('en' only)
 profanity.load_censor_words()
 
+
 ATTACHMENTS_PATH = 'monolith/static'
+
+
+@messages.errorhandler(404)
+def page_not_found(error):
+    return render_template('/error.html', error=error), 404
+
 
 # utility function for checking if recipient has sender on blacklist
 def is_blocked(recipient):
@@ -41,6 +48,7 @@ def is_blocked(recipient):
     else:
         return False
 
+
 # utility function for censoring bad language in received messages
 def filter_language(_message):
     censored_message = {}
@@ -51,11 +59,12 @@ def filter_language(_message):
 
     return censored_message
 
+
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
-    error='<h3>Wrong data provided!</h3><br/>Message not found'
     if _message is None:
-        return render_template('/error.html', error=error), 404
+        error='Message not found!'
+        abort(404, error)
     return _message
 
 
@@ -70,9 +79,8 @@ def is_sender_or_recipient(message, user_id):
                               or not message.is_delivered)
            )
        ):
-       error='<h3>Wrong data provided!</h3><br/>Forbidden'
-       raise Exception(error)
-       #return render_template('/error.html', error=error), 403
+       error = 'Message not found!'
+       abort(404, error)
     
 
 @messages.route('/schedule')
@@ -129,15 +137,9 @@ def mailbox():
 @messages.route('/message/<int:message_id>', methods=['GET', 'DELETE'])
 @login_required
 def message(message_id):
-    # TODO: Catch exception instead of if.
     _message = retrieve_message(message_id)
     user_id = current_user.get_id()
-    try:
-        is_sender_or_recipient(_message, user_id)
-    except:
-        error='Not found!'
-        return render_template('/error.html', error=error), 404
-        
+    is_sender_or_recipient(_message, user_id)
 
     _message_aux = _message
     # if language filter on
@@ -168,6 +170,7 @@ def message(message_id):
     db.session.commit()
     message='<h3>Message deleted!</h3><br/>'
     return render_template('/error.html', error=message), 200
+
 
 ''' 
     Manage the creation, reply, and the forward of messages and drafts
@@ -251,7 +254,7 @@ def create_message():
                 Rules:<br/>  
                     1. Delivery date must be in the future!<br/>
                     2. Recipient field can\'t be empty!
-                    '''
+                '''
             # Conflict
             return render_template('/error.html', error=error), 409
     # GET
