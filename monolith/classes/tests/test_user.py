@@ -356,7 +356,6 @@ class Test(unittest.TestCase):
     @pytest.mark.run(order=4)
     def test_info_validator(self):
 
-        '''
         # Check bad language message
         tocensor_message = Message()
         Message.text = 'Asshole'
@@ -378,7 +377,6 @@ class Test(unittest.TestCase):
                 'is_delivered': False
                 },
                 filter_language(tocensor_message))
-        '''
 
         # Invalid email
         invalid_email = "invalidemail"
