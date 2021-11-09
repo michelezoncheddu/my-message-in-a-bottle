@@ -8,6 +8,8 @@ from monolith.app import app
 
 from datetime import datetime, timedelta
 
+from ...views.messages import filter_language
+from ...database import Message
 from ...utils import allowed_email, allowed_password, allowed_birth_date
 
 
@@ -16,19 +18,19 @@ class Test(unittest.TestCase):
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
 
-        # login admin user
+        # Login admin user
         self.admin = {
             'email': 'admin@test.com',
             'password': 'Admin1@'
         }
 
-        # login user
+        # Login user
         self.common_user = {
             'email': 's@test.com',
             'password': 'Sender1@'
         }
 
-        # creation of dummy user for unregister
+        # Creation of dummy user for unregister
         self.create_tounregister_user = {
             'email': 'tounregister@test.com',
             'firstname': 'tounregister',
@@ -38,13 +40,13 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
 
-        # login of dummy user for unregister
+        # Login of dummy user for unregister
         self.tounregister_user = {
             'email': 'tounregister@test.com',
             'password': 'Tounregister1@'
         }
 
-        # dummy user for testing reject reported user
+        # Creation of dummy user for testing reject reported user
         self.create_toreject_user = {
             'email': 'toreject@test.com',
             'firstname': 'toreject',
@@ -54,7 +56,7 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
 
-        # dummy user for testing ban on endpoint users
+        # Creation of dummy user for testing ban on endpoint users
         self.create_toban1_user = {
             'email': 'toban1@test.com',
             'firstname': 'toban1',
@@ -64,13 +66,13 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
         
-        # login
+        # Login
         self.toban1_user = {
             'email': 'toban1@test.com',
             'password': 'Toban1@'
         }
 
-        # dummy user for testing ban on endpoint reported_users
+        # Creation of dummy user for testing ban on endpoint reported_users
         self.create_toban2_user = {
             'email': 'toban2@test.com',
             'firstname': 'toban2',
@@ -80,7 +82,7 @@ class Test(unittest.TestCase):
             'location': 'Pisa'
         }
 
-        # login
+        # Login
         self.toban2_user = {
             'email': 'toban2@test.com',
             'password': 'Toban2@'
@@ -92,7 +94,7 @@ class Test(unittest.TestCase):
         app.config['WTF_CSRF_ENABLED'] = False
 
 
-    # general tests for user
+    # Test user actions
     @pytest.mark.run(order=1)
     def test_user(self):
         tested_app = app.test_client()
@@ -105,7 +107,7 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 401)
 
-        # login user
+        # Login user
         reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
@@ -113,7 +115,7 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/profile')
         self.assertEqual(reply.status_code, 200)
 
-        # save updates on profile
+        # Save updates on profile
         data = {
                 'action': 'Save'
         }
@@ -153,6 +155,22 @@ class Test(unittest.TestCase):
                 'action': 'Upload',
                 'file': (open(filename, 'rb'), filename)
         }
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Toggle language filter: ON
+        data = {
+                'action': 'toggleFilter'
+        }
+
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Toggle language filter: OFF
+        data = {
+                'action': 'toggleFilter'
+        }
+
         reply = tested_app.post('/profile', data=data)
         self.assertEqual(reply.status_code, 200)
 
@@ -289,10 +307,11 @@ class Test(unittest.TestCase):
                         content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
-    # Unregister tests
+    # Unregister and already registered tests
     @pytest.mark.run(order=3)
     def test_unregister(self):
         tested_app = app.test_client()
+
 
         # Unregister without login
         reply = tested_app.get('/unregister')
@@ -304,7 +323,13 @@ class Test(unittest.TestCase):
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
-        # login 'tounregistere' user
+        # Failed register of already registered email
+        reply = tested_app.post('/create_user',
+                    data=json.dumps(self.create_tounregister_user),
+                    content_type='application/json', follow_redirects=True)
+        self.assertEqual(reply.status_code, 409)
+
+        # Login 'tounregister' user
         reply = tested_app.post('/login', data=json.dumps(self.tounregister_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
@@ -327,18 +352,32 @@ class Test(unittest.TestCase):
         self.assertEqual(reply.status_code, 302)
 
 
-    # Test for input fields format in create_user
+    # Test for input fields format in create_user and bad language filter
     @pytest.mark.run(order=4)
     def test_info_validator(self):
 
-        """
-        #Check bad language message
+        
+        # Check bad language message
         tocensor_message = Message()
-        Message.recipient_id = '1'
-        Message.delivery_date = '10/10/2022'
         Message.text = 'Asshole'
-        self.assertEqual({'recipient_id': '1', 'delivery_date': '10/10/2022', 'text': '****'}, filter_language(tocensor_message))
-        """
+        Message.delivery_date = '10/10/2022'
+        Message.recipient_id = '1'
+        Message.sender = '2'
+        Message.recipient = '1'
+        Message.is_draft = False
+        Message.is_delivered = False
+        self.assertEqual(
+                {
+                'text': '****',
+                'delivery_date': '10/10/2022',
+                'recipient_id': '1',
+                'sender':'2',
+                'recipient': '1',
+                'is_draft': False,
+                'is_delivered': False
+                },
+                filter_language(tocensor_message))
+        
 
         # Invalid email
         invalid_email = "invalidemail"
@@ -367,6 +406,7 @@ class Test(unittest.TestCase):
         # Invalid birth date
         birth_invalid = datetime.today().date() + timedelta(days = 1)
         self.assertEqual(False, allowed_birth_date(birth_invalid))
+
         # Valid birth date
         birth_valid = datetime.today().date() - timedelta(days = 1)
         self.assertEqual(True, allowed_birth_date(birth_valid))
