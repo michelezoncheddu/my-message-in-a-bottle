@@ -360,7 +360,8 @@ class Test(unittest.TestCase):
         # Check bad language message
         tocensor_message = Message()
         Message.text = 'Asshole'
-        Message.delivery_date = '10/10/2022'
+        now = datetime.now()
+        Message.delivery_date = now
         Message.recipient_id = '1'
         Message.sender = '2'
         Message.recipient = '1'
@@ -369,7 +370,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
                 {
                 'text': '****',
-                'delivery_date': '10/10/2022',
+                'delivery_date': now,
                 'recipient_id': '1',
                 'sender':'2',
                 'recipient': '1',
