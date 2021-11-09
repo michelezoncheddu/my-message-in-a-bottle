@@ -356,17 +356,16 @@ class Test(unittest.TestCase):
     @pytest.mark.run(order=4)
     def test_info_validator(self):
 
-        '''
-        # Check bad language message
+        # Censor bad language message
         tocensor_message = Message()
-        Message.text = 'Asshole'
+        tocensor_message.text = 'Asshole'
         now = datetime.now()
-        Message.delivery_date = now
-        Message.recipient_id = '1'
-        Message.sender = '2'
-        Message.recipient = '1'
-        Message.is_draft = False
-        Message.is_delivered = False
+        tocensor_message.delivery_date = now
+        tocensor_message.recipient_id = '1'
+        tocensor_message.sender = '2'
+        tocensor_message.recipient = '1'
+        tocensor_message.is_draft = False
+        tocensor_message.is_delivered = False
         self.assertEqual(
                 {
                 'text': '****',
@@ -378,7 +377,6 @@ class Test(unittest.TestCase):
                 'is_delivered': False
                 },
                 filter_language(tocensor_message))
-        '''
 
         # Invalid email
         invalid_email = "invalidemail"
