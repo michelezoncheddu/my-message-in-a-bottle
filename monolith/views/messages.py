@@ -71,7 +71,8 @@ def is_sender_or_recipient(message, user_id):
            )
        ):
        error='<h3>Wrong data provided!</h3><br/>Forbidden'
-       return render_template('/error.html', error=error), 403
+       raise Exception(error)
+       #return render_template('/error.html', error=error), 403
     
 
 @messages.route('/schedule')

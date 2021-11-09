@@ -90,6 +90,6 @@ def do_lottery():
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(10, do_task.s(), name='add every 10')
     #REALE
-    #sender.add_periodic_task(60*60*24*30, lottery.s(), name='lottery extraction')
+    sender.add_periodic_task(60*60*24*30, do_lottery.s(), name='lottery extraction')
     #TEST
-    sender.add_periodic_task(10000, do_lottery.s(), name='lottery extraction')
+    #sender.add_periodic_task(10000, do_lottery.s(), name='lottery extraction')

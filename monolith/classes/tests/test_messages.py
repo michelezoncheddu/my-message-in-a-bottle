@@ -8,11 +8,16 @@ from monolith.app import app
 from ...database import Message
 from ...views.messages import filter_language
 
+''' 
+   TESTCODE FOR CREATING, SENDING AND SAVING DRAFT MESSAGES.
+
+'''
+
 class Test(unittest.TestCase):
 
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
-
+    #Definition of user structures
         self.admin = {
             'email': 'admin@test.com',
             'password': 'Admin1@'
@@ -29,12 +34,12 @@ class Test(unittest.TestCase):
         }
         
 
-
+    #setup environment
     def setUp(self):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
 
-    
+    #TEST the mailbox 
     def test_mailbox(self):
         tested_app = app.test_client()
 
@@ -42,9 +47,11 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/mailbox')
         self.assertEqual(reply.status_code, 401)
 
+        #Standard User login
         reply = tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
-        
+
+        #Test the mailbox GET    
         reply = tested_app.get('/mailbox')
 
         # Parse HTML and get list of sent messages.
@@ -62,6 +69,7 @@ class Test(unittest.TestCase):
         #for i, message in enumerate(sent_messages):
         #   assert(message.text.strip() == f'{i+1} message from 1 to 1 n.{i+1} 1 1')
 
+    #TEST of retrieving of messages
     def test_message(self):
         tested_app = app.test_client()
     
@@ -72,9 +80,9 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/login', data=json.dumps(self.recipient), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # Existent message of other users.
+        # Retrieving Existent message of other users.
         reply = tested_app.get('/message/1')
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 404)
         
         tested_app = app.test_client()
     
@@ -127,7 +135,7 @@ class Test(unittest.TestCase):
 
         # Delete unexistent message.
         reply = tested_app.delete('/message/1')
-        self.assertEqual(reply.status_code, 200)
+        self.assertEqual(reply.status_code, 404)
 
         # Delete message of other users.
         reply = tested_app.delete('/message/4')
@@ -147,6 +155,7 @@ class Test(unittest.TestCase):
         Message.text = 'Asshole'
         self.assertEqual({'recipient_id': '1', 'delivery_date': '10/10/2022', 'text': '****'}, filter_language(tocensor_message))
 
+    #TEST the POST method to create,send and save messages
     def test_message_post(self): 
         tested_app = app.test_client()
         
