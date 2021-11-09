@@ -38,7 +38,7 @@ def page_not_found(error):
     return render_template('/error.html', error=error), 404
 
 
-# utility function for checking if recipient has sender on blacklist
+'''Utility function for checking if recipient has sender on blacklist.'''
 def is_blocked(recipient):
     recipient_id = (db.session.query(User).filter(User.id == recipient).first()).id
     # get list of blocked users ids
@@ -49,15 +49,17 @@ def is_blocked(recipient):
         return False
 
 
-# utility function for censoring bad language in received messages
+'''Utility function for censoring bad language in received messages.'''
 def filter_language(_message):
-    censored_message = {}
-
-    # censorship
-    _message.text = profanity.censor(_message.text)
-    censored_message.update({'recipient_id': _message.recipient_id, 'delivery_date': _message.delivery_date, 'text': _message.text})
-
-    return censored_message
+    return {
+        'text': profanity.censor(_message.text),  # Censorship.
+        'delivery_date': _message.delivery_date,
+        'recipient_id': _message.recipient_id,
+        'sender': _message.sender,
+        'recipient': _message.recipient,
+        'is_draft': _message.is_draft,
+        'is_delivered': _message.is_delivered
+    }
 
 
 def retrieve_message(message_id):
@@ -141,17 +143,16 @@ def message(message_id):
     user_id = current_user.get_id()
     is_sender_or_recipient(_message, user_id)
 
-    _message_aux = _message
-    # if language filter on
-    if current_user.has_language_filter:
-        _message_aux = filter_language(_message)
-
     if request.method == 'GET':
         if _message.get_recipient() == user_id and not _message.is_draft and not _message.is_read and _message.is_delivered:
-           #print("INVIO LETTURA MESSAGGIO: "+str(_message.get_sender()),flush=True)
            notify.delay(_message.get_sender(), 'Your message has been read!')
            _message.is_read = True
            db.session.commit()
+
+        _message_aux = _message
+        if current_user.has_language_filter:
+            _message_aux = filter_language(_message)
+
         return render_template('message.html', user=current_user, message=_message_aux)
     
     # Delete scheduled message using bonus

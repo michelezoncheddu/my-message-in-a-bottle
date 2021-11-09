@@ -17,7 +17,8 @@ class Test(unittest.TestCase):
 
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
-    #Definition of user structures
+        
+        '''Definition of user structures.'''
         self.admin = {
             'email': 'admin@test.com',
             'password': 'Admin1@'
@@ -34,12 +35,13 @@ class Test(unittest.TestCase):
         }
         
 
-    #setup environment
+    '''Setup the environment.'''
     def setUp(self):
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False
 
-    #TEST the mailbox 
+
+    '''TEST the mailbox.'''
     def test_mailbox(self):
         tested_app = app.test_client()
 
@@ -69,7 +71,7 @@ class Test(unittest.TestCase):
         #for i, message in enumerate(sent_messages):
         #   assert(message.text.strip() == f'{i+1} message from 1 to 1 n.{i+1} 1 1')
 
-    #TEST of retrieving of messages
+    '''TEST of retrieving of messages.'''
     def test_message(self):
         tested_app = app.test_client()
     
@@ -77,6 +79,7 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 401)
         
+        # Logging in as "recipient"
         reply = tested_app.post('/login', data=json.dumps(self.recipient), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
@@ -84,9 +87,7 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/message/1')
         self.assertEqual(reply.status_code, 404)
         
-        tested_app = app.test_client()
-    
-
+        # Logging in as "sender"
         reply = tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
         
@@ -129,11 +130,11 @@ class Test(unittest.TestCase):
         reply = tested_app.get('/create_message?reply_id=1')
         self.assertEqual(reply.status_code, 200)
 
-        # Delete message.
+        # Delete message from the sender's side.
         reply = tested_app.delete('/message/1')
         self.assertEqual(reply.status_code, 200)
 
-        # Delete unexistent message.
+        # Delete already deleted message.
         reply = tested_app.delete('/message/1')
         self.assertEqual(reply.status_code, 404)
 
@@ -141,25 +142,25 @@ class Test(unittest.TestCase):
         reply = tested_app.delete('/message/4')
         self.assertEqual(reply.status_code, 404)
 
+        # Logging in as admin
         reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # Delete message of other users.
+        # Delete message from the receiver's side.
         reply = tested_app.delete('/message/1')
         self.assertEqual(reply.status_code, 200)
 
         # Check bad language message
-        tocensor_message = Message()
-        Message.recipient_id = '1'
-        Message.delivery_date = '10/10/2022'
-        Message.text = 'Asshole'
-        self.assertEqual({'recipient_id': '1', 'delivery_date': '10/10/2022', 'text': '****'}, filter_language(tocensor_message))
+        to_censor_message = Message()
+        to_censor_message.text = 'Asshole'
+        self.assertEqual(filter_language(to_censor_message)['text'], '****')
 
-    #TEST the POST method to create,send and save messages
+
+    '''TEST the POST method to create, send and save messages.'''
     def test_message_post(self): 
         tested_app = app.test_client()
         
-        #Message test vector SAVE
+        # Message test vector SAVE
         self.message = {
             'text_area': 'text',
             'delivery_date': '2022-10-10T08:00',
@@ -171,7 +172,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        #Message test vector SAVE+HIDDEN
+        # Message test vector SAVE+HIDDEN
         self.message = {
             'message_id_hidden':1,
             'text_area': 'text',
@@ -184,7 +185,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        #Message test vector SEND
+        # Message test vector SEND
         self.message = {
             'text_area': 'text',
             'delivery_date': '2022-10-10T08:00',
@@ -197,7 +198,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        #Message test vector SEND+HIDDEN
+        # Message test vector SEND+HIDDEN
         self.message = {
             'message_id_hidden':1,
             'text_area': 'text',
@@ -211,9 +212,9 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        #ERRORS
+        # ERRORS
 
-        #Message test vector SEND wrong date        
+        # Message test vector SEND wrong date        
         self.message = {
             'text_area': 'text',
             'delivery_date': '2021-10-10T08:00',
@@ -238,7 +239,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 409)
         
-        #Message test vector SAVE wrong date
+        # Message test vector SAVE wrong date
         self.message = {
             'text_area': 'text',
             'delivery_date': '2021-10-10T08:00',
@@ -249,11 +250,3 @@ class Test(unittest.TestCase):
         tested_app.post('/login', data=json.dumps(self.sender), content_type='application/json')
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 409)
-
-
-        
-        
-
-
-
-        

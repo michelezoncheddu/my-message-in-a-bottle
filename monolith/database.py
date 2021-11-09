@@ -106,7 +106,6 @@ class Message(db.Model):
     text = db.Column(db.Unicode(128),nullable=False)
     delivery_date = db.Column(db.DateTime)
     is_draft = db.Column(db.Boolean, default=True)
-    last_update_date = db.Column(db.DateTime)
     access = db.Column(db.Integer, default=Access.ALL.value)  # Access rights.
     is_delivered = db.Column(db.Boolean, default=False)
     is_read = db.Column(db.Boolean, default=False)
@@ -137,10 +136,6 @@ class Message(db.Model):
     # get delivery_date
     def get_delivery_date(self):
         return self.delivery_date
-
-    # get last update date
-    def get_last_update_date(self):
-        return self.last_update_date
 
     # get attachement
     def get_attachement(self):
