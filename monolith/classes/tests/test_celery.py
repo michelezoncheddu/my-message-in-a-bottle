@@ -16,7 +16,7 @@ class Test(unittest.TestCase):
 
     '''TEST NOTIFY TASK.'''
     def test_notify(self):
-        bg.notify(1,'test') 
+        bg.notify(1,'test')
 
 
     '''TEST LOTTERY TASK'''

@@ -1,13 +1,14 @@
+from datetime import datetime
 import wtforms as f
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired
 from wtforms.fields.html5 import DateTimeLocalField, DateField
 from wtforms import SubmitField, SelectMultipleField, IntegerField
 from wtforms.widgets import HiddenInput
-from datetime import datetime
 
 from monolith.database import User, db
 from .utils import allowed_password, allowed_email, allowed_birth_date
+
 
 class LoginForm(FlaskForm):
     ''' Login form for the user. '''
@@ -21,15 +22,15 @@ class LoginForm(FlaskForm):
         # retrieve information from form
         email, password = self.email.data, self.password.data
         # retrieve users identified by email
-        user = db.session.query(User).filter(User.email==email, User.is_active == True).first()
+        user = db.session.query(User).filter(User.email == email, User.is_active).first()
         # check that user exists in the db and that the password is valid
         if user is None or not user.authenticate(password):
-            return [False, "invalid credentials"]
+            return [False, 'invalid credentials']
         # check if user is banned
-        elif user.is_banned == True:
-            return [False, "your account has been permanently banned!"]
-        else: 
-            return [result, ""]
+        elif user.is_banned:
+            return [False, 'your account has been permanently banned!']
+        else:
+            return [result, '']
 
 class UserForm(FlaskForm):
     ''' Registration form for the user. '''
@@ -44,18 +45,18 @@ class UserForm(FlaskForm):
     ''' Input check: email format, valid password and valid birth date. '''
     def validate_on_submit(self):
         result = super(UserForm, self).validate()
-        
+
         # check email format is valid
         if not allowed_email(self.email.data):
-            return [False, "invalid email format"]
+            return [False, 'invalid email format']
         # check password requirements
         if not allowed_password(self.password.data):
-            return [False, "password must be of length between 5 and 25 and contain at least one upper case, one number and one special character!"]
+            return [False, 'password must be of length between 5 and 25 and contain at least one upper case, one number and one special character!']
         # check birth date is in the past
         if not allowed_birth_date(self.date_of_birth.data):
-            return [False, "date of birth must be in the past"]
+            return [False, 'date of birth must be in the past']
 
-        return [result, ""]
+        return [result, '']
 
 
 class MessageForm(FlaskForm):
@@ -74,5 +75,5 @@ class MessageForm(FlaskForm):
             return False
         if (self.send_button.data) and (self.users_list.data == []):
             return False
-        
+
         return True

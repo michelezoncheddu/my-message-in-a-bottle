@@ -4,11 +4,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from .access import Access
 
+
 db = SQLAlchemy()
 
 
 class User(db.Model):
-
     __tablename__ = 'user'
 
     # Data
@@ -27,8 +27,8 @@ class User(db.Model):
     is_banned = db.Column(db.Boolean, default=False)
     is_reported = db.Column(db.Boolean, default=False)
     is_anonymous = False
-    # Files (path) 
-    profile_pic = db.Column(db.String, default=None)    # profile picture
+    # Files (path)
+    profile_pic = db.Column(db.String, default=None)  # profile picture
 
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
@@ -38,11 +38,9 @@ class User(db.Model):
     def get_password_hash(self):
         return self.password
 
-    # Set 'password'
     def set_password(self, password):
         self.password = generate_password_hash(password)
-        
-    # Set profile picture
+
     def set_profile_pic(self, image_path):
         self.profile_pic = image_path
 
@@ -56,38 +54,30 @@ class User(db.Model):
         self._authenticated = checked
         return self._authenticated
 
-    # Set 'is_reported'
     def set_reported(self, bool):
         self.is_reported = bool
 
-    # Set 'is_banned'
     def set_banned(self, bool):
         self.is_banned = bool
 
     def get_id(self):
         return self.id
-    
-    # Get 'firstname'
+
     def get_firstname(self):
         return self.firstname
 
-    # Get 'surname'
     def get_surname(self):
         return self.lastname
-    
-    # Get 'email'
+
     def get_email(self):
         return self.email
-    
-    # Get profile picture
+
     def get_profile_pic(self):
         return self.profile_pic
 
-'''
-    Auxiliary table for mantaining records of blocked users for each user
-'''
-class BlackList(db.Model):
 
+class BlackList(db.Model):
+    '''Auxiliary table for mantaining records of blocked users for each user.'''
     __tablename__ = 'black_list'
 
     # Data
@@ -104,7 +94,6 @@ class BlackList(db.Model):
 
 
 class Message(db.Model):
-
     __tablename__ = 'messages'
 
     # Data
@@ -125,30 +114,23 @@ class Message(db.Model):
     sender = relationship('User', foreign_keys='Message.sender_id')
     recipient = relationship('User', foreign_keys='Message.recipient_id')
 
-
     def __init__(self, *args, **kw):
         super(Message, self).__init__(*args, **kw)
 
-
     def get_id(self):
         return self.id
-    
-    # Get 'sender_id'
+
     def get_sender(self):
         return self.sender_id
 
-    # Get 'recipient_id'
     def get_recipient(self):
         return self.recipient_id
-    
-    # Get 'text'
+
     def get_text(self):
         return self.text
 
-    # Get 'delivery_date'
     def get_delivery_date(self):
         return self.delivery_date
 
-    # Get 'attachment'
     def get_attachement(self):
         return self.attachment

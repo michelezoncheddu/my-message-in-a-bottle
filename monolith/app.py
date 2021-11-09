@@ -29,9 +29,9 @@ def create_app():
     app.config['CKEDITOR_SERVE_LOCAL'] = True
 
     def jBleach(value):
-        return bleach.clean(value,tags=allowed_tags_sum,attributes=allowed_attrs_sum,strip=True)
+        return bleach.clean(value, tags=allowed_tags_sum, attributes=allowed_attrs_sum, strip=True)
 
-    app.jinja_env.filters["jBleach"] = jBleach  
+    app.jinja_env.filters['jBleach'] = jBleach
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -89,7 +89,7 @@ def create_app():
         # Getting the dummy message if any
         m = db.session.query(Message).filter(Message.sender_id == 2 and Message.recipient_id==1)
         message = m.first()
-        
+
         # Creating dummy messages
         if message is None:
             example = Message()
@@ -102,7 +102,7 @@ def create_app():
             example.is_draft = False
             example.is_delivered = True
             db.session.add(example)
-            
+
             example = Message()
             example.sender_id = 2
             example.recipient_id = 1
@@ -113,11 +113,12 @@ def create_app():
             example.is_draft = True
             db.session.add(example)
             db.session.commit()
-            
+
     return app
 
 
 app = create_app()
+
 
 if __name__ == '__main__':
     app.run()
