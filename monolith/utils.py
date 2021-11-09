@@ -22,7 +22,7 @@ ALLOWED_EMAILS = {'@test.com',
 
 
 '''
-    utility function to save attachments (messages) or profile pics (users)
+    Utility function to save attachments (messages) or profile pics (users)
 '''
 def save_image(file, path):
     filename = secure_filename(file.filename)

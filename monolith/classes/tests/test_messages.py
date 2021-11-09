@@ -212,7 +212,7 @@ class Test(unittest.TestCase):
         reply = tested_app.post('/create_message', data=json.dumps(self.message), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # ERRORS
+        '''ERRORS.'''
 
         # Message test vector SEND wrong date        
         self.message = {
