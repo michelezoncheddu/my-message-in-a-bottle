@@ -33,6 +33,7 @@ profanity.load_censor_words()
 ATTACHMENTS_PATH = 'monolith/static'
 
 
+'''Custom template for 404 Not Found error.'''
 @messages.errorhandler(404)
 def page_not_found(error):
     return render_template('/error.html', error=error), 404
@@ -62,6 +63,7 @@ def filter_language(_message):
     }
 
 
+'''Utility function for retrieving a message with a message id.'''
 def retrieve_message(message_id):
     _message = db.session.query(Message).filter(Message.id==message_id).first()
     if _message is None:
@@ -70,6 +72,7 @@ def retrieve_message(message_id):
     return _message
 
 
+'''Utility function for checking i'''
 def is_sender_or_recipient(message, user_id):
     is_sender = message.sender_id == user_id
     is_recipient = message.recipient_id == user_id
@@ -83,8 +86,13 @@ def is_sender_or_recipient(message, user_id):
        ):
        error = 'Message not found!'
        abort(404, error)
-    
 
+
+'''
+    Display the list of user's messages scheduled to be sent 
+
+    GET: show the list of messages
+'''
 @messages.route('/schedule')
 @login_required
 def schedule():
@@ -102,6 +110,17 @@ def schedule():
     return render_template('schedule.html', scheduled_messages=scheduled_messages)
 
 
+'''
+    Manage the user's sent and received messages, aswell as the drafts
+
+    GET: display the list of drafts, sent and received messages
+    POST: perform an action on drafts and messages
+        if <message> in <sent_messages> AND <To> button is clicked: display information about the recipient
+        if <message> in <received_messages> AND <From> button is clicked: display information about the sender
+        if <message> in <draft_messages>
+            if <Edit> button is clicked: allows to edit the message text, delivery_date and recipients
+            if <View> button is clicked: display the message information
+'''
 @messages.route('/mailbox')
 @login_required
 def mailbox():
@@ -135,7 +154,12 @@ def mailbox():
                                            draft_messages=draft_messages
     )
 
+'''
+    Allowes the user to read a specific message by id
 
+    GET: display the content of a specific message by id (censured if language_filter is ON)
+    DELETE: 
+'''
 @messages.route('/message/<int:message_id>', methods=['GET', 'DELETE'])
 @login_required
 def message(message_id):
@@ -312,6 +336,11 @@ def create_message():
         
         return render_template('create_message.html', form=form, selected=selected)
 
+'''
+    Display a calendar with the messages scheduled to be sent in each day
+
+    GET: show the calendar template
+'''
 
 @messages.route('/calendar')
 @login_required

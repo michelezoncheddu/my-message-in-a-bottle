@@ -61,6 +61,7 @@ def moderate_action(email, action):
 '''
     Utility function to research users in the database, based on the field <is_active>
 '''
+
 @login_required
 def get_users():
     return db.session.query(User).filter(User.is_active)

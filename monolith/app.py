@@ -17,7 +17,7 @@ allowed_attrs_sum = {'*': ['class','style','color'],
                         'img': ['src', 'alt','data-filename','style']}
 
 os.environ['TZ'] = 'Europe/Rome'
-time.tzset()
+#time.tzset()
 
 
 def create_app():
@@ -41,7 +41,7 @@ def create_app():
     login_manager.init_app(app)
     db.create_all(app=app)
 
-    # create a first admin user
+    # Create a first admin user
     with app.app_context():
         q = db.session.query(User).filter(User.email == 'admin@test.com')
         user = q.first()
@@ -86,11 +86,11 @@ def create_app():
             db.session.commit()
 
 
-        # getting the dummy message if any
+        # Getting the dummy message if any
         m = db.session.query(Message).filter(Message.sender_id == 2 and Message.recipient_id==1)
         message = m.first()
         
-        # creating dummy messages
+        # Creating dummy messages
         if message is None:
             example = Message()
             example.sender_id = 2

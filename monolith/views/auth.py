@@ -10,7 +10,7 @@ from monolith.forms import LoginForm
 auth = Blueprint('auth', __name__)
 
 ''' 
-    Manage the Login of a user
+    Manage the login of a user
 
     GET:  Returns the login page form  
     POST: Takes the input from the form, if the login is correct invokes the login_user() function that
@@ -38,7 +38,7 @@ def login():
         return render_template('login.html', form=form)
 
 ''' 
-    Manage the Logout of the logged in user
+    Manage the logout of the logged in user
 '''
 
 @auth.route('/logout')
