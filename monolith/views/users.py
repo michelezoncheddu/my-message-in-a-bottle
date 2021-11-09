@@ -1,11 +1,11 @@
 from flask import Blueprint, redirect, render_template, request
 
-from ..utils import allowed_file, allowed_email, allowed_birth_date, save_image
+from ..utils import allowed_file, allowed_email, save_image
 
 from werkzeug.utils import secure_filename
 from monolith.auth import login_required, admin_required
 from monolith.database import User, BlackList, db
-from monolith.forms import UserForm,UserDelForm
+from monolith.forms import UserForm
 
 from flask_login import current_user
 
@@ -17,11 +17,15 @@ users = Blueprint('users', __name__)
 DEFAULT_PROFILE_PIC = 'static/profile/default.png'
 PROFILE_PIC_PATH = 'monolith/static/profile/'
 
+'''
+    Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
+'''
 
-# utility function for applying an action: Ban, Unban, Report, Reject (a report request)
 def moderate_action(email, action):
     u = db.session.query(User).filter(User.email == email)
     _user = u.first()
+
+    # if user doesn't exist in the db, raises an error
     if _user is None:
         raise RuntimeError('Reported user not found in DB, this should not happen!')
 
@@ -54,11 +58,23 @@ def moderate_action(email, action):
         _user.set_reported(True)
         db.session.commit()
 
-
+'''
+    Utility function to research users in the database, based on the field <is_active>
+'''
 @login_required
 def get_users():
     return db.session.query(User).filter(User.is_active)
 
+
+'''
+    Manage the updating of the user's profile information and toggle of the language filter
+
+    GET: show the profile page
+    POST: update the profile's information
+        if <action> = <Upload>: check if a new image has been uploaded and then save it in the database as the user's new profile picture
+        if <action> = <Save>: save in the database the new inputted profile information (name, surname, email...)
+        if <action> = <ToggleFilter>: toggle the language filter and save the new value in the database under <Has_language_filter>
+'''
 
 @users.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -104,6 +120,13 @@ def profile():
 
         return render_template('profile.html', user=_user)
 
+'''
+    Manage the list of users in the database
+
+    GET: show the list of users divided into users and blocked users, with a button to either ban (if the user viewing the list is admin,) or report a user
+    POST: if <action_todo> = <Report>: report the chosen user
+          if <action_todo> = <Block>: block the chosen user
+'''
 
 @users.route('/users', methods=['POST', 'GET'])
 @login_required
@@ -134,6 +157,12 @@ def _users():
             _blocked_users = [r.id_blocked for r in db.session.query(BlackList.id_blocked).filter(BlackList.id_user == current_user.id)]
             return render_template('users.html', users=_users, blocked_users=_blocked_users, action=action_template)
 
+'''
+    Manage the user's blacklist 
+
+    GET: show the user's blacklist
+    POST: allows a user to unblock another user from the list
+'''
 
 @users.route('/blacklist', methods=['POST', 'GET'])
 @login_required
@@ -149,6 +178,14 @@ def blacklist():
         _black_list = db.session.query(BlackList).filter(BlackList.id_user == current_user.id).all()
         return render_template('blacklist.html', black_list=_black_list)
 
+'''
+    Manage the list of reported users, visible only to admins
+
+    GET: show the list of reported users
+    POST: based on user's reports, allows to:
+        reject a report if <action> = <Reject>
+        ban a user if <action> = <Ban>
+'''
 
 @users.route('/reported_users', methods=['POST', 'GET'])
 @login_required
@@ -164,6 +201,12 @@ def reported_users():
         moderate_action(email, action) # apply action
         return render_template('reported_users.html', users=_users)
 
+'''
+    Manage the sign up page for the application
+
+    GET: display the form for sign up 
+    POST: get all user information from the form and create a new User object that is saved on the database
+'''
 
 @users.route('/create_user', methods=['POST', 'GET'])
 def create_user():
@@ -172,6 +215,7 @@ def create_user():
         result = form.validate_on_submit()
         if result[0]:
             user = db.session.query(User).filter(User.email==form.email.data, User.is_active).first()
+            # check if the email is just registered and still active
             if user is not None:
                 error='This email is already registered'
                 return render_template('/error.html', error=error), 409

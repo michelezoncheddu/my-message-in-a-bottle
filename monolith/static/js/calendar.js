@@ -38,7 +38,9 @@ const Calendar = (id) => ({
                 let evTime = moment(ev.time);
                 if (evTime.year() == y && evTime.month() == m && evTime.date() == d) {
                     let frgEvent = document.createRange().createContextualFragment(`
-                        <div time="${ev.time}" class="event ${ev.cls}">${evTime.format('HH:mm')} <a href="/message/${ev.msg_id}">${ev.desc}</a> </div>
+                        <a href="/message/${ev.msg_id}" style="text-decoration: none">
+                            <div time="${ev.time}" class="event ${ev.cls}">${evTime.format('HH:mm')} ${ev.desc}</div>
+                        </a>
                     `);
                     divEvents.appendChild(frgEvent);
                     let divEvent = divEvents.querySelector(`.event[time='${ev.time}']`);
