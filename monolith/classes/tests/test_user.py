@@ -3,11 +3,8 @@ import json
 import unittest
 import pytest
 
-from bs4 import BeautifulSoup as bs
-from werkzeug.utils import redirect
 
 from monolith.app import app
-from monolith.forms import UserForm
 
 from datetime import datetime, timedelta
 
@@ -19,17 +16,19 @@ class Test(unittest.TestCase):
     def __init__(self, *args, **kw):
         super(Test, self).__init__(*args, **kw)
 
-        # admin user
+        # login admin user
         self.admin = {
             'email': 'admin@test.com',
             'password': 'Admin1@'
         }
-        # common user
+
+        # login user
         self.common_user = {
             'email': 's@test.com',
             'password': 'Sender1@'
         }
-        # dummy user for /unregister
+
+        # creation of dummy user for unregister
         self.create_tounregister_user = {
             'email': 'tounregister@test.com',
             'firstname': 'tounregister',
@@ -38,23 +37,13 @@ class Test(unittest.TestCase):
             'date_of_birth': '2020-10-09',
             'location': 'Pisa'
         }
+
+        # login of dummy user for unregister
         self.tounregister_user = {
             'email': 'tounregister@test.com',
             'password': 'Tounregister1@'
         }
-        # dummy user for delete user
-        self.create_todelete_user = {
-            'email': 'todelete@test.com',
-            'firstname': 'todelete',
-            'lastname': 'todelete',
-            'password': 'Todelete1@',
-            'date_of_birth': '2020-10-09',
-            'location': 'Pisa'
-        }
-        self.todelete_user = {
-            'email': 'todelete@test.com',
-            'password': 'Todelete1@'
-        }
+
         # dummy user for testing reject reported user
         self.create_toreject_user = {
             'email': 'toreject@test.com',
@@ -64,7 +53,8 @@ class Test(unittest.TestCase):
             'date_of_birth': '2020-10-09',
             'location': 'Pisa'
         }
-        # dummy user for testing ban 1
+
+        # dummy user for testing ban on endpoint users
         self.create_toban1_user = {
             'email': 'toban1@test.com',
             'firstname': 'toban1',
@@ -73,11 +63,14 @@ class Test(unittest.TestCase):
             'date_of_birth': '2020-10-09',
             'location': 'Pisa'
         }
+        
+        # login
         self.toban1_user = {
             'email': 'toban1@test.com',
             'password': 'Toban1@'
         }
-        # dummy user for testing ban 2
+
+        # dummy user for testing ban on endpoint reported_users
         self.create_toban2_user = {
             'email': 'toban2@test.com',
             'firstname': 'toban2',
@@ -86,6 +79,8 @@ class Test(unittest.TestCase):
             'date_of_birth': '2020-10-09',
             'location': 'Pisa'
         }
+
+        # login
         self.toban2_user = {
             'email': 'toban2@test.com',
             'password': 'Toban2@'
@@ -97,351 +92,263 @@ class Test(unittest.TestCase):
         app.config['WTF_CSRF_ENABLED'] = False
 
 
-    # general tests for common user
+    # general tests for user
     @pytest.mark.run(order=1)
     def test_user(self):
         tested_app = app.test_client()
 
-        # /create_user
+        # GET /create_user form
         reply = tested_app.get('/create_user')
         self.assertEqual(reply.status_code, 200)
 
-        # create dummy account 1
+        # Get profile of user not logged
+        reply = tested_app.get('/profile')
+        self.assertEqual(reply.status_code, 401)
+
+        # login user
+        reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
+        self.assertEqual(reply.status_code, 302)
+
+        # Get profile information of user
+        reply = tested_app.get('/profile')
+        self.assertEqual(reply.status_code, 200)
+
+        # save updates on profile
+        data = {
+                'action': 'Save'
+        }
+
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Get list of users
+        reply = tested_app.get('/users')
+        self.assertEqual(reply.status_code, 200)
+
+        # Get list of reported_users without permission
+        reply = tested_app.get('reported_users')
+        self.assertEqual(reply.status_code, 401)
+
+        # Change profile pic: no selected file
+        data = {
+                'action': 'Upload'
+        }
+
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 400)
+
+        # Change profile pic: invalid format
+        filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
+        data = {
+                'action': 'Upload',
+                'file': (open(filename, 'rb'), filename)
+        }
+
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 400)
+
+        # Successfully change profile pic
+        filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
+        data = {
+                'action': 'Upload',
+                'file': (open(filename, 'rb'), filename)
+        }
+        reply = tested_app.post('/profile', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Create user to report and not to be banned
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_toreject_user),
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
-        # create dummy account 2
+        # Report 'toreject' user
+        data = {
+                'action': 'Report',
+                'email': 'toreject@test.com'
+        }
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Block  'toreject' user
+        data = {
+                'action': 'Block',
+                'email': 'toreject@test.com'
+        }
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Unblock 'toreject' users on endpoint users
+        data = {
+                'action': 'Unblock',
+                'email': 'toreject@test.com'
+        }
+
+        reply = tested_app.post('/users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+
+        # Create user to report and to be banned
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_toban1_user),
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
-        # /profile without login
-        reply = tested_app.get('/profile')
-        self.assertEqual(reply.status_code, 401)
-
-        # login
-        reply = tested_app.post('/login', data=json.dumps(self.common_user), content_type='application/json')
-        self.assertEqual(reply.status_code, 302)
-
-        # /profile
-        reply = tested_app.get('/profile')
-        self.assertEqual(reply.status_code, 200)
-
-        # /profile save button
-        data = {'dir': '/profile',
-                'submit': 'Save',
-                'action': 'Save'
-                }
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # /users
-        reply = tested_app.get('/users')
-        self.assertEqual(reply.status_code, 200)
-
-        # /reported_users (denied access)
-        reply = tested_app.get('reported_users')
-        self.assertEqual(reply.status_code, 401)
-
-        # change profile pic : no selected file
-        data = {'dir': '/profile',
-                'submit': 'Upload',
-                'action': 'Upload'
-                }
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 400)
-
-        # change profile pic : invalid format
-        filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
-        data = {'dir': '/profile',
-                'submit': 'Upload',
-                'action': 'Upload',
-                'file': (open(filename, 'rb'), filename)
-                }
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 400)
-
-        # change profile pic
-        filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
-        data = {'dir': '/profile',
-                'submit': 'Upload',
-                'action': 'Upload',
-                'file': (open(filename, 'rb'), filename)
-                }
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # report 1
-        data = {'dir': '/users',
-                'submit': 'Report', 
-                'action': 'Report',
-                'email': 'toreject@test.com'}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
         
-        # report 2
-        data = {'dir': '/users',
-                'submit': 'Report', 
+        # Report 'toban' user
+        data = {
                 'action': 'Report',
-                'email': 'toban1@test.com'}
+                'email': 'toban1@test.com'
+        }
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
-
-        # block 
-        data = {'dir': '/users',
-                'submit': 'Block', 
+        # Block 'toban' user
+        data = {
                 'action': 'Block',
-                'email': 'toreject@test.com'}
+                'email': 'toban1@test.com'
+        }
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
-        # block 2
-        data = {'dir': '/users',
-                'submit': 'Block', 
-                'action': 'Block',
-                'email': 'toban1@test.com'}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # unblock on /users
-        data = {'dir': '/users',
-                'submit': 'Unblock', 
-                'action': 'Unblock',
-                'email': 'toreject@test.com'}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # /blacklist
+        
+        # Get blacklist 
         reply = tested_app.get('blacklist')
         self.assertEqual(reply.status_code, 200)
 
-        # unblock on /blacklist
-        data = {'dir': '/blacklist',
-                'submit': 'Unblock', 
+        # Unblock 'toban' user on endpoint blacklist
+        data = {
                 'unblock': 'toban1@test.com'
-                }
+        }
         reply = tested_app.post('/blacklist', data=data)
         self.assertEqual(reply.status_code, 200)
 
 
-        print("COMMON USER: OK")
-
-
-    # general tests for admin
+    # Tests admin actions
     @pytest.mark.run(order=2)
     def test_admin(self):
         tested_app = app.test_client()
 
-        # create dummy account 3
+        # create account to directly ban
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_toban2_user),
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
-        # /profile without login
-        reply = tested_app.get('/profile')
-        self.assertEqual(reply.status_code, 401)
-
-        # login
+        # Login admin
         reply = tested_app.post('/login', data=json.dumps(self.admin), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # /profile
-        reply = tested_app.get('/profile')
-        self.assertEqual(reply.status_code, 200)
-
-        # /users
-        reply = tested_app.get('/users')
-        self.assertEqual(reply.status_code, 200)
-
-
-        """# create todelete account
-        reply = tested_app.post('/create_user',
-                    data=json.dumps(self.create_todelete_user),
-                    content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 200)
-        # /delete_user
-        reply = tested_app.get('/delete_user')
-        self.assertEqual(reply.status_code, 200)
-
-        # delete user
-        data = {'dir': '/delete_user',
-                'submit': 'Submit', 
-                'firstname': 'todelete'}
-        reply = tested_app.post('/delete_user', data=data)
-        self.assertEqual(reply.status_code, 302)"""
-
-
-        # /reported_users
+        # Get list of reported users
         reply = tested_app.get('reported_users')
         self.assertEqual(reply.status_code, 200)
 
-        # change profile pic : no selected file
-        data = {'dir': '/profile',
-                'submit': 'Upload',
-                'action': 'Upload'}
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 400)   
-
-
-        # change profile pic : invalid format
-        filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'test_invalid_format.txt')
-        data = {'dir': '/profile',
-                'submit': 'Upload',
-                'action': 'Upload',
-                'file': (open(filename, 'rb'), filename)
-                }
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 400)
-
-
-        # change profile pic
-        filename = os.path.join(os.path.dirname('monolith/static/profile/'), 'default.png')
-        data = {'dir': '/profile',
-                'submit': 'Upload',
-                'action': 'Upload',
-                'file': (open(filename, 'rb'), filename)
-                }
-        reply = tested_app.post('/profile', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # block 
-        data = {'dir': '/users',
-                'submit': 'Block', 
-                'action': 'Block',
-                'email': 'toreject@test.com'}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # block 2
-        data = {'dir': '/users',
-                'submit': 'Block', 
-                'action': 'Block',
-                'email': 'toban1@test.com'}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # unblock on /users
-        data = {'dir': '/users',
-                'submit': 'Unblock', 
-                'action': 'Unblock',
-                'email': 'toreject@test.com'}
-        reply = tested_app.post('/users', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # /blacklist
-        reply = tested_app.get('blacklist')
-        self.assertEqual(reply.status_code, 200)
-
-        # unblock on /blacklist
-        data = {'dir': '/blacklist',
-                'submit': 'Unblock', 
-                'unblock': 'toban1@test.com'
-                }
-        reply = tested_app.post('/blacklist', data=data)
-        self.assertEqual(reply.status_code, 200)
-
-        # reject reported user
-        data = {'dir': '/reported_users',
-                'submit': 'Reject', 
+        # Reject reported 'toreject' user
+        data = {
                 'action': "Reject",
                 'email': 'toreject@test.com'
-                }
+        }
         reply = tested_app.post('/reported_users', data=data)
         self.assertEqual(reply.status_code, 200)
 
-        # ban on /users endpoint
-        data = {'dir': '/users',
-                'submit': 'Ban', 
+        # Ban reported_users 'toban' on endpoint reported_users
+        data = {'action': "Ban",
+                'email': 'toban1@test.com'
+        }
+        reply = tested_app.post('/reported_users', data=data)
+        self.assertEqual(reply.status_code, 200)
+
+        # Directly ban 'toban2' on endpoint users
+        data = {
                 'action': 'Ban',
                 'email': 'toban2@test.com'
-                }
+        }
         reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
-        # ban on /reported_users endpoint
-        data = {'dir': '/reported_users',
-                'submit': 'Ban', 
-                'action': "Ban",
-                'email': 'toban1@test.com'
-                }
-        reply = tested_app.post('/reported_users', data=data)
+        # Unban 'toban2' on endpoint users
+        data = {
+                'action': 'Unban',
+                'email': 'toban2@test.com'
+        }
+        reply = tested_app.post('/users', data=data)
         self.assertEqual(reply.status_code, 200)
 
-        # logout
+
+        # Logout admin
         reply = tested_app.get('/logout')
         self.assertEqual(reply.status_code, 302)
 
-        # try login as banned 1
+        # Failed login of banned user 'toban1'
         reply = tested_app.post('/login', data=json.dumps(self.toban1_user), 
                         content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 409)
 
-        # try login as banned 2
+        # Success login of unbanned user 'toban2'
         reply = tested_app.post('/login', data=json.dumps(self.toban2_user), 
                         content_type='application/json', follow_redirects=True)
-        self.assertEqual(reply.status_code, 409)
+        self.assertEqual(reply.status_code, 200)
 
-        print("ADMIN USER: OK")
-
-
-    # /unregister tests
+    # Unregister tests
     @pytest.mark.run(order=3)
     def test_unregister(self):
         tested_app = app.test_client()
 
-        # get /unregister without login
+        # Unregister without login
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 401)
 
-        # create tounregister account
+        # Create tounregister user
         reply = tested_app.post('/create_user',
                     data=json.dumps(self.create_tounregister_user),
                     content_type='application/json', follow_redirects=True)
         self.assertEqual(reply.status_code, 200)
 
-        # login
+        # login 'tounregistere' user
         reply = tested_app.post('/login', data=json.dumps(self.tounregister_user), content_type='application/json')
         self.assertEqual(reply.status_code, 302)
 
-        # get /unregister
+        # Get unregister form
         reply = tested_app.get('/unregister')
         self.assertEqual(reply.status_code, 200)
 
-        # unregister with wrong password
-        data = {'dir': '/unregister',
-                'submit': 'Confirm', 
-                'password': 'Incorrectpw1@'}
+        # Unregister with wrong password
+        data = {
+                'password': 'Incorrectpw1@'
+        }
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 400)
 
-        # unregister
-        data = {'dir': '/unregister',
-                'submit': 'Confirm', 
-                'password': 'Tounregister1@'}
+        # Success unregister
+        data = {
+                'password': 'Tounregister1@'
+        }
         reply = tested_app.post('/unregister', data=data)
         self.assertEqual(reply.status_code, 302)
 
-        print("UNREGISTER USER: OK")
 
-
-    # validator of user info tests
+    # Test for input fields format in create_user
     @pytest.mark.run(order=4)
     def test_info_validator(self):
-        tested_app = app.test_client()
 
-        # email invalid
+        """
+        #Check bad language message
+        tocensor_message = Message()
+        Message.recipient_id = '1'
+        Message.delivery_date = '10/10/2022'
+        Message.text = 'Asshole'
+        self.assertEqual({'recipient_id': '1', 'delivery_date': '10/10/2022', 'text': '****'}, filter_language(tocensor_message))
+        """
+
+        # Invalid email
         invalid_email = "invalidemail"
         self.assertEqual(False, allowed_email(invalid_email))
-        # email valid
+        
+        # Valid email
         valid_email = "valid@hotmail.com"
         self.assertEqual(True, allowed_email(valid_email))
 
-        # password invalid
+        # Invalid password
         invalid_pw1 = "aaaa"                            # too short
         invalid_pw2 = "aaaaaaaaaaaaaaaaaaaaaaaaaa"      # too long
         invalid_pw3 = "password"                        # no upper case
@@ -452,18 +359,16 @@ class Test(unittest.TestCase):
         self.assertEqual(False, allowed_password(invalid_pw3))
         self.assertEqual(False, allowed_password(invalid_pw4))
         self.assertEqual(False, allowed_password(invalid_pw5))
-        # password valid
+        
+        # Valid password
         valid_pw = "Password1@"
         self.assertEqual(True, allowed_password(valid_pw))
 
-        # birth invalid
+        # Invalid birth date
         birth_invalid = datetime.today().date() + timedelta(days = 1)
         self.assertEqual(False, allowed_birth_date(birth_invalid))
-        # birth valid
+        # Valid birth date
         birth_valid = datetime.today().date() - timedelta(days = 1)
         self.assertEqual(True, allowed_birth_date(birth_valid))
-
-        print("INFO VALIDATOR: OK")
-
 
 
