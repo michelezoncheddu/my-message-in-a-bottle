@@ -9,8 +9,8 @@ class Test(unittest.TestCase):
 
 
     '''TEST MESSAGE DELIVERY TASK.'''
-    def test_do_task(self):
-        reply=bg.do_task()
+    def test_send_messages(self):
+        reply=bg.send_messages()
         self.assertEqual(reply, 'delivered')
 
 
@@ -21,4 +21,4 @@ class Test(unittest.TestCase):
 
     '''TEST LOTTERY TASK'''
     def test_lottery(self):
-        bg.do_lottery()
+        bg.lottery()

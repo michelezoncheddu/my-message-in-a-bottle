@@ -205,7 +205,8 @@ def create_user():
     '''Manage the sign up page for the application.
 
         GET:  display the form for sign up
-        POST: get all user information from the form and create a new User object that is saved on the database
+        POST: get all user information from the form
+              and create a new User object that is saved on the database
     '''
     form = UserForm()
     if request.method == 'POST':
@@ -224,9 +225,9 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             return redirect('/login')
-        else:
-            error = result[1]
-            return render_template('create_user.html', form=form, error=error)
+
+        error = result[1]
+        return render_template('create_user.html', form=form, error=error)
 
     # GET
     return render_template('create_user.html', form=form)

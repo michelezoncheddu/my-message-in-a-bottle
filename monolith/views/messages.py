@@ -36,7 +36,7 @@ ATTACHMENTS_PATH = 'monolith/static'
 
 @messages.errorhandler(404)
 def page_not_found(error):
-    '''Custom template for 404 Not Found error.'''
+    '''Custom error handler for 404 Not Found error.'''
     return render_template('/error.html', error=error), 404
 
 
