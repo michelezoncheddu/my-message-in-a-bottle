@@ -20,7 +20,7 @@ If you want to run the application WITH docker, yopu have to execute the followi
 
 If you want to run the application WITHOUT docker, you have to execute the following commands:
 
-1. `bash run.sh`
-2. `docker run -d -p 6379:6379 redis`
+1. Run the script `run.sh` by typing `bash run.sh`
+2. Run redis `docker run -d -p 6379:6379 redis`
 3. `celery --app monolith.background worker -l INFO`
 4. `celery --app monolith.background beat -l INFO`
