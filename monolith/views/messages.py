@@ -71,19 +71,26 @@ def retrieve_message(message_id):
 
 
 def is_sender_or_recipient(message, user_id):
-    '''Utility function for checking i'''
+    '''Utility function for checking if the current user
+       is allowed to read the message.
+    '''
     is_sender = message.sender_id == user_id
     is_recipient = message.recipient_id == user_id
 
+    '''The recipient can access the message if:
+       - it has the access rights for the message, and
+       - the message is not a draft, and
+       - the message is delivered or the recipient is the sender.
+    '''
+    recipient_authorized = (
+        message.access & Access.RECIPIENT.value
+        and not message.is_draft
+        and (message.is_delivered or is_sender)
+    )
+
     if (not (is_sender or is_recipient)
         or (is_sender and not message.access & Access.SENDER.value)
-        or (is_recipient and (not message.access & Access.RECIPIENT.value
-                              or message.is_draft
-                              or (not message.is_delivered
-                                  and not is_sender
-                                 )
-                             )
-           )
+        or (is_recipient and not recipient_authorized)
        ):
         error = 'Message not found!'
         abort(404, error)
