@@ -17,7 +17,7 @@ allowed_attrs_sum = {'*': ['class','style','color'],
                         'img': ['src', 'alt','data-filename','style']}
 
 os.environ['TZ'] = 'Europe/Rome'
-#time.tzset()
+time.tzset()
 
 
 def create_app():
