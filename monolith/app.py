@@ -87,7 +87,7 @@ def create_app():
 
 
         # Getting the dummy message if any
-        m = db.session.query(Message).filter(Message.sender_id == 2 and Message.recipient_id==1)
+        m = db.session.query(Message).filter(Message.sender_id == 2 and Message.recipient_id == 1)
         message = m.first()
 
         # Creating dummy messages

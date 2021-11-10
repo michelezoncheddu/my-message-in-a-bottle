@@ -94,5 +94,7 @@ def setup_periodic_tasks(sender, **kwargs):
         'minute': 60,
         'month': 60*60*24*30
     }
+    # Send pending messages every 5 minutes.
     sender.add_periodic_task(5 * seconds_in_a['minute'], send_messages.s(), name='send_messages')
+    # Lottery very month.
     sender.add_periodic_task(seconds_in_a['month'], lottery.s(), name='lottery')

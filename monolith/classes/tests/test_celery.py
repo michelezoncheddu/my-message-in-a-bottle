@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
     '''TEST MESSAGE DELIVERY TASK.'''
     def test_send_messages(self):
         reply=bg.send_messages()
-        self.assertEqual(reply, 'delivered')
+        self.assertEqual(reply, 'Delivered')
 
 
     '''TEST NOTIFY TASK.'''
