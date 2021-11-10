@@ -157,7 +157,7 @@ def message(message_id):
     '''Allows the user to read a specific message by id.
 
        GET: display the content of a specific message by id (censored if language_filter is ON)
-       DELETE:
+       DELETE: delete the message from the caller point of view
     '''
     _message = retrieve_message(message_id)
     user_id = current_user.get_id()
