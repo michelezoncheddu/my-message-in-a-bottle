@@ -79,7 +79,10 @@ def is_sender_or_recipient(message, user_id):
         or (is_sender and not message.access & Access.SENDER.value)
         or (is_recipient and (not message.access & Access.RECIPIENT.value
                               or message.is_draft
-                              or not message.is_delivered)
+                              or (not message.is_delivered
+                                  and not is_sender
+                                 )
+                             )
            )
        ):
         error = 'Message not found!'
