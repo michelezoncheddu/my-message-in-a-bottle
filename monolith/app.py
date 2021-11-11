@@ -41,7 +41,7 @@ def create_app():
     login_manager.init_app(app)
     db.create_all(app=app)
 
-    # Create a first admin user
+    # Create first admin, sender, and recipient users
     with app.app_context():
         q = db.session.query(User).filter(User.email == 'admin@test.com')
         user = q.first()

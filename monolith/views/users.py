@@ -17,11 +17,12 @@ users = Blueprint('users', __name__)
 DEFAULT_PROFILE_PIC = 'static/profile/default.png'
 PROFILE_PIC_PATH = 'monolith/static/profile/'
 
-'''
-    Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
-'''
+
 
 def moderate_action(email, action):
+    '''
+    Utility function used to apply an action to a User object; the possible actions are Ban, Unban, Report, Reject (a report request)
+    '''
     u = db.session.query(User).filter(User.email == email)
     _user = u.first()
 
@@ -218,6 +219,7 @@ def create_user():
                 error = 'This email is already registered'
                 return render_template('/error.html', error=error), 409
 
+            # otherwise create a new user
             new_user = User()
             form.populate_obj(new_user)
             new_user.set_password(form.password.data)
