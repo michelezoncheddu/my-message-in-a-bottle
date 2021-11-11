@@ -16,7 +16,7 @@ To setup the environment, you should follow these steps:
 If you want to run the application WITH docker, yopu have to execute the following commands:
 
 1. `docker-compose build`
-2. `docker-compose app`
+2. `docker-compose up`
 
 If you want to run the application WITHOUT docker, you have to execute the following commands:
 
