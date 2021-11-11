@@ -9,7 +9,6 @@ To setup the environment, you should follow these steps:
 1. Open the project in your IDE.
 2. From IDE terminal, or normal Ubuntu/MacOS terminal execute the command `virtualenv venv` inside project root.
 3. Now, you have to activate it, by executing the command `source venv/bin/activate`.
-4. You have to install all requirements, let's do that with `pip install -r requirements.txt`.
 
 ### Run the application
 
@@ -20,7 +19,8 @@ If you want to run the application WITH docker, yopu have to execute the followi
 
 If you want to run the application WITHOUT docker, you have to execute the following commands:
 
-1. Run the script `run.sh` by typing `bash run.sh`
-2. Run redis, `docker run -d -p 6379:6379 redis`
-3. `celery --app monolith.background worker -l INFO`
-4. `celery --app monolith.background beat -l INFO`
+1. You have to install all requirements, let's do that with `pip install -r requirements.txt`.
+2. Run the script `run.sh` by typing `bash run.sh`
+3. Run redis, `docker run -d -p 6379:6379 redis`
+4. `celery --app monolith.background worker -l INFO`
+5. `celery --app monolith.background beat -l INFO`
